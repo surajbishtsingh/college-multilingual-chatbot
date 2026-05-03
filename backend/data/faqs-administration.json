@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "question": "Who is the Chairman of the Governing Council at GBPIET?",
+    "answer": "The Chairman of the Governing Council at GBPIET is Prof B. S. Bisht, Educationist, nominated by the State Government.",
+    "category": "governing_council",
+    "tags": ["chairman"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "Who is the Member Secretary of the Governing Council at GBPIET?",
+    "answer": "The Member Secretary of the Governing Council at GBPIET is Prof. Vijay Kumar Banga, Director, GBPIET, Pauri Garhwal.",
+    "category": "governing_council",
+    "tags": ["member secretary"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "Who are the members of the Governing Council at GBPIET?",
+    "answer": "The members of the Governing Council at GBPIET include Prof B. S. Bisht, Principal Secretary Technical Education, Director Technical Education, Vice Chancellor UTU Dehradun, Shri Pankaj Gupta, Prof. M. Y. Shah, Prof. M. P. Singh, Prof. S. P. Singh, Prof. A. K. Ahuja, Secretary Finance Uttarakhand Govt, Prof. M. K. Panda, Prof. Ashutosh Gupta, Dr. Yatendra Kumar, and Prof. Vijay Kumar Banga.",
+    "category": "governing_council",
+    "tags": ["members"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "Who is Prof. Vijay Kumar Banga in GBPIET Governing Council?",
+    "answer": "Prof. Vijay Kumar Banga is the Member Secretary of the Governing Council and Director of GBPIET, Pauri Garhwal.",
+    "category": "governing_council",
+    "tags": ["member secretary", "director"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "Who is Prof B. S. Bisht in GBPIET Governing Council?",
+    "answer": "Prof B. S. Bisht is the Chairman of the Governing Council at GBPIET.",
+    "category": "governing_council",
+    "tags": ["chairman"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "Who is Shri Pankaj Gupta in GBPIET Governing Council?",
+    "answer": "Shri Pankaj Gupta is a member of the Governing Council at GBPIET, serving as an Industrialist.",
+    "category": "governing_council",
+    "tags": ["member"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "Who is the Chairman of the Board of Governors at GBPIET?",
+    "answer": "The Chairman of the Board of Governors at GBPIET is Shri Subodh Uniyal, Minister of Technical Education, Uttarakhand.",
+    "category": "board_of_governors",
+    "tags": ["chairman"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "Who is the Vice Chairman of the Board of Governors at GBPIET?",
+    "answer": "The Vice Chairman is Dr. Ranjit Kumar Sinha (IAS), Principal Secretary Technical Education.",
+    "category": "board_of_governors",
+    "tags": ["vice chairman"],
+    "lang": "en"
+  },
+  {
+    "id": 9,
+    "question": "Who is the Member Secretary of the Board of Governors at GBPIET?",
+    "answer": "The Member Secretary is Prof. Vijay Kumar Banga, Director GBPIET.",
+    "category": "board_of_governors",
+    "tags": ["member secretary"],
+    "lang": "en"
+  },
+  {
+    "id": 10,
+    "question": "Who are the members of the Board of Governors at GBPIET?",
+    "answer": "Members include Shri Subodh Uniyal, Dr. Ranjit Kumar Sinha, Shri R. P. Gupta, Prof. Onkar Singh, Prof. Y. N. Singh, Shri Pankaj Gupta, Shri Sanjay Singh Tolia, Prof. K. K. S. Mer, and Prof. Vijay Kumar Banga.",
+    "category": "board_of_governors",
+    "tags": ["members"],
+    "lang": "en"
+  },
+  {
+    "id": 11,
+    "question": "Who are the Deans at GBPIET?",
+    "answer": "The Deans are Prof. Vijay Kumar Banga, Prof. Ashutosh Gupta, Prof. Mamta Baunthiyal, Prof. H. Goel, and Dr. Amit Joshi.",
+    "category": "academics",
+    "tags": ["deans"],
+    "lang": "en"
+  },
+  {
+    "id": 12,
+    "question": "Who is the Dean of Academics at GBPIET?",
+    "answer": "The Dean (Academics) is Prof. Ashutosh Gupta.",
+    "category": "academics",
+    "tags": ["academics"],
+    "lang": "en"
+  },
+  {
+    "id": 13,
+    "question": "Who is the Dean of Research and Development at GBPIET?",
+    "answer": "The Dean (R&D) is Prof. Mamta Baunthiyal.",
+    "category": "academics",
+    "tags": ["research"],
+    "lang": "en"
+  },
+  {
+    "id": 14,
+    "question": "Who is the Dean of Student Welfare at GBPIET?",
+    "answer": "The Dean (Student Welfare) is Prof. H. Goel.",
+    "category": "academics",
+    "tags": ["student welfare"],
+    "lang": "en"
+  },
+  {
+    "id": 15,
+    "question": "Who is the Dean of PG at GBPIET?",
+    "answer": "The Dean (PG) is Dr. Amit Joshi.",
+    "category": "academics",
+    "tags": ["pg"],
+    "lang": "en"
+  },
+  {
+    "id": 16,
+    "question": "Who are the Deputy Deans at GBPIET?",
+    "answer": "Deputy Deans include Dr. P. K. Pant, Dr. S. S. Samant, Dr. Y. S. Chauhan, Dr. Manoj Kumar, Dr. Sunil Chamoli, Mr. Ramesh Kumar, and Mr. Satyaveer Singh Rawat.",
+    "category": "academics",
+    "tags": ["deputy dean"],
+    "lang": "en"
+  },
+  {
+    "id": 17,
+    "question": "Who is the Registrar at GBPIET?",
+    "answer": "The Registrar at GBPIET is Mr. Sandeep Kumar.",
+    "category": "administration",
+    "tags": ["registrar"],
+    "lang": "en"
+  },
+  {
+    "id": 18,
+    "question": "Who is the Head of Training And Placement at GBPIET?",
+    "answer": "The Head of Training and Placement is Dr. Kamaljit Singh Bhatia.",
+    "category": "placement",
+    "tags": ["placement"],
+    "lang": "en"
+  },
+  {
+    "id": 19,
+    "question": "Who are the Deputy Deans of PG at GBPIET?",
+    "answer": "The Deputy Deans (PG) are Mr. Ramesh Kumar and Mr. Satyaveer Singh Rawat.",
+    "category": "academics",
+    "tags": ["pg"],
+    "lang": "en"
+  },
+  {
+    "id": 20,
+    "question": "List all Deans at GBPIET with their departments",
+    "answer": "Prof. Vijay Kumar Banga - Administration, Prof. Ashutosh Gupta - Academics, Prof. Mamta Baunthiyal - R&D, Prof. H. Goel - Student Welfare, Dr. Amit Joshi - PG.",
+    "category": "academics",
+    "tags": ["deans"],
+    "lang": "en"
+  }
+]

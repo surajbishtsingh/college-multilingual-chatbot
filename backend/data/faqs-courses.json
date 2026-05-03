@@ -1,0 +1,150 @@
+[
+  {
+    "id": 301,
+    "question": "What are the departments at GBPIET?",
+    "answer": "GBPIET has 8 departments: Applied Sciences and Humanities, Biotechnology, Civil Engineering, Computer Science and Applications, Computer Science and Engineering, Electronics and Communication Engineering, Electrical Engineering, and Mechanical Engineering.",
+    "category": "academics",
+    "tags": ["departments"],
+    "url": "https://gbpiet.ac.in/departments/",
+    "lang": "en"
+  },
+  {
+    "id": 302,
+    "question": "What undergraduate courses are offered at GBPIET?",
+    "answer": "GBPIET offers B.Tech programs in Civil, CSE, CSA, ECE, Electrical, Mechanical, Biotechnology, and Applied Sciences.",
+    "category": "academics",
+    "tags": ["btech"],
+    "lang": "en"
+  },
+  {
+    "id": 303,
+    "question": "What are the B.Tech branches at GBPIET?",
+    "answer": "B.Tech branches include CSE, CSE (AI & ML), ECE, Mechanical, Manufacturing, Electrical, Civil, and Biotechnology. Admissions are through JEE Main and UKTECH counselling.",
+    "category": "academics",
+    "tags": ["btech", "branches"],
+    "url": "https://gbpiet.ac.in/admission/",
+    "lang": "en"
+  },
+  {
+    "id": 304,
+    "question": "What is B.Tech CSE AI ML at GBPIET?",
+    "answer": "It is a specialization in Artificial Intelligence and Machine Learning under CSE, focusing on AI, ML, Deep Learning, and Data Science.",
+    "category": "academics",
+    "tags": ["ai", "ml"],
+    "lang": "en"
+  },
+  {
+    "id": 305,
+    "question": "What postgraduate courses are offered at GBPIET?",
+    "answer": "GBPIET offers M.Tech in CSE, DSP, Biotechnology, Production, Thermal, Geotechnology, Infrastructure, and MCA programs.",
+    "category": "academics",
+    "tags": ["mtech", "mca"],
+    "url": "https://gbpiet.ac.in/academic-programmes/postgraduate/",
+    "lang": "en"
+  },
+  {
+    "id": 306,
+    "question": "Does GBPIET offer PhD programs?",
+    "answer": "Yes, GBPIET offers PhD programs in Engineering and Science disciplines with research support and assistantships.",
+    "category": "academics",
+    "tags": ["phd"],
+    "url": "https://gbpiet.ac.in/academic-programmes/doctoral/",
+    "lang": "en"
+  },
+  {
+    "id": 307,
+    "question": "What is MCA program at GBPIET?",
+    "answer": "MCA is a 2-year postgraduate program with 60 seats offered by the Computer Science and Applications department.",
+    "category": "academics",
+    "tags": ["mca"],
+    "url": "https://gbpiet.ac.in/departments/computer-science-and-applications/",
+    "lang": "en"
+  },
+  {
+    "id": 308,
+    "question": "What is CSE department at GBPIET?",
+    "answer": "The CSE department offers B.Tech CSE, B.Tech CSE (AI & ML), and M.Tech CSE programs.",
+    "category": "departments",
+    "tags": ["cse"],
+    "url": "https://gbpiet.ac.in/departments/computer-science-engineering/",
+    "lang": "en"
+  },
+  {
+    "id": 309,
+    "question": "What is ECE department at GBPIET?",
+    "answer": "ECE department offers B.Tech ECE and M.Tech in Digital Signal Processing.",
+    "category": "departments",
+    "tags": ["ece"],
+    "url": "https://gbpiet.ac.in/departments/electronics-and-communication-engineering/",
+    "lang": "en"
+  },
+  {
+    "id": 310,
+    "question": "What is Mechanical Engineering at GBPIET?",
+    "answer": "Mechanical department offers B.Tech Mechanical, B.Tech Manufacturing, and M.Tech Production and Thermal Engineering.",
+    "category": "departments",
+    "tags": ["mechanical"],
+    "url": "https://gbpiet.ac.in/departments/mechanical-engineering/",
+    "lang": "en"
+  },
+  {
+    "id": 311,
+    "question": "What is Civil Engineering at GBPIET?",
+    "answer": "Civil department offers B.Tech Civil, M.Tech Geotechnology, and M.Tech Infrastructure.",
+    "category": "departments",
+    "tags": ["civil"],
+    "url": "https://gbpiet.ac.in/departments/civil-engineering/",
+    "lang": "en"
+  },
+  {
+    "id": 312,
+    "question": "What is Biotechnology at GBPIET?",
+    "answer": "Biotechnology department offers B.Tech Biotechnology and M.Tech Biotechnology programs.",
+    "category": "departments",
+    "tags": ["biotech"],
+    "url": "https://gbpiet.ac.in/departments/biotechnology/",
+    "lang": "en"
+  },
+  {
+    "id": 313,
+    "question": "What is Electrical Engineering at GBPIET?",
+    "answer": "Electrical Engineering department offers B.Tech Electrical Engineering program.",
+    "category": "departments",
+    "tags": ["electrical"],
+    "url": "https://gbpiet.ac.in/departments/electrical-engineering/",
+    "lang": "en"
+  },
+  {
+    "id": 314,
+    "question": "What is the admission process for PhD at GBPIET?",
+    "answer": "PhD admission is through a written test followed by an interview. Candidates must have a relevant Master's degree.",
+    "category": "academics",
+    "tags": ["phd"],
+    "url": "https://gbpiet.ac.in/academic-programmes/doctoral/",
+    "lang": "en"
+  },
+  {
+    "id": 315,
+    "question": "What are the research areas in PhD at GBPIET?",
+    "answer": "Research areas include Computer Science, Electronics, Biotechnology, and Applied Sciences like Mathematics, Physics, and Chemistry.",
+    "category": "academics",
+    "tags": ["research"],
+    "lang": "en"
+  },
+  {
+    "id": 316,
+    "question": "What facilities are available for PhD students at GBPIET?",
+    "answer": "PhD students get access to advanced labs, faculty guidance, research facilities, and publication opportunities.",
+    "category": "academics",
+    "tags": ["phd"],
+    "lang": "en"
+  },
+  {
+    "id": 317,
+    "question": "Does GBPIET provide support for PhD research?",
+    "answer": "Yes, support includes assistantships, QIP programs, funded projects, and industry collaborations.",
+    "category": "academics",
+    "tags": ["phd"],
+    "lang": "en"
+  }
+]

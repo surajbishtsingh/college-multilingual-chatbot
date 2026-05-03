@@ -1,0 +1,156 @@
+[
+  {
+    "id": 801,
+    "question": "GBPIET में कितने हॉस्टल हैं?",
+    "answer": "GBPIET में कुल 11 हॉस्टल हैं: 8 बॉयज़ हॉस्टल (1172 सीटें) और 3 गर्ल्स हॉस्टल (416 सीटें)।",
+    "category": "hostel",
+    "tags": ["overview"],
+    "lang": "hi"
+  },
+  {
+    "id": 802,
+    "question": "GBPIET में बॉयज़ हॉस्टल कौन-कौन से हैं?",
+    "answer": "बॉयज़ हॉस्टल हैं: नीलकंठ, केदार ABC, कैलाश, रुद्र, बद्री, अलकनंदा, शिवालिक और त्रिशूल।",
+    "category": "hostel",
+    "tags": ["boys"],
+    "lang": "hi"
+  },
+  {
+    "id": 803,
+    "question": "GBPIET में गर्ल्स हॉस्टल कौन-कौन से हैं?",
+    "answer": "गर्ल्स हॉस्टल हैं: रमन हॉस्टल, भागीरथी हॉस्टल और विश्वेश्वरैया हॉस्टल।",
+    "category": "hostel",
+    "tags": ["girls"],
+    "lang": "hi"
+  },
+  {
+    "id": 804,
+    "question": "GBPIET में प्रथम वर्ष के लड़कों के लिए कौन सा हॉस्टल है?",
+    "answer": "प्रथम वर्ष के लड़कों को आमतौर पर त्रिशूल हॉस्टल और कैलाश हॉस्टल आवंटित किया जाता है।",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "hi"
+  },
+  {
+    "id": 805,
+    "question": "GBPIET में प्रथम वर्ष की लड़कियों के लिए कौन सा हॉस्टल है?",
+    "answer": "प्रथम वर्ष की लड़कियों को विश्वेश्वरैया हॉस्टल आवंटित किया जाता है।",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "hi"
+  },
+  {
+    "id": 806,
+    "question": "GBPIET के हॉस्टल में कौन-कौन सी सुविधाएं उपलब्ध हैं?",
+    "answer": "सुविधाओं में WiFi, स्वच्छ पेयजल, टीवी रूम, समाचार पत्र, स्वच्छ मेस और 24/7 सुरक्षा शामिल हैं।",
+    "category": "hostel",
+    "tags": ["facilities"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "hi"
+  },
+  {
+    "id": 807,
+    "question": "नीलकंठ हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: श्री लोकेश नायर और श्री भानु प्रताप।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 808,
+    "question": "केदार ABC हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: डॉ. अजीत नेगी और श्री सुमित राणा।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 809,
+    "question": "कैलाश हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: डॉ. किरीट सेमवाल और श्री नीम सागर।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 810,
+    "question": "रुद्र हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: श्री दिव्येश शर्मा और डॉ. अमित कुमार।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 811,
+    "question": "बद्री हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: श्री एस. एस. रावत और डॉ. संदीप कुमार।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 812,
+    "question": "अलकनंदा हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: श्री अश्विनी सैनी और श्री संदीप राणा।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 813,
+    "question": "शिवालिक हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: डॉ. आर. बी. यादव और डॉ. अजय कुमार।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 814,
+    "question": "त्रिशूल हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: श्री के. डी. नारायण और डॉ. सचिन तेजयान।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 815,
+    "question": "रमन हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: डॉ. रश्मि सैनी और श्रीमती रुचि तेलवाल।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 816,
+    "question": "भागीरथी हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: श्रीमती मीनाक्षी कठायत और डॉ. गरिमा सिंह।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 817,
+    "question": "विश्वेश्वरैया हॉस्टल के वार्डन कौन हैं?",
+    "answer": "वार्डन हैं: डॉ. प्रीति डिमरी और श्रीमती ओ. एल. देवी।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  },
+  {
+    "id": 818,
+    "question": "GBPIET में हॉस्टल फीस कैसे जमा करें?",
+    "answer": "हॉस्टल फीस SBI Collect के माध्यम से ऑनलाइन जमा की जा सकती है।",
+    "category": "hostel",
+    "tags": ["fees"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "hi"
+  },
+  {
+    "id": 824,
+    "question": "GBPIET में मुख्य वार्डन कौन हैं?",
+    "answer": "मुख्य वार्डन डॉ. एम. के. अग्रवाल हैं।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "hi"
+  }
+]

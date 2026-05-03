@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "question": "How to apply for admission at GBPIET?",
+    "answer": "GBPIET Admission Process: 1. Appear in JEE Main for B.Tech admission, 2. Apply through UKTECH counselling at www.uktech.ac.in, 3. Required documents: 10th and 12th marksheet, JEE scorecard, Photo ID, 6 passport photos, Transfer certificate, Character certificate, Category certificate if applicable. 4. Pay fees through SBI Collect portal. For further info Please visit: https://gbpiet.ac.in/admission/ or call 01368-228030",
+    "category": "admission",
+    "tags": ["application", "process"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "What is the admission process for B.Tech at GBPIET?",
+    "answer": "B.Tech Admission at GBPIET: Entrance exam: JEE Main. Counselling through Uttarakhand Technical University (UKTECH). Available branches with 60 seats each: CSE, CSE AI and ML, ECE, Mechanical, Manufacturing, Electrical, Civil, Biotechnology.For further details Please Visit: https://gbpiet.ac.in/admission/",
+    "category": "admission",
+    "tags": ["btech", "process"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "What is the admission process for M.Tech at GBPIET?",
+    "answer": "M.Tech Admission at GBPIET: Entrance exam: GATE. Counselling processed directly by the college. Available M.Tech programs: CSE (18 seats), Digital Signal Processing (10 seats), Biotechnology (25 seats), Production Engineering (18 seats), Thermal Engineering (18 seats), Geotechnology (18 seats), Infrastructure (18 seats). Eligibility: Bachelor degree with minimum 50% marks.",
+    "category": "admission",
+    "tags": ["mtech", "process"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "What is the admission process for MCA at GBPIET?",
+    "answer": "MCA Admission at GBPIET: Entrance exam: Conducted by VMSB Uttarakhand Technical University, Dehradun. Total seats: 60. HOD of CSA/MCA: Prof. Priti Dimri. For further details Please visit: https://gbpiet.ac.in/admission/",
+    "category": "admission",
+    "tags": ["mca", "process"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "What is the admission process for PhD at GBPIET?",
+    "answer": "PhD Admission at GBPIET: Selection through written exam and interview conducted by the college. Available in CSE, ECE, and Biotechnology. Total intake: approximately 60 students.",
+    "category": "admission",
+    "tags": ["phd", "process"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "What documents are required for admission at GBPIET?",
+    "answer": "Documents required: 10th and 12th marksheet, JEE Main scorecard, Photo ID (Aadhar/Passport), 6 passport photos, Transfer certificate, Character certificate, Category certificate if applicable (SC/ST/OBC).",
+    "category": "admission",
+    "tags": ["documents"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "What is the eligibility for B.Tech at GBPIET?",
+    "answer": "B.Tech eligibility at GBPIET: Must have passed 10+2 with Physics, Chemistry, Mathematics. Must appear in JEE Main. Admission through UKTECH State counselling. For further details Please Visit: www.uktech.ac.in",
+    "category": "eligibility",
+    "tags": ["btech"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "What is the eligibility for MCA at GBPIET?",
+    "answer": "MCA eligibility at GBPIET: Bachelor degree in BCA, B.Sc (Computer Science/IT/Mathematics), or B.Tech. Must appear in UTUEE exam. Minimum 50% marks in qualifying examination.",
+    "category": "eligibility",
+    "tags": ["mca"],
+    "lang": "en"
+  }
+]

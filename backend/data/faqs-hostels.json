@@ -1,0 +1,196 @@
+[
+  {
+    "id": 801,
+    "question": "How many hostels does GBPIET have?",
+    "answer": "GBPIET has 11 hostels: 8 boys hostels with 1172 seats and 3 girls hostels with 416 seats.",
+    "category": "hostel",
+    "tags": ["overview"],
+    "lang": "en"
+  },
+  {
+    "id": 802,
+    "question": "What are the boys hostels at GBPIET?",
+    "answer": "Boys hostels are: Neelkanth, Kedar ABC, Kailash, Rudra, Badri, Alaknanda, Shivalik and Trishul.",
+    "category": "hostel",
+    "tags": ["boys"],
+    "lang": "en"
+  },
+  {
+    "id": 803,
+    "question": "What are the girls hostels at GBPIET?",
+    "answer": "Girls hostels are: Raman Hostel, Bhagirathi Hostel and Viswerwarya Hostel.",
+    "category": "hostel",
+    "tags": ["girls"],
+    "lang": "en"
+  },
+  {
+    "id": 804,
+    "question": "Which hostel is for first year boys at GBPIET?",
+    "answer": "First year boys are usually allotted Trishul Hostel and Kailash Hostel.",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "en"
+  },
+  {
+    "id": 805,
+    "question": "Which hostel is for first year girls at GBPIET?",
+    "answer": "First year girls are allotted Viswerwarya Hostel.",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "en"
+  },
+  {
+    "id": 806,
+    "question": "What facilities are available in GBPIET hostels?",
+    "answer": "Facilities include WiFi, clean drinking water, TV room, newspaper, hygienic mess, and 24/7 security.",
+    "category": "hostel",
+    "tags": ["facilities"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "en"
+  },
+  {
+    "id": 807,
+    "question": "Who is the warden of Neelkanth Hostel?",
+    "answer": "Wardens are Mr. Lokesh Nair and Mr. Bhanu Pratap.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 808,
+    "question": "Who is the warden of Kedar ABC Hostel?",
+    "answer": "Wardens are Dr. Ajit Negi and Mr. Sumit Rana.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 809,
+    "question": "Who is the warden of Kailash Hostel?",
+    "answer": "Wardens are Dr. Kireet Semwal and Mr. Neem Sagar.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 810,
+    "question": "Who is the warden of Rudra Hostel?",
+    "answer": "Wardens are Mr. Divyesh Sharma and Dr. Amit Kumar.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 811,
+    "question": "Who is the warden of Badri Hostel?",
+    "answer": "Wardens are Mr. S. S. Rawat and Dr. Sandeep Kumar.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 812,
+    "question": "Who is the warden of Alaknanda Hostel?",
+    "answer": "Wardens are Mr. Ashwani Saini and Mr. Sandeep Rana.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 813,
+    "question": "Who is the warden of Shivalik Hostel?",
+    "answer": "Wardens are Dr. R. B. Yadav and Dr. Ajay Kumar.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 814,
+    "question": "Who is the warden of Trishul Hostel?",
+    "answer": "Wardens are Mr. K. D. Narayan and Dr. Sachin Tejyan.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 815,
+    "question": "Who is the warden of Raman Hostel?",
+    "answer": "Wardens are Dr. Rashmi Saini and Mrs. Ruchi Telwal.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 816,
+    "question": "Who is the warden of Bhagirathi Hostel?",
+    "answer": "Wardens are Mrs. Meenakshi Kathayat and Dr. Garima Singh.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 817,
+    "question": "Who is the warden of Viswerwarya Hostel?",
+    "answer": "Wardens are Dr. Priti Dimri and Mrs. O. L. Devi.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  },
+  {
+    "id": 818,
+    "question": "How to pay hostel fees at GBPIET?",
+    "answer": "Hostel fees can be paid online via SBI Collect.",
+    "category": "hostel",
+    "tags": ["fees"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "en"
+  },
+  {
+    "id": 819,
+    "question": "GBPIET mein kitne hostel hain?",
+    "answer": "GBPIET mein total 11 hostel hain: 8 boys aur 3 girls hostel.",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "en"
+  },
+  {
+    "id": 820,
+    "question": "GBPIET mein girls hostel kaun kaun se hain?",
+    "answer": "Girls hostel hain: Raman, Bhagirathi aur Viswerwarya.",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "en"
+  },
+  {
+    "id": 821,
+    "question": "GBPIET mein boys hostel kaun kaun se hain?",
+    "answer": "Boys hostel hain: Neelkanth, Kedar ABC, Kailash, Rudra, Badri, Alaknanda, Shivalik aur Trishul.",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "en"
+  },
+  {
+    "id": 822,
+    "question": "First year girls ka hostel kaunsa hai?",
+    "answer": "First year girls ka hostel Viswerwarya hai.",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "en"
+  },
+  {
+    "id": 823,
+    "question": "First year boys ka hostel kaunsa hai?",
+    "answer": "First year boys ke hostel Trishul aur Kailash hain.",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "en"
+  },
+  {
+    "id": 824,
+    "question": "Who is the Chief Warden at GBPIET?",
+    "answer": "The Chief Warden is Dr. M. K. Aggrawal.",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "en"
+  }
+]

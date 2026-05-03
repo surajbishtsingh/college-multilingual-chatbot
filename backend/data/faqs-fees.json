@@ -1,0 +1,124 @@
+[
+  {
+    "id": 501,
+    "question": "What is the fee structure for B.Tech at GBPIET?",
+    "answer": "B.Tech fees are semester-wise: 1st: 37980, 2nd: 31035, 3rd: 32280, 4th: 31035, 5th: 32280, 6th: 31035, 7th: 32280, 8th: 31535. Mess fee is 16000 per semester and hostel fee ranges from 1980 to 2480.",
+    "category": "fees",
+    "tags": ["btech", "fees"],
+    "lang": "en"
+  },
+  {
+    "id": 502,
+    "question": "What is the fee structure for M.Tech at GBPIET?",
+    "answer": "M.Tech fees are semester-wise: 1st: 43480, 2nd: 36535, 3rd: 37780, 4th: 36835. Mess fee is 16000 per semester and hostel fee ranges from 1980 to 2480.",
+    "category": "fees",
+    "tags": ["mtech"],
+    "lang": "en"
+  },
+  {
+    "id": 503,
+    "question": "What is the fee structure for MCA at GBPIET?",
+    "answer": "MCA fees are semester-wise: 1st: 43480, 2nd: 36535, 3rd: 37780, 4th: 36835. Mess fee is 16000 per semester and hostel fee ranges from 1980 to 2480.",
+    "category": "fees",
+    "tags": ["mca"],
+    "lang": "en"
+  },
+  {
+    "id": 504,
+    "question": "What is the fee structure for B.Tech 1st semester at GBPIET?",
+    "answer": "Institute fee: 37980, Mess fee: 16000, Hostel fee: 2480.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 505,
+    "question": "What is the fee structure for B.Tech 2nd semester?",
+    "answer": "Institute fee: 31035, Mess fee: 16000, Hostel fee: 1980.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 506,
+    "question": "What is the fee structure for B.Tech 3rd semester?",
+    "answer": "Institute fee: 32280, Mess fee: 16000, Hostel fee: 2480.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 507,
+    "question": "What is the fee structure for B.Tech 4th semester?",
+    "answer": "Institute fee: 31035, Mess fee: 16000, Hostel fee: 1980.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 508,
+    "question": "What is the fee structure for B.Tech 5th semester?",
+    "answer": "Institute fee: 32280, Mess fee: 16000, Hostel fee: 2480.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 509,
+    "question": "What is the fee structure for B.Tech 6th semester?",
+    "answer": "Institute fee: 31035, Mess fee: 16000, Hostel fee: 1980.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 510,
+    "question": "What is the fee structure for B.Tech 7th semester?",
+    "answer": "Institute fee: 32280, Mess fee: 16000, Hostel fee: 2480.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 511,
+    "question": "What is the fee structure for B.Tech 8th semester?",
+    "answer": "Institute fee: 31535, Mess fee: 16000, Hostel fee: 1980.",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "en"
+  },
+  {
+    "id": 512,
+    "question": "What is the mess fee in GBPIET?",
+    "answer": "Mess fee is 16000 per semester for all courses.",
+    "category": "fees",
+    "tags": ["mess"],
+    "lang": "en"
+  },
+  {
+    "id": 513,
+    "question": "What is the hostel fee in GBPIET?",
+    "answer": "Hostel fee ranges between 1980 and 2480 per semester depending on the semester.",
+    "category": "fees",
+    "tags": ["hostel"],
+    "lang": "en"
+  },
+  {
+    "id": 514,
+    "question": "How to pay college fees at GBPIET?",
+    "answer": "Fees can be paid online through SBI Collect portal.",
+    "category": "fees",
+    "tags": ["payment"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332",
+    "lang": "en"
+  },
+  {
+    "id": 515,
+    "question": "How to pay hostel and mess fees at GBPIET?",
+    "answer": "Hostel and mess fees can be paid online through SBI Collect portal.",
+    "category": "fees",
+    "tags": ["payment"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "en"
+  }
+]

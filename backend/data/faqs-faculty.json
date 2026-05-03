@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "question": "Who are the faculty of CSE department at GBPIET?",
+    "answer": "CSE Department Faculty at GBPIET: HOD: Dr. Bhumika Gupta, Prof. H. S. Bhadauria, Mr. Papendra Kumar, Mrs. Ruchi Telwal, Dr. Garima Singh, Mrs. Rashmi Saini, Mr. Vivek Tamta, Mr. Abhishek Gupta, Mr. Jitendra Singh Rauthan.",
+    "category": "faculty",
+    "tags": ["cse", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "Who are the faculty of CSA/MCA department at GBPIET?",
+    "answer": "CSA/MCA Department Faculty at GBPIET: HOD: Dr. Priti Dimri, Dr. Ashish Negi, Dr. Yashwant Singh Chauhan, Mr. Deepak Dangwal, Dr. Shail K Dinkar, Dr. Siddharth Ghansela, Mr. Kunwar Deep Narayan.",
+    "category": "faculty",
+    "tags": ["csa", "mca", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "Who are the faculty of ECE department at GBPIET?",
+    "answer": "ECE Department Faculty at GBPIET: HOD: Dr. Mahesh Kumar Agarwal, Dr. Y. Singh, Dr. Anil Kumar Gautam, Dr. Rajesh Kumar, Dr. Sanjeev Naithani, Dr. Kamaljit Singh Bhatia, Mr. Pushkar Praveen, Dr. Manoj Kumar, Dr. Balraj Singh, Mr. Gagan Singh, Mr. Sandeep Kumar.",
+    "category": "faculty",
+    "tags": ["ece", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "Who are the faculty of Mechanical Engineering department at GBPIET?",
+    "answer": "Mechanical Engineering Faculty at GBPIET: HOD: Dr. K. K. S. Mer, Dr. Ashutosh Gupta, Dr. Nitin Kumar Baliyan, Dr. Amit Joshi, Dr. Vinay Kumar Patel, Dr. Hemant Kumar, Dr. Pawan Kumar Pant, Dr. Sanjay Singh Samant, Dr. Sachin Tejyan, Dr. Sunil Chamoli, Dr. Manoj Kumar Pathak, Mr. Lokesh Nair, Mr. Sumit Rana.",
+    "category": "faculty",
+    "tags": ["mechanical", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "Who are the faculty of Civil Engineering department at GBPIET?",
+    "answer": "Civil Engineering Faculty at GBPIET: HOD: Dr. Bhishm Singh Khati, Dr. Hira Lal Yadav, Dr. Dilip Kumar Jha, Mr. Divyesh Sharma, Mr. Himanshu Jhinkwan, Dr. Sareesh Chandrawanshi, Mrs. Rajni.",
+    "category": "faculty",
+    "tags": ["civil", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "Who are the faculty of Electrical Engineering department at GBPIET?",
+    "answer": "Electrical Engineering Faculty at GBPIET: HOD: Dr. Sanjay Gairola, Dr. Vishnu Mohan Mishra, Dr. Yatindra Kumar, Mr. Atul Katiyar, Mr. Satyaveer Singh Rawat, Mr. Nitish Rawat, Ms. Sudheeksha Misra, Mr. Prashant Prakash.",
+    "category": "faculty",
+    "tags": ["electrical", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "Who are the faculty of Biotechnology department at GBPIET?",
+    "answer": "Biotechnology Faculty at GBPIET: HOD: Dr. Arun Bhatt, Dr. Mamta Baunthiyal, Dr. Pavan Kumar Agrawal, Dr. Suresh Chandra Phulara, Mr. Sumit Kumar Rai, Mr. Rahul Kumar Arya, Mr. Pranshu Dangwal, Ms. Preeti Semwal, Dr. Kajal Gautam.",
+    "category": "faculty",
+    "tags": ["biotechnology", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "Who are the faculty of Applied Sciences department at GBPIET?",
+    "answer": "Applied Sciences and Humanities Faculty at GBPIET: HOD: Dr. B. S. Tewari, Dr. Vijaya Nand Kala, Dr. Harmendra Goel, Dr. Kireet Semwal, Dr. Ajit Singh Negi, Dr. Mangal Singh Bisht, Dr. Alok Darshan Kothiyal, Dr. Balwant Singh Negi, Dr. Mahipal Singh Bisht, Dr. Sidharth Kashyap, Dr. Nimisha Rawat.",
+    "category": "faculty",
+    "tags": ["applied_sciences", "department"],
+    "lang": "en"
+  },
+  {
+    "id": 9,
+    "question": "Who is the highest paid employee of the institute?",
+    "answer": "Out of Syllabus",
+    "category": "general",
+    "tags": ["unknown"],
+    "lang": "en"
+  }
+]

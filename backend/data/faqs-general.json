@@ -1,0 +1,198 @@
+[
+  {
+    "id": 1,
+    "question": "What is GBPIET?",
+    "answer": "Govind Ballabh Pant Institute of Engineering and Technology (GBPIET), Pauri Garhwal, Uttarakhand is a premier autonomous institute of the Government of Uttarakhand. Established in 1989, it started its first academic session in 1991-92. It offers B.Tech, M.Tech, MCA and PhD programs. The institute is UGC autonomous and AICTE approved.",
+    "category": "general",
+    "tags": ["about"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "Where is GBPIET located?",
+    "answer": "GBPIET is located in Pauri Garhwal, Uttarakhand - 246194. From Haridwar: 145 km, Dehradun: 155 km, Rishikesh: 100 km. Nearest railway station: Kotdwar (75 km). More info: https://gbpiet.ac.in/about/how-to-reach/",
+    "category": "general",
+    "tags": ["location"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "What is the contact number of GBPIET?",
+    "answer": "Important Contacts: DSW (Dr. H. Goel): +91 8755068959, Chief Warden (Dr. M.K. Aggrawal): +91 9410323549, Dean Academics (Dr. Ashutosh Gupta): +91 9639890767.",
+    "category": "contact",
+    "tags": ["phone"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "Who is the Director of GBPIET?",
+    "answer": "The Director of GBPIET is Prof. (Dr.) V.K. Banga.",
+    "category": "administration",
+    "tags": ["director"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "Is GBPIET accredited?",
+    "answer": "Yes, GBPIET has UGC autonomy (2024-25 to 2028-29), is AICTE approved, and affiliated to VMSBUTU.",
+    "category": "general",
+    "tags": ["accreditation"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "What is the vision of GBPIET?",
+    "answer": "Vision: Excellence in technical education and producing globally competent professionals. Mission: Quality manpower, best education and research facilities, innovation, and sustainable development.",
+    "category": "general",
+    "tags": ["vision", "mission"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "What are the social media handles of GBPIET?",
+    "answer": "Twitter/X: @gbpietpauri, Instagram: @officialgbpietpauri, Facebook: GBPIET Pauri, Website: https://gbpiet.ac.in",
+    "category": "general",
+    "tags": ["social media"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "What is the anti-ragging policy of GBPIET?",
+    "answer": "GBPIET has zero tolerance for ragging. Helpline: 7017059887, 8126565328. Security: 8791884847. Details: https://gbpiet.ac.in/conduct-rules/anti-ragging-measures/",
+    "category": "rules",
+    "tags": ["anti-ragging"],
+    "lang": "en"
+  },
+  {
+    "id": 9,
+    "question": "How to login to GBPIET ERP portal?",
+    "answer": "ERP Portal: https://gbpiet.sitslive.com/Login. Used for attendance, results, registration, fees, and timetable.",
+    "category": "erp",
+    "tags": ["login"],
+    "lang": "en"
+  },
+  {
+    "id": 10,
+    "question": "How to check results at GBPIET?",
+    "answer": "Check results at https://gbpiet.ac.in/result/ or ERP portal. For queries call 01368-228030.",
+    "category": "academic",
+    "tags": ["results"],
+    "lang": "en"
+  },
+  {
+    "id": 11,
+    "question": "What cultural events does GBPIET organize?",
+    "answer": "GBPIET organizes Goonj (annual cultural fest), techno-management fest, hackathons, design contests, and intercollegiate tournaments.",
+    "category": "student_life",
+    "tags": ["events"],
+    "lang": "en"
+  },
+  {
+    "id": 12,
+    "question": "Does GBPIET have IEEE Student Branch?",
+    "answer": "Yes, GBPIET has an active IEEE Student Branch organizing technical events and workshops.",
+    "category": "student_life",
+    "tags": ["ieee"],
+    "lang": "en"
+  },
+  {
+    "id": 13,
+    "question": "What is NPTEL at GBPIET?",
+    "answer": "GBPIET has an NPTEL Local Chapter offering 1000+ online courses from IITs and IISc with certification opportunities.",
+    "category": "academic",
+    "tags": ["nptel"],
+    "lang": "en"
+  },
+  {
+    "id": 14,
+    "question": "What is the alumni network of GBPIET?",
+    "answer": "GBPIET has a strong alumni network with members in Amazon, Microsoft, Infosys, TCS, BEL, BHEL, NTPC.",
+    "category": "general",
+    "tags": ["alumni"],
+    "lang": "en"
+  },
+  {
+    "id": 15,
+    "question": "Does GBPIET have guest house?",
+    "answer": "Yes, GBPIET has a guest house for visitors and faculty.",
+    "category": "facilities",
+    "tags": ["guest house"],
+    "lang": "en"
+  },
+  {
+    "id": 16,
+    "question": "What is the transport facility at GBPIET?",
+    "answer": "GBPIET provides transport services on scheduled routes for students and staff.",
+    "category": "facilities",
+    "tags": ["transport"],
+    "lang": "en"
+  },
+  {
+    "id": 17,
+    "question": "Does GBPIET have health centre?",
+    "answer": "Yes, GBPIET has an on-campus health centre with medical staff.",
+    "category": "facilities",
+    "tags": ["health"],
+    "lang": "en"
+  },
+  {
+    "id": 18,
+    "question": "What sports facilities are available at GBPIET?",
+    "answer": "Facilities include cricket, football, basketball, volleyball, badminton, table tennis, and chess.",
+    "category": "facilities",
+    "tags": ["sports"],
+    "lang": "en"
+  },
+  {
+    "id": 19,
+    "question": "What is the library facility at GBPIET?",
+    "answer": "Central Library with 50,000+ books, e-books, journals, IEEE digital library, and NPTEL resources.",
+    "category": "facilities",
+    "tags": ["library"],
+    "lang": "en"
+  },
+  {
+    "id": 20,
+    "question": "What campus facilities are available at GBPIET?",
+    "answer": "Facilities include library, computer centre, workshops, hostels, health centre, bank, auditorium, sports complex, internet, transport, post office, eateries, and guest house.",
+    "category": "facilities",
+    "tags": ["campus"],
+    "lang": "en"
+  },
+  {
+    "id": 21,
+    "question": "What scholarships are available at GBPIET?",
+    "answer": "Scholarships include state government scholarships (SC/ST/OBC), merit scholarships, central sector scholarships, and post-matric scholarships.",
+    "category": "scholarship",
+    "tags": ["financial aid"],
+    "lang": "en"
+  },
+  {
+    "id": 22,
+    "question": "When are the semester exams at GBPIET?",
+    "answer": "Odd semester exams are in Nov-Dec, even semester exams are in May-June.",
+    "category": "academic",
+    "tags": ["exam"],
+    "lang": "en"
+  },
+  {
+  "question": "Which bank is available at GBPIET?",
+  "answer": "GBPIET has a State Bank of India (SBI) branch and ATM on campus. Students can easily access banking services without leaving campus. The SBI branch is located inside the campus premises."
+},
+{
+  "question": "which bank is available",
+  "answer": "State Bank of India (SBI) branch and ATM is available on the GBPIET campus."
+},
+{
+  "question": "bank atm gbpiet",
+  "answer": "GBPIET campus has a State Bank of India (SBI) branch and ATM facility for students and staff."
+},
+{
+  "question": "is there sbi in gbpiet",
+  "answer": "Yes, State Bank of India (SBI) has a branch and ATM on the GBPIET campus."
+},
+{
+  "question": "bank on campus",
+  "answer": "State Bank of India (SBI) branch and ATM is available on the GBPIET campus for banking convenience."
+}
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "id": 1,
+    "question": "GBPIET में कौन-कौन से विभाग हैं?",
+    "answer": "GBPIET में 8 विभाग हैं: एप्लाइड साइंसेज एंड ह्यूमैनिटीज, बायोटेक्नोलॉजी, सिविल इंजीनियरिंग, कंप्यूटर साइंस एंड एप्लिकेशन (CSA/MCA), कंप्यूटर साइंस एंड इंजीनियरिंग (CSE), इलेक्ट्रॉनिक्स एंड कम्युनिकेशन इंजीनियरिंग (ECE), इलेक्ट्रिकल इंजीनियरिंग (EE), मैकेनिकल इंजीनियरिंग (ME)।",
+    "category": "academics",
+    "tags": ["departments"],
+    "lang": "hi"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET में कौन-कौन से अंडरग्रेजुएट कोर्स उपलब्ध हैं?",
+    "answer": "GBPIET में B.Tech के 8 विषय उपलब्ध हैं: सिविल, CSE, CSA, ECE, इलेक्ट्रिकल, मैकेनिकल, बायोटेक्नोलॉजी, एप्लाइड साइंसेज एंड ह्यूमैनिटीज। सभी कोर्स AICTE द्वारा अनुमोदित हैं।",
+    "category": "academics",
+    "tags": ["ug", "courses"],
+    "lang": "hi"
+  },
+  {
+    "id": 3,
+    "question": "GBPIET में B.Tech की शाखाएं कौन-कौन सी हैं?",
+    "answer": "B.Tech शाखाएं: CSE, CSE (AI & ML), ECE, मैकेनिकल, मैन्युफैक्चरिंग, इलेक्ट्रिकल, सिविल, बायोटेक्नोलॉजी। प्रत्येक में 60 सीटें हैं।",
+    "category": "academics",
+    "tags": ["btech", "branches"],
+    "lang": "hi"
+  },
+  {
+    "id": 4,
+    "question": "GBPIET में B.Tech CSE AI ML क्या है?",
+    "answer": "यह CSE का स्पेशलाइजेशन है जिसमें AI, मशीन लर्निंग, डीप लर्निंग और डेटा साइंस पढ़ाया जाता है। सीटें: 60।",
+    "category": "academics",
+    "tags": ["cse", "ai_ml"],
+    "lang": "hi"
+  },
+  {
+    "id": 5,
+    "question": "GBPIET में कौन-कौन से पोस्टग्रेजुएट कोर्स उपलब्ध हैं?",
+    "answer": "पोस्टग्रेजुएट कोर्स: M.Tech (CSE, DSP, बायोटेक्नोलॉजी, प्रोडक्शन, थर्मल, जियोटेक्नोलॉजी, इंफ्रास्ट्रक्चर) और MCA (60 सीटें)।",
+    "category": "academics",
+    "tags": ["pg", "courses"],
+    "lang": "hi"
+  },
+  {
+    "id": 6,
+    "question": "क्या GBPIET में PhD प्रोग्राम उपलब्ध है?",
+    "answer": "हाँ, GBPIET में इंजीनियरिंग और साइंस विषयों में PhD प्रोग्राम उपलब्ध हैं।",
+    "category": "academics",
+    "tags": ["phd"],
+    "lang": "hi"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET में MCA प्रोग्राम क्या है?",
+    "answer": "MCA 2 साल का पोस्टग्रेजुएट कोर्स है जिसमें 60 सीटें हैं। यह CSA विभाग द्वारा संचालित है।",
+    "category": "academics",
+    "tags": ["mca"],
+    "lang": "hi"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET में CSE विभाग क्या है?",
+    "answer": "CSE विभाग में B.Tech CSE, B.Tech CSE AI & ML और M.Tech CSE उपलब्ध हैं। HOD: डॉ. भूमिका गुप्ता।",
+    "category": "academics",
+    "tags": ["cse", "department"],
+    "lang": "hi"
+  },
+  {
+    "id": 9,
+    "question": "GBPIET में ECE विभाग क्या है?",
+    "answer": "ECE विभाग में B.Tech ECE और M.Tech DSP उपलब्ध हैं। HOD: डॉ. महेश कुमार अग्रवाल।",
+    "category": "academics",
+    "tags": ["ece", "department"],
+    "lang": "hi"
+  },
+  {
+    "id": 10,
+    "question": "GBPIET में मैकेनिकल इंजीनियरिंग क्या है?",
+    "answer": "मैकेनिकल विभाग में B.Tech ME, B.Tech मैन्युफैक्चरिंग, M.Tech प्रोडक्शन और M.Tech थर्मल इंजीनियरिंग उपलब्ध हैं।",
+    "category": "academics",
+    "tags": ["mechanical", "department"],
+    "lang": "hi"
+  },
+  {
+    "id": 11,
+    "question": "GBPIET में सिविल इंजीनियरिंग क्या है?",
+    "answer": "सिविल विभाग में B.Tech सिविल, M.Tech जियोटेक्नोलॉजी और M.Tech इंफ्रास्ट्रक्चर उपलब्ध हैं।",
+    "category": "academics",
+    "tags": ["civil", "department"],
+    "lang": "hi"
+  },
+  {
+    "id": 12,
+    "question": "GBPIET में बायोटेक्नोलॉजी क्या है?",
+    "answer": "बायोटेक्नोलॉजी विभाग में B.Tech और M.Tech बायोटेक्नोलॉजी उपलब्ध हैं।",
+    "category": "academics",
+    "tags": ["biotechnology", "department"],
+    "lang": "hi"
+  },
+  {
+    "id": 13,
+    "question": "GBPIET में इलेक्ट्रिकल इंजीनियरिंग क्या है?",
+    "answer": "इलेक्ट्रिकल विभाग में B.Tech इलेक्ट्रिकल इंजीनियरिंग उपलब्ध है।",
+    "category": "academics",
+    "tags": ["electrical", "department"],
+    "lang": "hi"
+  }
+]

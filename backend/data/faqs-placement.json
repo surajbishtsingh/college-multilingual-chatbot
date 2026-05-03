@@ -1,0 +1,51 @@
+[
+  {
+    "id": 901,
+    "question": "What is the placement record of GBPIET?",
+    "answer": "GBPIET maintains a consistent placement record. Students from branches like CSE and ECE secure good offers every year, with top packages around 12 LPA.",
+    "category": "placement",
+    "tags": ["overview"],
+    "lang": "en"
+  },
+  {
+    "id": 902,
+    "question": "Which companies visit GBPIET for placements?",
+    "answer": "Top recruiters include Bharat Electronics Limited (BEL), Nokia, Reliance Industries, Capgemini, Cognizant, HCL Technologies, Accenture, and Axis Bank.",
+    "category": "placement",
+    "tags": ["companies"],
+    "lang": "en"
+  },
+  {
+    "id": 903,
+    "question": "What is the highest package at GBPIET?",
+    "answer": "The highest package is around 12 LPA, offered by companies like Bharat Electronics Limited.",
+    "category": "placement",
+    "tags": ["highest"],
+    "lang": "en"
+  },
+  {
+    "id": 904,
+    "question": "What is the average package at GBPIET?",
+    "answer": "The average package ranges between 3 LPA to 6 LPA depending on the branch and academic year.",
+    "category": "placement",
+    "tags": ["average"],
+    "lang": "en"
+  },
+  {
+    "id": 905,
+    "question": "Who received the highest placement at GBPIET?",
+    "answer": "Students from CSE and ECE branches have received top offers of around 12 LPA from companies like Bharat Electronics Limited.",
+    "category": "placement",
+    "tags": ["top_students"],
+    "lang": "en"
+  },
+  {
+    "id": 906,
+    "question": "Where can I check GBPIET placement details?",
+    "answer": "You can check official placement records on the GBPIET website.",
+    "category": "placement",
+    "tags": ["official"],
+    "url": "https://gbpiet.ac.in/placement-records/",
+    "lang": "en"
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "question": "Who developed this chatbot?",
+    "answer": "This chatbot was developed by a team of 4 students from GBPIET: Diksha Phartyal, Anjali Gusain, Suraj Singh Bisht, and Priyanshu Dhyani, under the supervision of Mr. K.D. Narayan.",
+    "category": "chatbot",
+    "tags": ["developer", "creator"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "Who is Diksha?",
+    "answer": "Diksha is a multilingual AI chatbot for GBPIET, developed by Diksha Phartyal, Anjali Gusain, Suraj Singh Bisht, and Priyanshu Dhyani, under the supervision of Mr. K.D. Narayan.",
+    "category": "chatbot",
+    "tags": ["diksha", "about"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "How many students are there in GBPIET?",
+    "answer": "There are approximately 1720 students.",
+    "category": "general",
+    "tags": ["students", "count"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "Who is the Director of GBPIET?",
+    "answer": "The Director of GBPIET is Prof. (Dr.) V.K. Banga.",
+    "category": "administration",
+    "tags": ["director"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "Who is the Registrar of GBPIET?",
+    "answer": "The Registrar of GBPIET is Mr. Sandeep Kumar.",
+    "category": "administration",
+    "tags": ["registrar"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "What is Goonj festival at GBPIET?",
+    "answer": "Goonj is the annual cultural festival of GBPIET, organized since 1996. It features music, dance, drama, competitions, and various cultural activities.",
+    "category": "student_life",
+    "tags": ["festival", "goonj"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "What is Student Activity Cell at GBPIET?",
+    "answer": "The Student Activity Cell (SAC) organizes cultural, technical, and sports events at GBPIET, including Goonj and techno-management fest.",
+    "category": "student_life",
+    "tags": ["sac", "activities"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "What sports are available at GBPIET?",
+    "answer": "Sports facilities include cricket, football, basketball, volleyball, badminton, table tennis, chess, and more.",
+    "category": "facilities",
+    "tags": ["sports"],
+    "lang": "en"
+  },
+  {
+    "id": 9,
+    "question": "What technical events does GBPIET organize?",
+    "answer": "GBPIET organizes techno-management fest, hackathons, design contests, IEEE workshops, NPTEL courses, and technical seminars.",
+    "category": "student_life",
+    "tags": ["technical events"],
+    "lang": "en"
+  },
+  {
+    "id": 10,
+    "question": "Why choose GBPIET?",
+    "answer": "GBPIET is a government autonomous institute with UGC autonomy and AICTE approval. It offers strong placements, experienced faculty, good infrastructure, a scenic campus, active student clubs, and affordable fees.",
+    "category": "general",
+    "tags": ["why gbpiet"],
+    "lang": "en"
+  }
+]

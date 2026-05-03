@@ -1,0 +1,47 @@
+[
+  {
+    "question": "GBPIET के सभी विभागों के HOD की सूची बताएं",
+    "answer": "GBPIET विभागाध्यक्ष (HOD): 1. एप्लाइड साइंसेज: डॉ. बी. एस. तिवारी, 2. बायोटेक्नोलॉजी: डॉ. अरुण भट्ट, 3. सिविल इंजीनियरिंग: डॉ. बी. एस. खाती, 4. CSE: डॉ. भूमिका गुप्ता, 5. CSA/MCA: प्रो. प्रीति डिमरी, 6. इलेक्ट्रिकल इंजीनियरिंग: प्रो. संजय गैरोला, 7. ECE: डॉ. महेश कुमार अग्रवाल, 8. मैकेनिकल इंजीनियरिंग: प्रो. के. के. एस. मेर। अधिक जानकारी: https://gbpiet.ac.in/administration/heads-of-departments/",
+    "lang": "hi"
+  },
+  {
+    "question": "GBPIET में एप्लाइड साइंसेज के HOD कौन हैं?",
+    "answer": "GBPIET में एप्लाइड साइंसेज और ह्यूमैनिटीज के HOD डॉ. बी. एस. तिवारी हैं। यह गणित, भौतिकी, रसायन विज्ञान और अंग्रेज़ी जैसे मूलभूत विषय पढ़ाते हैं।",
+    "lang": "hi"
+  },
+  {
+    "question": "बायोटेक्नोलॉजी विभाग के HOD कौन हैं?",
+    "answer": "GBPIET में बायोटेक्नोलॉजी के HOD डॉ. अरुण भट्ट (एसोसिएट प्रोफेसर) हैं। इनके शोध क्षेत्र: जेनेटिक्स, मॉलिक्यूलर ब्रीडिंग, प्लांट बायोटेक्नोलॉजी, जीनोमिक्स। विभाग: https://gbpiet.ac.in/departments/biotechnology/",
+    "lang": "hi"
+  },
+  {
+    "question": "सिविल इंजीनियरिंग के HOD कौन हैं?",
+    "answer": "GBPIET में सिविल इंजीनियरिंग के HOD डॉ. बी. एस. खाती हैं। इनके शोध क्षेत्र: स्ट्रक्चरल इंजीनियरिंग, जियोटेक्नोलॉजी, इंफ्रास्ट्रक्चर। विभाग: https://gbpiet.ac.in/departments/civil-engineering/",
+    "lang": "hi"
+  },
+  {
+    "question": "CSA या MCA विभाग के HOD कौन हैं?",
+    "answer": "GBPIET में कंप्यूटर साइंस एंड एप्लीकेशंस (CSA/MCA) के HOD प्रो. प्रीति डिमरी हैं। वे MCA प्रोग्राम का संचालन करती हैं। विभाग: https://gbpiet.ac.in/departments/computer-science-and-applications/",
+    "lang": "hi"
+  },
+  {
+    "question": "CSE विभाग के HOD कौन हैं?",
+    "answer": "GBPIET में कंप्यूटर साइंस एंड इंजीनियरिंग (CSE) के HOD डॉ. भूमिका गुप्ता हैं। इनके शोध क्षेत्र: मशीन लर्निंग, आर्टिफिशियल इंटेलिजेंस, डेटा माइनिंग, नेटवर्क सिक्योरिटी। विभाग: https://gbpiet.ac.in/departments/computer-science-engineering/",
+    "lang": "hi"
+  },
+  {
+    "question": "इलेक्ट्रिकल इंजीनियरिंग के HOD कौन हैं?",
+    "answer": "GBPIET में इलेक्ट्रिकल इंजीनियरिंग के HOD प्रो. संजय गैरोला हैं। इनके शोध क्षेत्र: पावर सिस्टम, कंट्रोल सिस्टम, नवीकरणीय ऊर्जा। विभाग: https://gbpiet.ac.in/departments/electrical-engineering/",
+    "lang": "hi"
+  },
+  {
+    "question": "ECE विभाग के HOD कौन हैं?",
+    "answer": "GBPIET में इलेक्ट्रॉनिक्स एंड कम्युनिकेशन इंजीनियरिंग (ECE) के HOD डॉ. महेश कुमार अग्रवाल हैं। इनके शोध क्षेत्र: VLSI डिजाइन, सिग्नल प्रोसेसिंग, एम्बेडेड सिस्टम। विभाग: https://gbpiet.ac.in/departments/electronics-and-communication-engineering/",
+    "lang": "hi"
+  },
+  {
+    "question": "मैकेनिकल इंजीनियरिंग के HOD कौन हैं?",
+    "answer": "GBPIET में मैकेनिकल इंजीनियरिंग के HOD प्रो. के. के. एस. मेर हैं। इनके शोध क्षेत्र: CAD/CAM, थर्मल इंजीनियरिंग, प्रोडक्शन इंजीनियरिंग। विभाग: https://gbpiet.ac.in/departments/mechanical-engineering/",
+    "lang": "hi"
+  }
+]

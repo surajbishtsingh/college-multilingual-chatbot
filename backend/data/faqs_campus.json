@@ -1,0 +1,58 @@
+[
+  {
+    "id": 101,
+    "question": "Does GBPIET have a bank on campus?",
+    "answer": "Yes! GBPIET has a Bank of Baroda branch and ATM facility on campus. Students can easily access banking services without leaving campus.",
+    "category": "facilities",
+    "tags": ["bank", "atm", "finance"],
+    "lang": "en"
+  },
+  {
+    "id": 102,
+    "question": "Does GBPIET have a post office?",
+    "answer": "Yes! GBPIET has an on-campus Post Office facility for students and staff. Details: https://gbpiet.ac.in/post-office/",
+    "category": "facilities",
+    "tags": ["post office", "services"],
+    "lang": "en"
+  },
+  {
+    "id": 103,
+    "question": "What eateries are available at GBPIET?",
+    "answer": "GBPIET has multiple eateries and canteen facilities on campus serving students and staff. Details: https://gbpiet.ac.in/eateries/",
+    "category": "facilities",
+    "tags": ["canteen", "food", "eateries"],
+    "lang": "en"
+  },
+  {
+    "id": 104,
+    "question": "Does GBPIET have a shopping centre?",
+    "answer": "Yes! GBPIET has a Shopping Centre on campus with daily needs stores. Details: https://gbpiet.ac.in/shopping-centre/",
+    "category": "facilities",
+    "tags": ["shopping", "store", "daily needs"],
+    "lang": "en"
+  },
+  {
+    "id": 105,
+    "question": "What is M.G. Auditorium at GBPIET?",
+    "answer": "M.G. Auditorium is the main auditorium at GBPIET used for cultural events, seminars, convocations and college functions. Details: https://gbpiet.ac.in/m-g-auditorium/",
+    "category": "infrastructure",
+    "tags": ["auditorium", "events"],
+    "lang": "en"
+  },
+  {
+    "id": 106,
+    "question": "What internet facility is available at GBPIET?",
+    "answer": "GBPIET has high-speed internet connectivity across campus including hostels. WiFi is available in academic buildings and residential areas. Details: https://gbpiet.ac.in/internet/",
+    "category": "facilities",
+    "tags": ["wifi", "internet", "network"],
+    "lang": "en"
+  },
+  {
+    "id": 107,
+    "question": "Does GBPIET have places of worship?",
+    "answer": "Yes! GBPIET campus has places of worship for students and staff of all faiths. Details: https://gbpiet.ac.in/places-of-worships/",
+    "category": "facilities",
+    "tags": ["worship", "religion"],
+    "lang": "en"
+  }
+]

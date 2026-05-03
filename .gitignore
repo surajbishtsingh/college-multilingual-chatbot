@@ -1,0 +1,48 @@
+# Environment variables — KABHI PUSH MAT KARO
+.env
+*.env
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# FAISS index — bada hota hai, rebuild ho sakta hai
+backend/faiss_index/
+
+# Qdrant storage — bada hota hai
+backend/qdrant_storage/
+
+# Model cache — bahut bada hota hai
+*.bin
+*.safetensors
+models/
+model_cache/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (frontend ke liye)
+node_modules/
+
+# Build files
+dist/
+build/
+*.egg-info/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.user
