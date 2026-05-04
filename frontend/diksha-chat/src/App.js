@@ -30,7 +30,8 @@ function renderTextWithLinks(text) {
   });
 }
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// ✅ UPDATED: Points to Railway backend (reads from env variable in production)
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://motivated-forgiveness-production-1681.up.railway.app';
 
 const LANGUAGES = [
   { code: 'en', label: '',  native: 'English' },
@@ -384,7 +385,6 @@ function FeesDropdown({ lang }) {
 
   const isHi = lang === 'hi';
 
-  // ✅ REAL DATA FROM YOUR JSON
   const btechFees = [
     { sem: 'Sem 1', fee: 37980, hostel: 2480 },
     { sem: 'Sem 2', fee: 31035, hostel: 1980 },
@@ -478,27 +478,17 @@ function FeesDropdown({ lang }) {
 
       {/* Payment links */}
       <div style={{ marginTop: 8, fontSize: 11 }}>
-  🌐 Pay Fees:  
-  <br />
-
-  <a
-    href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Institute Fee
-  </a>
-
-  <br />
-
-  <a
-    href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Hostel & Mess Fee
-  </a>
-</div>
+        🌐 Pay Fees:
+        <br/>
+        <a href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332" target="_blank" rel="noopener noreferrer">
+          Institute Fee
+        </a>
+        <br/>
+        <a href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435" target="_blank" rel="noopener noreferrer">
+          Hostel &amp; Mess Fee
+        </a>
+      </div>
+    </div>
   );
 }
 // ══ MAIN APP ════════════════════════════════════════════
@@ -607,7 +597,7 @@ useEffect(() => {
 };
 const fetchAndPlayTTS = async (text, lang, onEnd) => {
   try {
-    const cleanText = expandTextForTTS(text, lang); // 🔥 HERE
+    const cleanText = expandTextForTTS(text, lang);
 
     const res = await fetch(`${BACKEND_URL}/tts`, {
       method: 'POST',
@@ -645,7 +635,6 @@ const fetchAndPlayTTS = async (text, lang, onEnd) => {
   };
 
   // ── Called from language pills INSIDE the drawer ──────
-  // Resets chat completely — fresh start in chosen language (same as welcome popup)
   const handleLangSwitch = async (langCode) => {
     if (langCode === currentLang) return;
     stopSpeaking();
@@ -656,7 +645,6 @@ const fetchAndPlayTTS = async (text, lang, onEnd) => {
     setLoading(false);
 
     const welcomeText = getWelcomeMessage(langCode);
-    // Clear all messages and start fresh with welcome message
     setMessages([{
       role: 'diksha',
       text: welcomeText,
@@ -666,12 +654,6 @@ const fetchAndPlayTTS = async (text, lang, onEnd) => {
 
     await fetchAndPlayTTS(welcomeText, langCode);
   };
-
-  // ── REPLACE these 2 functions in your App.js ──
-
-// OLD isCourseQuery had 'btech','mca','mtech' which caused
-// "admission process of btech" to show course dropdown WRONG
-// NEW — only show dropdown when user explicitly asks about courses/list
 
 const isFeesQuery = (q) => {
   const lower = q.toLowerCase().trim();
@@ -694,15 +676,12 @@ const isFeesQuery = (q) => {
 const isCourseQuery = (q) => {
   const lower = q.toLowerCase().trim();
 
-  
-  // If user is asking about admission/process/fees — NOT a course dropdown query
   const isAdmissionQuery = ['admission', 'process', 'apply', 'how to',
     'eligibility', 'jee', 'gate', 'utuee', 'document', 'seat',
     'प्रवेश', 'दाखिला', 'आवेदन'].some(w => lower.includes(w));
 
   if (isAdmissionQuery) return false;
 
-  // Only show dropdown for these
   return ['what courses', 'which courses', 'list of courses',
     'courses available', 'courses offered', 'all courses',
     'available courses', 'course list', 'programs offered',
@@ -747,7 +726,6 @@ const handleAdmissionSelect = (query, label) => {
     }
   ]);
 
-  // 🚀 IMPORTANT: skip intent detection
   handleSend(query, true);
 };    
 
@@ -811,7 +789,7 @@ const handleAdmissionSelect = (query, label) => {
       role: 'diksha',
       text: txt,
       lang: language,
-      type: 'fees',   // 🔥 IMPORTANT
+      type: 'fees',
       time: new Date().toLocaleTimeString()
     }]);
 
@@ -862,12 +840,11 @@ const handleAdmissionSelect = (query, label) => {
 
   r.onend = () => setIsListening(false);
 
-  // 🚀 MAIN CHANGE HERE
   r.onresult = (e) => {
     const transcript = e.results[0][0].transcript;
 
-    setInput(transcript);     // optional (for UI)
-    handleSend(transcript);   // 🔥 auto send instantly
+    setInput(transcript);
+    handleSend(transcript);
   };
 
   r.onerror = () => setIsListening(false);
@@ -1000,7 +977,7 @@ const handleAdmissionSelect = (query, label) => {
             </div>
           </div>
 
-         {/* ── Language pills — clicking switches language instantly ──*/}
+         {/* ── Language pills ──*/}
           <div className="drawer-lang-row">
             
             {LANGUAGES.map(l => (
@@ -1014,9 +991,6 @@ const handleAdmissionSelect = (query, label) => {
               </button>
             ))}
           </div>
-
-         
-          
 
           {/* Messages */}
           <div className="chat-messages">
@@ -1035,10 +1009,8 @@ const handleAdmissionSelect = (query, label) => {
                   <div className={`msg-bubble ${msg.isLangSwitch ? 'lang-switch-bubble' : ''}`}>
   {msg.isLangSwitch && <span className="lang-switch-icon">🌐 </span>}
 
-  {/* ✅ Show text ONLY once */}
   <div>{renderTextWithLinks(msg.text)}</div>
 
-  {/* ✅ Placement link ONLY in Diksha reply */}
   {msg.role === 'diksha' && msg.text.toLowerCase().includes('placement') && (
     <div style={{ marginTop: 8 }}>
       <a
@@ -1134,9 +1106,7 @@ const handleAdmissionSelect = (query, label) => {
                 rows={1}
                 disabled={!language || loading}
               />
-                 {/* Clear button — sirf tab dikhega jab kuch likha ho */}
                 {input && (<button onClick={() => setInput('')} title="Clear">✕</button>)}
- 
 
               <button
                 className="send-btn"
