@@ -31,7 +31,7 @@ function renderTextWithLinks(text) {
 }
 
 // ✅ UPDATED: Points to Railway backend (reads from env variable in production)
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://motivated-forgiveness-production-1681.up.railway.app';
+const BACKEND_URL = 'https://motivated-forgiveness-production-1681.up.railway.app';
 
 const LANGUAGES = [
   { code: 'en', label: '',  native: 'English' },
