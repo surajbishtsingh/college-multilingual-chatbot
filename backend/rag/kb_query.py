@@ -7,7 +7,7 @@ import asyncio
 import unicodedata
 from langchain_huggingface import HuggingFaceEmbeddings
 from groq import Groq
-from google import genai
+import google.generativeai as genai
 from google.genai import types
 from google.genai import types as genai_types
 from dotenv import load_dotenv
