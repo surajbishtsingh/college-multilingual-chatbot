@@ -15,6 +15,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ── Cache HuggingFace model to disk (prevents re-download on restart) ─
+os.environ.setdefault("HF_HOME",                     "/app/.cache")
+os.environ.setdefault("TRANSFORMERS_CACHE",           "/app/.cache")
+os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME",   "/app/.cache")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+
 # ── Detect Database Type ──────────────────────────────────────────────
 USE_POSTGRES = (
     bool(os.getenv("DATABASE_URL")) and
@@ -180,7 +186,7 @@ def record_visit(ip: str):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#   STARTUP  (with timeout guards so crash-loop is prevented)
+#   STARTUP — lightweight only, NO heavy model loading
 # ══════════════════════════════════════════════════════════════════════
 @app.on_event("startup")
 async def startup_event():
@@ -199,7 +205,7 @@ async def startup_event():
     except Exception as e:
         print(f"[Startup] ⚠️  Database init failed ({e}) — continuing anyway")
 
-    # ── 2. BM25 index ─────────────────────────────────────────────────
+    # ── 2. BM25 index (light — just reads JSON files) ─────────────────
     try:
         print("[Startup] Building BM25 index...")
         await asyncio.wait_for(
@@ -207,51 +213,31 @@ async def startup_event():
         )
         print("[Startup] ✅ BM25 ready")
     except asyncio.TimeoutError:
-        print("[Startup] ⚠️  BM25 index timed out — will build on first request")
+        print("[Startup] ⚠️  BM25 timed out — will build on first request")
     except Exception as e:
-        print(f"[Startup] ⚠️  BM25 index failed ({e}) — will build on first request")
+        print(f"[Startup] ⚠️  BM25 failed ({e}) — will build on first request")
 
-    # ── 3. Embedding model ────────────────────────────────────────────
+    # ── 3. Scheduler ──────────────────────────────────────────────────
     try:
-        print("[Startup] Loading embedding model (may take ~30s first time)...")
-        await asyncio.wait_for(
-            run_in_threadpool(get_embed_model), timeout=120
-        )
-        print("[Startup] ✅ Embedding model ready")
-    except asyncio.TimeoutError:
-        print("[Startup] ⚠️  Embedding model timed out — will load on first request")
-    except Exception as e:
-        print(f"[Startup] ⚠️  Embedding model failed ({e}) — will load on first request")
-
-    # ── 4. Qdrant ─────────────────────────────────────────────────────
-    try:
-        print("[Startup] Connecting to Qdrant...")
-        await asyncio.wait_for(
-            run_in_threadpool(get_qdrant), timeout=15
-        )
-        print("[Startup] ✅ Qdrant connected")
-    except asyncio.TimeoutError:
-        print("[Startup] ⚠️  Qdrant connection timed out — check QDRANT_URL env var")
-    except Exception as e:
-        print(f"[Startup] ⚠️  Qdrant connection failed ({e}) — check QDRANT_URL env var")
-
-    # ── 5. Scheduler ─────────────────────────────────────────────────
-    try:
-        print("[Startup] Starting scraper scheduler...")
         start_scheduler()
         print("[Startup] ✅ Scheduler started")
     except Exception as e:
         print(f"[Startup] ⚠️  Scheduler failed ({e}) — continuing without it")
 
-    # ── API key status ────────────────────────────────────────────────
+    # ── NOTE ──────────────────────────────────────────────────────────
+    # Embedding model + Qdrant are NOT loaded here.
+    # They load lazily on the first /chat request.
+    # This prevents OOM crash-loop on low-memory containers.
+    # ─────────────────────────────────────────────────────────────────
+
     groq_key   = os.getenv("GROQ_API_KEY")
     gemini_key = os.getenv("GEMINI_API_KEY")
     serpapi    = os.getenv("SERPAPI_KEY")
-    print(f"\n  Groq    : {'✅' if groq_key   else '❌ MISSING'}")
-    print(f"  Gemini  : {'✅' if gemini_key else '❌ MISSING'}")
-    print(f"  SerpAPI : {'✅' if serpapi    else '⚠️  no internet search'}")
+    print(f"\n  Groq    : {'✅' if groq_key   else '❌ MISSING — chat will fail'}")
+    print(f"  Gemini  : {'✅' if gemini_key else '❌ MISSING — fallback unavailable'}")
+    print(f"  SerpAPI : {'✅' if serpapi    else '⚠️  missing — no internet search'}")
     print(f"  DB Type : {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
-    print("\n✅ Diksha Dynamic is ready!")
+    print("\n✅ Diksha is ready! (embedding model loads on first /chat request)")
     print("=" * 55)
 
 
@@ -323,7 +309,7 @@ async def chat(request: ChatRequest, req: Request):
     record_visit(ip)
     visit_data["chatbot_usage"] += 1
 
-    # Memory pipeline
+    # Memory + answer pipeline
     await process_user_message(session_id, question, lang)
     memory_context = await build_memory_context(session_id)
     answer = await run_in_threadpool(get_answer, question, lang, memory_context)
