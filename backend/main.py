@@ -16,9 +16,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── Cache HuggingFace model to disk (prevents re-download on restart) ─
-os.environ.setdefault("HF_HOME",                     "/app/.cache")
-os.environ.setdefault("TRANSFORMERS_CACHE",           "/app/.cache")
-os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME",   "/app/.cache")
+os.environ.setdefault("HF_HOME",                      "/app/.cache")
+os.environ.setdefault("TRANSFORMERS_CACHE",            "/app/.cache")
+os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME",    "/app/.cache")
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 
 # ── Detect Database Type ──────────────────────────────────────────────
@@ -79,20 +79,13 @@ app = FastAPI(title="Diksha - GBPIET Chatbot", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://gbpiet.ac.in",
-        "https://www.gbpiet.ac.in",
-        # ✅ Add your exact Vercel URL
-        "https://college-multilingual-chatbot-lzrp.vercel.app",
-        "https://*.vercel.app",
-        "https://*.railway.app",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # ✅ Allow all origins (safest fix for Vercel)
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+chat_sessions = {}
 
 # ══════════════════════════════════════════════════════════════════════
 #   VISIT COUNTER
@@ -194,7 +187,25 @@ def record_visit(ip: str):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#   STARTUP — lightweight only, NO heavy model loading
+#   KEEP-ALIVE — prevents Railway from sleeping
+# ══════════════════════════════════════════════════════════════════════
+async def keep_alive():
+    """Ping self every 4 minutes to prevent Railway free-tier sleep"""
+    await asyncio.sleep(60)  # wait 1 min after startup before first ping
+    while True:
+        try:
+            import httpx
+            port = int(os.environ.get("PORT", 8000))
+            async with httpx.AsyncClient(timeout=10) as client:
+                r = await client.get(f"http://localhost:{port}/health")
+            print(f"[KeepAlive] ✅ Pinged self — status: {r.status_code}")
+        except Exception as e:
+            print(f"[KeepAlive] ⚠️  Ping failed: {e}")
+        await asyncio.sleep(240)  # ping every 4 minutes
+
+
+# ══════════════════════════════════════════════════════════════════════
+#   STARTUP
 # ══════════════════════════════════════════════════════════════════════
 @app.on_event("startup")
 async def startup_event():
@@ -213,7 +224,7 @@ async def startup_event():
     except Exception as e:
         print(f"[Startup] ⚠️  Database init failed ({e}) — continuing anyway")
 
-    # ── 2. BM25 index (light — just reads JSON files) ─────────────────
+    # ── 2. BM25 index ─────────────────────────────────────────────────
     try:
         print("[Startup] Building BM25 index...")
         await asyncio.wait_for(
@@ -225,18 +236,46 @@ async def startup_event():
     except Exception as e:
         print(f"[Startup] ⚠️  BM25 failed ({e}) — will build on first request")
 
-    # ── 3. Scheduler ──────────────────────────────────────────────────
+    # ── 3. ✅ FIX: Pre-load embedding model at startup ────────────────
+    # This prevents the first user message from timing out
+    try:
+        print("[Startup] Loading embedding model (this may take ~30s)...")
+        await asyncio.wait_for(
+            run_in_threadpool(get_embed_model),
+            timeout=120
+        )
+        print("[Startup] ✅ Embedding model ready")
+    except asyncio.TimeoutError:
+        print("[Startup] ⚠️  Embedding model timed out — will load on first request")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Embedding model failed ({e}) — will load on first request")
+
+    # ── 4. ✅ FIX: Pre-load Qdrant at startup ─────────────────────────
+    try:
+        print("[Startup] Loading Qdrant...")
+        await asyncio.wait_for(
+            run_in_threadpool(get_qdrant),
+            timeout=120
+        )
+        print("[Startup] ✅ Qdrant ready")
+    except asyncio.TimeoutError:
+        print("[Startup] ⚠️  Qdrant timed out — will load on first request")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Qdrant failed ({e}) — will load on first request")
+
+    # ── 5. Scheduler ──────────────────────────────────────────────────
     try:
         start_scheduler()
         print("[Startup] ✅ Scheduler started")
     except Exception as e:
         print(f"[Startup] ⚠️  Scheduler failed ({e}) — continuing without it")
 
-    # ── NOTE ──────────────────────────────────────────────────────────
-    # Embedding model + Qdrant are NOT loaded here.
-    # They load lazily on the first /chat request.
-    # This prevents OOM crash-loop on low-memory containers.
-    # ─────────────────────────────────────────────────────────────────
+    # ── 6. ✅ FIX: Start keep-alive background task ───────────────────
+    try:
+        asyncio.create_task(keep_alive())
+        print("[Startup] ✅ Keep-alive task started (pings every 4 min)")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Keep-alive failed to start ({e})")
 
     groq_key   = os.getenv("GROQ_API_KEY")
     gemini_key = os.getenv("GEMINI_API_KEY")
@@ -245,7 +284,7 @@ async def startup_event():
     print(f"  Gemini  : {'✅' if gemini_key else '❌ MISSING — fallback unavailable'}")
     print(f"  SerpAPI : {'✅' if serpapi    else '⚠️  missing — no internet search'}")
     print(f"  DB Type : {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
-    print("\n✅ Diksha is ready! (embedding model loads on first /chat request)")
+    print("\n✅ Diksha fully ready — all models loaded!")
     print("=" * 55)
 
 
@@ -305,6 +344,8 @@ async def chat(request: ChatRequest, req: Request):
         question   = request.question.strip()
         session_id = request.session_id or str(uuid.uuid4())
 
+        print(f"[CHAT] Q: {question[:80]}")
+
         # Language detection
         lang = (
             request.language
@@ -322,20 +363,30 @@ async def chat(request: ChatRequest, req: Request):
         await process_user_message(session_id, question, lang)
         memory_context = await build_memory_context(session_id)
 
-        # 🔥 SAFE ANSWER GENERATION
+        # ✅ FIX: Answer generation with 25-second timeout
         try:
-            answer = await run_in_threadpool(get_answer, question, lang, memory_context)
+            answer = await asyncio.wait_for(
+                run_in_threadpool(get_answer, question, lang, memory_context),
+                timeout=25.0
+            )
 
-            # ✅ fallback if empty
             if not answer or len(answer.strip()) == 0:
                 raise ValueError("Empty answer")
 
+            print(f"[CHAT] ✅ Answer generated ({len(answer)} chars)")
+
+        except asyncio.TimeoutError:
+            print(f"[TIMEOUT] Question timed out after 25s: {question[:60]}")
+            answer = (
+                "I'm thinking... this is taking longer than usual. Please ask again in a moment."
+                if lang == "en"
+                else "मैं सोच रही हूँ... कृपया एक पल बाद फिर पूछें।"
+            )
+
         except Exception as e:
             print(f"[ERROR] get_answer failed: {e}")
-
-            # ✅ fallback response
             answer = (
-                "Sorry, I don’t have information on that yet. "
+                "Sorry, I don't have information on that yet. "
                 "Please ask about admissions, fees, courses, or contact details."
             )
 
@@ -349,13 +400,12 @@ async def chat(request: ChatRequest, req: Request):
 
     except Exception as e:
         print(f"[FATAL ERROR] Chat failed: {e}")
-
-        # 🚨 NEVER CRASH → ALWAYS RETURN RESPONSE
         return ChatResponse(
             answer="Sorry, something went wrong. Please try again.",
             language="en",
             session_id=request.session_id or "unknown"
         )
+
 
 @app.get("/history/{session_id}", response_model=HistoryResponse)
 def get_history(session_id: str):
