@@ -79,12 +79,20 @@ app = FastAPI(title="Diksha - GBPIET Chatbot", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://gbpiet.ac.in",
+        "https://www.gbpiet.ac.in",
+        # ✅ Add your exact Vercel URL
+        "https://college-multilingual-chatbot-lzrp.vercel.app",
+        "https://*.vercel.app",
+        "https://*.railway.app",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-chat_sessions = {}
 
 # ══════════════════════════════════════════════════════════════════════
 #   VISIT COUNTER
