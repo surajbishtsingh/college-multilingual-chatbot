@@ -31,7 +31,7 @@ numpy==1.26.4
 
 # ── LLM APIs ─────────────────────────────────────────────────────────
 groq==0.9.0
-google-generativeai==0.5.4
+google-genai==1.7.0
 
 # ── Language Detection ───────────────────────────────────────────────
 langdetect==1.0.9
