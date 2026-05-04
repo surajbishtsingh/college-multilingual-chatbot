@@ -478,17 +478,27 @@ function FeesDropdown({ lang }) {
 
       {/* Payment links */}
       <div style={{ marginTop: 8, fontSize: 11 }}>
-        🌐 Pay Fees:  
-        <br/>
-        <a href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332" target="_blank">
-          Institute Fee
-        </a>
-        <br/>
-        <a href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435" target="_blank">
-          Hostel & Mess Fee
-        </a>
-      </div>
-    </div>
+  🌐 Pay Fees:  
+  <br />
+
+  <a
+    href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Institute Fee
+  </a>
+
+  <br />
+
+  <a
+    href="https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Hostel & Mess Fee
+  </a>
+</div>
   );
 }
 // ══ MAIN APP ════════════════════════════════════════════
