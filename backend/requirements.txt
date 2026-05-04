@@ -19,6 +19,8 @@ langchain-core==0.1.52
 langchain-community==0.0.38
 langchain-huggingface==0.0.3
 sentence-transformers==2.7.0
+transformers==4.40.2
+tokenizers==0.19.1
 
 # ── Vector DB ────────────────────────────────────────────────────────
 qdrant-client==1.9.1
@@ -34,10 +36,9 @@ google-generativeai==0.5.4
 # ── Language Detection ───────────────────────────────────────────────
 langdetect==1.0.9
 
-# ── Scraping / Parsing ───────────────────────────────────────────────
+# ── Scraping / Parsing (run locally only) ────────────────────────────
 beautifulsoup4==4.12.3
 lxml==5.2.1
-selenium==4.21.0
 
 # ── Scheduler ────────────────────────────────────────────────────────
 apscheduler==3.10.4
@@ -51,3 +52,7 @@ secure-smtplib==0.1.1
 
 # ── Pydantic ─────────────────────────────────────────────────────────
 pydantic==2.7.0
+pydantic-settings==2.2.1
+
+# ── Langsmith (pinned for Python 3.12 compat) ────────────────────────
+langsmith==0.1.63
