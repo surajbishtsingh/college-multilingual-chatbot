@@ -7,8 +7,7 @@ import asyncio
 import unicodedata
 from langchain_huggingface import HuggingFaceEmbeddings
 from groq import Groq
-from google import genai
-from google.genai import types as genai_types
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,7 +22,7 @@ from rag.internet_search import search_college_website
 from rag.reranker import rerank_with_diversity
 # ── LLM clients ───────────────────────────────────────────────────────
 groq_client   = Groq(api_key=os.getenv("GROQ_API_KEY"))
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 _embed_model = None
 _qa_database = []
@@ -156,7 +155,7 @@ def translate_answer_if_needed(answer: str, lang: str, question: str) -> str:
         print(f"[TRANSLATE] Groq failed ({e}), trying Gemini...")
 
     try:
-        r = gemini_client.models.generate_content(
+         r = genai.GenerativeModel("gemini-1.5-flash").generate_content(
             model="gemini-2.0-flash",
             contents=f"{system}\n\n{prompt}",
             config=genai_types.GenerateContentConfig(
@@ -721,7 +720,7 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
 
     # Fallback to Gemini
     try:
-        r = gemini_client.models.generate_content(
+       r = genai.GenerativeModel("gemini-1.5-flash").generate_content(
             model="gemini-2.0-flash",
             contents=prompt,
             config=genai_types.GenerateContentConfig(
