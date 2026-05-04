@@ -1,36 +1,21 @@
-﻿fastapi
+# Core backend
+fastapi
 uvicorn
-langchain
-langchain-community
-langchain-text-splitters
-sentence-transformers
-qdrant-client
-python-dotenv
-requests
-edge-tts
-langchain-core
-rank-bm25
-google-generativeai
-langdetect
-groq
-# Core
 python-dotenv
 requests
 tqdm
+httpx
+orjson
+
+# Database (PostgreSQL)
 asyncpg
 
-# Parsing / scraping
-beautifulsoup4
-lxml
-
-# JS rendering
-playwright
-
-# Embeddings
-sentence-transformers
+# RAG + embeddings
 langchain
+langchain-core
 langchain-community
 langchain-huggingface
+sentence-transformers
 
 # Vector DB
 qdrant-client
@@ -43,8 +28,15 @@ numpy
 groq
 google-generativeai
 
-# Async support
-httpx
+# Language detection
+langdetect
 
-# Optional (better performance/logging)
-orjson
+# Scraping / parsing
+beautifulsoup4
+lxml
+
+# JS rendering (optional)
+playwright
+
+# TTS
+edge-tts
