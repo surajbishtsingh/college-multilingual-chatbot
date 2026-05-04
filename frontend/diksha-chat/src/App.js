@@ -30,7 +30,7 @@ function renderTextWithLinks(text) {
   });
 }
 
-const BACKEND_URL = 'https://motivated-forgiveness-production-1681.up.railway.app';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const LANGUAGES = [
   { code: 'en', label: '',  native: 'English' },
