@@ -293,32 +293,61 @@ async def tts_endpoint(request: TTSRequest):
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, req: Request):
-    question   = request.question.strip()
-    session_id = request.session_id or str(uuid.uuid4())
+    try:
+        question   = request.question.strip()
+        session_id = request.session_id or str(uuid.uuid4())
 
-    # Language detection
-    lang = (
-        request.language
-        if request.language in ["en", "hi", "ga", "ku"]
-        else detect_language(question)
-    )
+        # Language detection
+        lang = (
+            request.language
+            if request.language in ["en", "hi", "ga", "ku"]
+            else detect_language(question)
+        )
 
-    # Visit tracking
-    forwarded = req.headers.get("x-forwarded-for")
-    ip        = forwarded.split(",")[0].strip() if forwarded else req.client.host
-    record_visit(ip)
-    visit_data["chatbot_usage"] += 1
+        # Visit tracking
+        forwarded = req.headers.get("x-forwarded-for")
+        ip        = forwarded.split(",")[0].strip() if forwarded else req.client.host
+        record_visit(ip)
+        visit_data["chatbot_usage"] += 1
 
-    # Memory + answer pipeline
-    await process_user_message(session_id, question, lang)
-    memory_context = await build_memory_context(session_id)
-    answer = await run_in_threadpool(get_answer, question, lang, memory_context)
-    await process_bot_message(session_id, answer, lang)
+        # Memory
+        await process_user_message(session_id, question, lang)
+        memory_context = await build_memory_context(session_id)
 
-    return ChatResponse(
-        answer=answer, language=lang, session_id=session_id
-    )
+        # 🔥 SAFE ANSWER GENERATION
+        try:
+            answer = await run_in_threadpool(get_answer, question, lang, memory_context)
 
+            # ✅ fallback if empty
+            if not answer or len(answer.strip()) == 0:
+                raise ValueError("Empty answer")
+
+        except Exception as e:
+            print(f"[ERROR] get_answer failed: {e}")
+
+            # ✅ fallback response
+            answer = (
+                "Sorry, I don’t have information on that yet. "
+                "Please ask about admissions, fees, courses, or contact details."
+            )
+
+        await process_bot_message(session_id, answer, lang)
+
+        return ChatResponse(
+            answer=answer,
+            language=lang,
+            session_id=session_id
+        )
+
+    except Exception as e:
+        print(f"[FATAL ERROR] Chat failed: {e}")
+
+        # 🚨 NEVER CRASH → ALWAYS RETURN RESPONSE
+        return ChatResponse(
+            answer="Sorry, something went wrong. Please try again.",
+            language="en",
+            session_id=request.session_id or "unknown"
+        )
 
 @app.get("/history/{session_id}", response_model=HistoryResponse)
 def get_history(session_id: str):
