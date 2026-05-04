@@ -21,7 +21,7 @@ from rag.hybrid_search import multi_collection_search
 from rag.bm25_search import bm25_search, build_bm25_index
 from rag.fusion import reciprocal_rank_fusion
 from rag.internet_search import search_college_website
-
+from rag.reranker import rerank_with_diversity
 # ── LLM clients ───────────────────────────────────────────────────────
 groq_client   = Groq(api_key=os.getenv("GROQ_API_KEY"))
 gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -573,14 +573,24 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
             vector_weight=0.6,
         )
 
+        # ── RERANKER ADD KIYA ─────────────────────────────────────
+        if merged:
+            merged = rerank_with_diversity(
+                results=merged,
+                query=question,
+                top_k=3,
+            )
+        # ─────────────────────────────────────────────────────────
+
         ctx_parts = []
         for r in merged[:3]:
             url = r.get("url") or r.get("metadata", {}).get("source", "")
             if url and url.startswith("http"):
                 sources.append(url)
-            ctx_parts.append(f"[Score: {r['rrf_score']:.3f}]\n{r['text']}")
+            ctx_parts.append(f"[Score: {r['rerank_score']:.3f}]\n{r['text']}")
 
-        top_score = merged[0]["rrf_score"] if merged else 0
+        # ── Internet fallback — rerank score use karo ─────────────
+        top_score = merged[0]["rerank_score"] if merged else 0
         if top_score < 0.05 or not merged:
             print("[RAG] Low confidence — trying internet search")
             internet_results = search_college_website(question)
@@ -598,7 +608,7 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
         context = "\n\n---\n\n".join(ctx_parts)
         sources = list(dict.fromkeys(sources))
 
-        print(f"[RAG] Context from {len(ctx_parts)} chunks | Internet: {used_internet}")
+        print(f"[RAG] Context: {len(ctx_parts)} chunks | Internet: {used_internet}")
         return {"context": context, "sources": sources, "used_internet": used_internet}
 
     except Exception as e:
