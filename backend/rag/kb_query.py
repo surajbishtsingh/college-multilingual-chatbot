@@ -154,8 +154,9 @@ def translate_answer_if_needed(answer: str, lang: str, question: str) -> str:
     except Exception as e:
         print(f"[TRANSLATE] Groq failed ({e}), trying Gemini...")
 
+    # FIX 1: Removed extra leading space on 'r =' line
     try:
-         r = genai.GenerativeModel("gemini-1.5-flash").generate_content(
+        r = genai.GenerativeModel("gemini-1.5-flash").generate_content(
             model="gemini-2.0-flash",
             contents=f"{system}\n\n{prompt}",
             config=genai_types.GenerateContentConfig(
@@ -242,7 +243,7 @@ SPECIFIC_ROLE_MAP = {
     "hod mca":                "hod mca",
     "hod of csa":             "hod mca",
     "hod csa":                "hod mca",
-   "hod of biotech":         "hod biotechnology",
+    "hod of biotech":         "hod biotechnology",
     "hod biotech":            "hod biotechnology",
     "hod of biotechnology":   "hod biotechnology",
     "hod biotechnology":      "hod biotechnology",
@@ -298,7 +299,6 @@ def fix_typos(text: str) -> str:
 
 
 def specific_role_answer(question: str, preferred_lang: str = "en") -> str | None:
-    # ✅ Fix 1: preferred_lang parameter added
     q_fixed = fix_typos(question)
     q_clean = re.sub(r'[^\w\s]', '', q_fixed.strip().lower()).strip()
 
@@ -314,7 +314,6 @@ def specific_role_answer(question: str, preferred_lang: str = "en") -> str | Non
 
     topic_words = mapped.lower().split()
 
-    # ✅ Fix 2: Blacklist — "List all HODs" type entries skip karo
     BLACKLIST = [
         "list all", "all hod", "all department", "all heads",
         "departments at gbpiet", "list of hod", "all hods",
@@ -327,7 +326,6 @@ def specific_role_answer(question: str, preferred_lang: str = "en") -> str | Non
         q_lower = item["question"].lower()
         a_lower = item["answer"].lower()
 
-        # ✅ Skip list-type entries
         if any(p in q_lower for p in BLACKLIST):
             continue
 
@@ -378,10 +376,6 @@ DIRECT_KEYWORD_MAP = {
 
 
 def direct_keyword_answer(question: str, preferred_lang: str = "en") -> str | None:
-    """
-    Step 0b — single/double word queries.
-    ✅ Prefers answers in the requested language.
-    """
     q_clean    = question.strip().lower()
     word_count = len(q_clean.split())
 
@@ -405,7 +399,6 @@ def direct_keyword_answer(question: str, preferred_lang: str = "en") -> str | No
     print(f"[DIRECT_KW] '{q_clean}' → topic '{mapped}'")
     mapped_lower = mapped.lower()
 
-    # ✅ Collect all candidates with language info
     candidates = []
 
     for item in load_qa_database():
@@ -416,7 +409,6 @@ def direct_keyword_answer(question: str, preferred_lang: str = "en") -> str | No
         if score > 0:
             answer_text = item["answer"]
 
-            # Detect answer language
             ga_markers  = ['छन', 'छ।', 'हूँद', 'कुण', 'मिलद', 'पैलू', 'अर']
             latin_chars = sum(1 for c in answer_text if c.isascii() and c.isalpha())
             total_chars = len(answer_text.replace(" ", ""))
@@ -440,7 +432,6 @@ def direct_keyword_answer(question: str, preferred_lang: str = "en") -> str | No
     if not candidates:
         return None
 
-    # ✅ Prefer answer in requested language
     candidates.sort(key=lambda c: (1 if c["lang"] == preferred_lang else 0, c["score"]), reverse=True)
 
     best = candidates[0]
@@ -530,7 +521,6 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
     if not candidates:
         return None
 
-    # ✅ Prefer answer in requested language
     candidates.sort(
         key=lambda c: (1 if c["lang"] == preferred_lang else 0, c["score"]),
         reverse=True
@@ -571,14 +561,12 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
             vector_weight=0.6,
         )
 
-        # ── RERANKER ADD KIYA ─────────────────────────────────────
         if merged:
             merged = rerank_with_diversity(
                 results=merged,
                 query=question,
                 top_k=3,
             )
-        # ─────────────────────────────────────────────────────────
 
         ctx_parts = []
         for r in merged[:3]:
@@ -587,7 +575,6 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
                 sources.append(url)
             ctx_parts.append(f"[Score: {r['rerank_score']:.3f}]\n{r['text']}")
 
-        # ── Internet fallback — rerank score use karo ─────────────
         top_score = merged[0]["rerank_score"] if merged else 0
         if top_score < 0.05 or not merged:
             print("[RAG] Low confidence — trying internet search")
@@ -718,9 +705,9 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
     except Exception as e:
         print(f"[LLM] Groq failed ({e}), trying Gemini...")
 
-    # Fallback to Gemini
+    # FIX 2: Removed extra leading space on 'r =' line
     try:
-       r = genai.GenerativeModel("gemini-1.5-flash").generate_content(
+        r = genai.GenerativeModel("gemini-1.5-flash").generate_content(
             model="gemini-2.0-flash",
             contents=prompt,
             config=genai_types.GenerateContentConfig(
