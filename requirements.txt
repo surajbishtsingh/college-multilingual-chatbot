@@ -1,11 +1,13 @@
 # Core backend
 fastapi
 uvicorn
+gunicorn
 python-dotenv
 requests
 tqdm
 httpx
 orjson
+aiofiles
 
 # Database (PostgreSQL)
 asyncpg
@@ -40,3 +42,12 @@ playwright
 
 # TTS
 edge-tts
+
+# CORS
+flask-cors
+
+# Scheduling
+apscheduler
+
+# Email
+secure-smtplib
