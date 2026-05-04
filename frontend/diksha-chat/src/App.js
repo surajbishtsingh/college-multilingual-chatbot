@@ -30,7 +30,7 @@ function renderTextWithLinks(text) {
   });
 }
 
-const BACKEND_URL = 'http://127.0.0.1:8000';
+const BACKEND_URL = 'https://motivated-forgiveness-production-1681.up.railway.app';
 
 const LANGUAGES = [
   { code: 'en', label: '',  native: 'English' },
