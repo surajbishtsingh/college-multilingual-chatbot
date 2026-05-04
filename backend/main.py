@@ -5,6 +5,7 @@ from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import os
 import uuid
+import asyncio
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -179,7 +180,7 @@ def record_visit(ip: str):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#   STARTUP
+#   STARTUP  (with timeout guards so crash-loop is prevented)
 # ══════════════════════════════════════════════════════════════════════
 @app.on_event("startup")
 async def startup_event():
@@ -188,30 +189,66 @@ async def startup_event():
     print("=" * 55)
     print("Starting Diksha Dynamic Edition...")
 
-    # Init database (PostgreSQL or SQLite)
-    await init_db()
+    # ── 1. Database ───────────────────────────────────────────────────
+    try:
+        print("[Startup] Initialising database...")
+        await asyncio.wait_for(init_db(), timeout=30)
+        print("[Startup] ✅ Database ready")
+    except asyncio.TimeoutError:
+        print("[Startup] ⚠️  Database init timed out — continuing anyway")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Database init failed ({e}) — continuing anyway")
 
-    # BM25 index
-    print("Building BM25 index...")
-    await run_in_threadpool(build_bm25_index)
+    # ── 2. BM25 index ─────────────────────────────────────────────────
+    try:
+        print("[Startup] Building BM25 index...")
+        await asyncio.wait_for(
+            run_in_threadpool(build_bm25_index), timeout=60
+        )
+        print("[Startup] ✅ BM25 ready")
+    except asyncio.TimeoutError:
+        print("[Startup] ⚠️  BM25 index timed out — will build on first request")
+    except Exception as e:
+        print(f"[Startup] ⚠️  BM25 index failed ({e}) — will build on first request")
 
-    # Embedding model
-    print("Loading embedding model...")
-    await run_in_threadpool(get_embed_model)
+    # ── 3. Embedding model ────────────────────────────────────────────
+    try:
+        print("[Startup] Loading embedding model (may take ~30s first time)...")
+        await asyncio.wait_for(
+            run_in_threadpool(get_embed_model), timeout=120
+        )
+        print("[Startup] ✅ Embedding model ready")
+    except asyncio.TimeoutError:
+        print("[Startup] ⚠️  Embedding model timed out — will load on first request")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Embedding model failed ({e}) — will load on first request")
 
-    # Qdrant
-    print("Connecting Qdrant...")
-    await run_in_threadpool(get_qdrant)
+    # ── 4. Qdrant ─────────────────────────────────────────────────────
+    try:
+        print("[Startup] Connecting to Qdrant...")
+        await asyncio.wait_for(
+            run_in_threadpool(get_qdrant), timeout=15
+        )
+        print("[Startup] ✅ Qdrant connected")
+    except asyncio.TimeoutError:
+        print("[Startup] ⚠️  Qdrant connection timed out — check QDRANT_URL env var")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Qdrant connection failed ({e}) — check QDRANT_URL env var")
 
-    # Auto-scraper scheduler
-    start_scheduler()
+    # ── 5. Scheduler ─────────────────────────────────────────────────
+    try:
+        print("[Startup] Starting scraper scheduler...")
+        start_scheduler()
+        print("[Startup] ✅ Scheduler started")
+    except Exception as e:
+        print(f"[Startup] ⚠️  Scheduler failed ({e}) — continuing without it")
 
-    # API keys check
+    # ── API key status ────────────────────────────────────────────────
     groq_key   = os.getenv("GROQ_API_KEY")
     gemini_key = os.getenv("GEMINI_API_KEY")
     serpapi    = os.getenv("SERPAPI_KEY")
-    print(f"\n  Groq    : {'✅' if groq_key   else '❌'}")
-    print(f"  Gemini  : {'✅' if gemini_key else '❌'}")
+    print(f"\n  Groq    : {'✅' if groq_key   else '❌ MISSING'}")
+    print(f"  Gemini  : {'✅' if gemini_key else '❌ MISSING'}")
     print(f"  SerpAPI : {'✅' if serpapi    else '⚠️  no internet search'}")
     print(f"  DB Type : {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
     print("\n✅ Diksha Dynamic is ready!")
@@ -223,10 +260,17 @@ async def startup_event():
 # ══════════════════════════════════════════════════════════════════════
 @app.on_event("shutdown")
 async def shutdown_event():
-    stop_scheduler()
-    # Close PostgreSQL pool cleanly (SQLite pe skip hoga)
+    try:
+        stop_scheduler()
+    except Exception as e:
+        print(f"[Shutdown] Scheduler stop error: {e}")
+
     if USE_POSTGRES:
-        await close_pg_pool()
+        try:
+            await close_pg_pool()
+        except Exception as e:
+            print(f"[Shutdown] PG pool close error: {e}")
+
     print("[Shutdown] Clean shutdown complete")
 
 
@@ -372,6 +416,7 @@ async def rebuild_kb(background_tasks: BackgroundTasks):
 
     background_tasks.add_task(run)
     return {"status": "KB rebuild started — check server logs"}
+
 
 # ══════════════════════════════════════════════════════════════════════
 #   RUN (Railway / local)
