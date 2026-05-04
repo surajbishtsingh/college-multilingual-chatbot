@@ -372,3 +372,11 @@ async def rebuild_kb(background_tasks: BackgroundTasks):
 
     background_tasks.add_task(run)
     return {"status": "KB rebuild started — check server logs"}
+
+# ══════════════════════════════════════════════════════════════════════
+#   RUN (Railway / local)
+# ══════════════════════════════════════════════════════════════════════
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
