@@ -3,7 +3,7 @@ fastapi==0.110.0
 uvicorn==0.29.0
 gunicorn==21.2.0
 python-dotenv==1.0.1
-httpx==0.27.0
+httpx==0.28.1
 requests==2.31.0
 orjson==3.10.1
 aiofiles==23.2.1
@@ -54,5 +54,5 @@ secure-smtplib==0.1.1
 pydantic==2.7.0
 pydantic-settings==2.2.1
 
-# ── Langsmith (pinned for Python 3.12 compat) ────────────────────────
-langsmith==0.1.63
+# ── Langsmith ────────────────────────────────────────────────────────
+langsmith
