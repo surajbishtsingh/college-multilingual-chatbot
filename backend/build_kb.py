@@ -56,6 +56,103 @@ ALL_COLLECTIONS = [
     "gbpiet_admissions",
 ]
 
+# build_kb.py — top imports section, add:
+import qdrant_setup
+
+# Replace the temp/swap logic with this cloud-compatible version:
+def build_knowledge_base(recreate: bool = True):
+    print("=" * 60)
+    print("Diksha KB Builder")
+    print(f"Target: {'Qdrant Cloud' if qdrant_setup.USE_CLOUD else 'Local Qdrant'}")
+    print("=" * 60)
+
+    data_folder = os.path.join(os.path.dirname(__file__), "data")
+
+    # Step 1: Load documents
+    print("\n[1/4] Loading JSON files...")
+    buckets = load_documents(data_folder)
+
+    # Step 2: Chunk
+    print("\n[2/4] Chunking documents...")
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=400, chunk_overlap=60,
+        separators=["\n\n", "\n", ". ", " "]
+    )
+    chunked = {}
+    for collection_suffix, docs in buckets.items():
+        if not docs:
+            continue
+        # Add prefix for cloud
+        prefix   = qdrant_setup.PREFIX
+        col_name = f"{prefix}{collection_suffix}"
+        chunks   = splitter.split_documents(docs)
+        chunked[col_name] = chunks
+        print(f"  {col_name}: {len(docs)} docs → {len(chunks)} chunks")
+
+    # Step 3: Embed
+    print("\n[3/4] Creating embeddings...")
+    embeddings = HuggingFaceEmbeddings(
+        model_name=EMBED_MODEL_NAME,
+        model_kwargs={"device": "cpu"},
+        encode_kwargs={"normalize_embeddings": True}
+    )
+
+    all_texts = []
+    for chunks in chunked.values():
+        all_texts.extend([c.page_content for c in chunks])
+
+    print(f"  Embedding {len(all_texts)} chunks...")
+    all_vectors = embeddings.embed_documents(all_texts)
+    print(f"  Embedding dim: {len(all_vectors[0])}")
+
+    # Step 4: Upload to Qdrant (cloud or local)
+    print("\n[4/4] Uploading to Qdrant...")
+
+    # Reset client to ensure fresh connection
+    qdrant_setup._client = None
+    ensure_collections(recreate=recreate)
+    client = get_client()
+
+    vector_idx = 0
+    for col_name, chunks in chunked.items():
+        if not chunks:
+            continue
+
+        points = []
+        for chunk in chunks:
+            vec = all_vectors[vector_idx]
+            vector_idx += 1
+            points.append(PointStruct(
+                id=str(uuid.uuid4()),
+                vector=vec,
+                payload={
+                    **chunk.metadata,
+                    "text": chunk.page_content,
+                }
+            ))
+
+        # Upload in batches
+        batch_size = 100
+        for start in range(0, len(points), batch_size):
+            client.upsert(
+                collection_name=col_name,
+                points=points[start:start + batch_size]
+            )
+
+        print(f"  ✅ {col_name}: {len(points)} points")
+
+    print("\n" + "=" * 60)
+    print("✅ KB Build Complete!")
+    print("=" * 60)
+
+    # Print stats
+    for name in chunked:
+        try:
+            info = client.get_collection(name)
+            print(f"  {name}: {info.points_count} points")
+        except Exception:
+            pass
+
 
 def get_collection(item: dict) -> str:
     category = item.get("category", "").lower().strip()
