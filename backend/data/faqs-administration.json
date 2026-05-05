@@ -158,5 +158,13 @@
     "category": "academics",
     "tags": ["deans"],
     "lang": "en"
-  }
+  },
+  {
+    "id":21,
+    "question": "Who is the current Vice-Chancellor of Veer Madho Singh Bhandari Uttarakhand Technical University?",
+    "answer": "Dr. Tripta Thakur is the current Vice-Chancellor of Veer Madho Singh Bhandari Uttarakhand Technical University (UTU), Dehradun."
+    "category": "administration",
+    "tags": ["vice chancellor", "utu", "dr tripta thakur"],
+    "lang": "en"
+    }
 ]
