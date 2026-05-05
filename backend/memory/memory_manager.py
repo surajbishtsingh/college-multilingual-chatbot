@@ -1,9 +1,10 @@
 # memory/memory_manager.py
 import re
+import json
 from memory.database import (
     save_user_fact, get_user_facts,
     update_user_profile, get_recent_history,
-    save_message,
+    save_message, get_pg_pool,
 )
 
 # ── Fact extraction patterns ───────────────────────────────────────────
@@ -50,7 +51,6 @@ def extract_facts(text: str) -> dict[str, str]:
         match = re.search(pattern, text_low, re.IGNORECASE)
         if match:
             value = match.group(1).strip().upper()
-            # Clean up extracted name (remove trailing common words)
             if fact_type == "name":
                 value = re.sub(
                     r'\b(AND|THE|IS|ARE|FROM|IN|A|AN)\b', '', value
@@ -60,6 +60,43 @@ def extract_facts(text: str) -> dict[str, str]:
             facts[fact_type] = value
 
     return facts
+
+
+async def _safe_update_profile(session_id: str, updates: dict):
+    """
+    Directly update user profile using raw SQL with explicit ::text casts
+    to avoid 'could not determine data type of parameter $1' error.
+    """
+    try:
+        pool = await get_pg_pool()
+        async with pool.acquire() as conn:
+            # First ensure row exists
+            await conn.execute(
+                """
+                INSERT INTO user_profiles (session_id)
+                VALUES ($1)
+                ON CONFLICT (session_id) DO NOTHING
+                """,
+                session_id
+            )
+
+            # Update only columns that exist in updates
+            allowed = ["name", "branch", "semester", "course", "language", "year"]
+            for key, value in updates.items():
+                if key not in allowed:
+                    continue
+                # Use explicit ::text cast to fix parameter type error
+                await conn.execute(
+                    f"""
+                    UPDATE user_profiles
+                    SET {key} = $1::text,
+                        updated_at = NOW()
+                    WHERE session_id = $2::text
+                    """,
+                    str(value), str(session_id)
+                )
+    except Exception as e:
+        print(f"[Memory] _safe_update_profile failed (non-fatal): {e}")
 
 
 async def process_user_message(
@@ -85,13 +122,12 @@ async def process_user_message(
     if "branch"   in facts: profile_updates["branch"]   = facts["branch"]
     if "semester" in facts: profile_updates["semester"] = facts["semester"]
     if "course"   in facts: profile_updates["course"]   = facts["course"]
+    if "year"     in facts: profile_updates["year"]     = facts["year"]
     if lang:                profile_updates["language"]  = lang
 
     if profile_updates:
-        try:
-            await update_user_profile(session_id, **profile_updates)
-        except Exception as e:
-            print(f"[Memory] Profile update failed (non-fatal): {e}")
+        # Use safe direct SQL instead of update_user_profile(**kwargs)
+        await _safe_update_profile(session_id, profile_updates)
 
 
 async def process_bot_message(
