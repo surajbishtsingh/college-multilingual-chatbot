@@ -174,105 +174,90 @@ app = FastAPI(
 # STARTUP
 # ═════════════════════════════════════════════════════════════
 
-# ═════════════════════════════════════════════════════════════
-# STARTUP
-# ═════════════════════════════════════════════════════════════
-
 @app.on_event("startup")
 async def startup_event():
-
     from rag.bm25_search import build_bm25_index
 
     print("=" * 60)
-    print("Starting Diksha Dynamic Edition...")
+    print("[Startup] BEGIN")
+    sys.stdout.flush()
 
-    # DATABASE
-
+    # ── DATABASE ──────────────────────────────────────────
+    print("[Startup] Step 1: Database...")
+    sys.stdout.flush()
     try:
-        print("[Startup] Initialising database...")
-
-        await asyncio.wait_for(
-            init_db(),
-            timeout=30
-        )
-
+        await asyncio.wait_for(init_db(), timeout=15)
         print("[Startup] ✅ Database ready")
-
+    except asyncio.TimeoutError:
+        print("[Startup] ❌ Database TIMED OUT after 15s — check DATABASE_URL")
     except Exception as e:
-        print(f"[Startup] Database failed: {e}")
+        print(f"[Startup] ❌ Database ERROR: {e}")
+        traceback.print_exc()
+    sys.stdout.flush()
 
-    # BM25
-
+    # ── BM25 ──────────────────────────────────────────────
+    print("[Startup] Step 2: BM25 index...")
+    sys.stdout.flush()
     try:
-        print("[Startup] Building BM25 index...")
-
         await asyncio.wait_for(
-            run_in_threadpool(build_bm25_index),
-            timeout=60
+            run_in_threadpool(build_bm25_index), timeout=30
         )
-
         print("[Startup] ✅ BM25 ready")
-
+    except asyncio.TimeoutError:
+        print("[Startup] ❌ BM25 TIMED OUT after 30s")
     except Exception as e:
-        print(f"[Startup] BM25 failed: {e}")
+        print(f"[Startup] ❌ BM25 ERROR: {e}")
+        traceback.print_exc()
+    sys.stdout.flush()
 
-    # EMBEDDING MODEL
-    # Removed timeout because HuggingFace model loading
-    # can take longer on Railway cold start
-
+    # ── EMBEDDING MODEL ───────────────────────────────────
+    print("[Startup] Step 3: Embedding model...")
+    sys.stdout.flush()
     try:
-        print("[Startup] Loading embedding model...")
-
-        await run_in_threadpool(get_embed_model)
-
-        print("[Startup] ✅ Embedding model ready")
-
-    except Exception as e:
-        print(f"[Startup] Embedding model failed: {e}")
-
-    # QDRANT
-
-    try:
-        print("[Startup] Connecting Qdrant...")
-
         await asyncio.wait_for(
-            run_in_threadpool(get_qdrant),
-            timeout=120
+            run_in_threadpool(get_embed_model), timeout=60
         )
-
-        print("[Startup] ✅ Qdrant connected")
-
+        print("[Startup] ✅ Embedding model ready")
+    except asyncio.TimeoutError:
+        print("[Startup] ❌ Embedding model TIMED OUT after 60s")
     except Exception as e:
-        print(f"[Startup] Qdrant failed: {e}")
+        print(f"[Startup] ❌ Embedding model ERROR: {e}")
+        traceback.print_exc()
+    sys.stdout.flush()
 
-    # SCHEDULER
+    # ── QDRANT ────────────────────────────────────────────
+    print("[Startup] Step 4: Qdrant...")
+    sys.stdout.flush()
+    try:
+        await asyncio.wait_for(
+            run_in_threadpool(get_qdrant), timeout=15
+        )
+        print("[Startup] ✅ Qdrant connected")
+    except asyncio.TimeoutError:
+        print("[Startup] ❌ Qdrant TIMED OUT after 15s — check QDRANT_URL and QDRANT_API_KEY")
+    except Exception as e:
+        print(f"[Startup] ❌ Qdrant ERROR: {e}")
+        traceback.print_exc()
+    sys.stdout.flush()
 
+    # ── SCHEDULER ─────────────────────────────────────────
+    print("[Startup] Step 5: Scheduler...")
+    sys.stdout.flush()
     try:
         start_scheduler()
         print("[Startup] ✅ Scheduler started")
-
     except Exception as e:
-        print(f"[Startup] Scheduler failed: {e}")
+        print(f"[Startup] ❌ Scheduler ERROR: {e}")
+        traceback.print_exc()
+    sys.stdout.flush()
 
-    # ENV STATUS
+    # ── ENV STATUS ────────────────────────────────────────
+    print(f"  Groq Key 1 : {'✅' if os.getenv('GROQ_API_KEY') else '❌'}")
+    print(f"  Groq Key 2 : {'✅' if os.getenv('GROQ_API_KEY_2') else '⚠️'}")
+    print(f"  SerpAPI    : {'✅' if os.getenv('SERPAPI_KEY') else '⚠️'}")
+    print(f"  DB         : {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
+    print(f"  Qdrant     : {'Cloud' if os.getenv('QDRANT_URL') else 'Local'}")
 
-    groq_key = os.getenv("GROQ_API_KEY")
-    groq_key2 = os.getenv("GROQ_API_KEY_2")
-    serpapi = os.getenv("SERPAPI_KEY")
-
-    print(f"\n  Groq Key 1 : {'✅' if groq_key else '❌'}")
-    print(f"  Groq Key 2 : {'✅' if groq_key2 else '⚠️'}")
-    print(f"  SerpAPI    : {'✅' if serpapi else '⚠️ DDG only'}")
-
-    print(
-        f"  DB         : "
-        f"{'PostgreSQL' if USE_POSTGRES else 'SQLite'}"
-    )
-
-    print(
-        f"  Qdrant     : "
-        f"{'Cloud' if os.getenv('QDRANT_URL') else 'Local'}"
-    )
-
-    print("\n✅ Diksha Ready!")
+    print("[Startup] ✅ Diksha Ready!")
     print("=" * 60)
+    sys.stdout.flush()
