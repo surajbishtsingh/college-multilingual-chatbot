@@ -31,7 +31,6 @@ async def get_pg_pool():
     if _pg_pool is None:
         import asyncpg
 
-        # Fix Railway/Render URL format if needed
         db_url = DATABASE_URL
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -56,10 +55,9 @@ async def close_pg_pool():
 
 
 # ══════════════════════════════════════════════════════════════════════
-# INIT — Create tables in both PostgreSQL and SQLite
+# INIT — Create tables
 # ══════════════════════════════════════════════════════════════════════
 async def init_db():
-    """Create all tables if they don't exist."""
     if USE_POSTGRES:
         await _init_postgres()
     else:
@@ -69,7 +67,6 @@ async def init_db():
 async def _init_postgres():
     pool = await get_pg_pool()
     async with pool.acquire() as conn:
-        # Users table
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 session_id   TEXT PRIMARY KEY,
@@ -82,8 +79,6 @@ async def _init_postgres():
                 updated_at   TEXT
             )
         """)
-
-        # Conversations table
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS conversations (
                 id           SERIAL PRIMARY KEY,
@@ -94,14 +89,10 @@ async def _init_postgres():
                 timestamp    TEXT
             )
         """)
-
-        # Index for faster session queries
         await conn.execute("""
             CREATE INDEX IF NOT EXISTS idx_conv_session
             ON conversations(session_id)
         """)
-
-        # User facts table
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS user_facts (
                 id           SERIAL PRIMARY KEY,
@@ -113,8 +104,6 @@ async def _init_postgres():
                 UNIQUE(session_id, fact_type)
             )
         """)
-
-        # Scrape history table
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS scrape_history (
                 id           SERIAL PRIMARY KEY,
@@ -124,7 +113,6 @@ async def _init_postgres():
                 chunk_count  INTEGER DEFAULT 0
             )
         """)
-
     print("[DB] ✅ PostgreSQL tables ready")
 
 
@@ -188,8 +176,7 @@ async def get_or_create_user(session_id: str) -> dict:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
             row = await conn.fetchrow(
-                "SELECT * FROM users WHERE session_id = $1",
-                session_id
+                "SELECT * FROM users WHERE session_id = $1", session_id
             )
             if row:
                 return dict(row)
@@ -219,8 +206,14 @@ async def get_or_create_user(session_id: str) -> dict:
 
 
 async def update_user_profile(session_id: str, **kwargs):
-    """Update user profile fields."""
-    valid_fields = {"name", "branch", "semester", "course", "language"}
+    """
+    Update user profile fields.
+    
+    BUG FIX: Previous version had wrong parameter index in UPDATE query.
+    Now each column is updated individually with explicit ::text cast
+    to avoid 'could not determine data type of parameter $1' error.
+    """
+    valid_fields = {"name", "branch", "semester", "course", "language", "year"}
     updates = {k: v for k, v in kwargs.items() if k in valid_fields}
     if not updates:
         return
@@ -230,26 +223,20 @@ async def update_user_profile(session_id: str, **kwargs):
     if USE_POSTGRES:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
-            # Ensure user exists first
+            # Ensure user row exists first
             await conn.execute(
                 """INSERT INTO users (session_id, created_at, updated_at)
                    VALUES ($1, $2, $2)
                    ON CONFLICT (session_id) DO NOTHING""",
                 session_id, now
             )
-            # Update fields
-            set_parts = [
-                f"{k} = ${i+2}"
-                for i, k in enumerate(updates.keys())
-            ]
-            set_parts.append(f"updated_at = ${len(updates)+2}")
-            set_clause = ", ".join(set_parts)
-            values     = list(updates.values()) + [now, session_id]
-
-            await conn.execute(
-                f"UPDATE users SET {set_clause} WHERE session_id = ${len(values)}",
-                *values
-            )
+            # ✅ FIX: Update each column separately with explicit ::text cast
+            # This avoids asyncpg "could not determine data type of parameter $1"
+            for col, val in updates.items():
+                await conn.execute(
+                    f"UPDATE users SET {col} = $1::text, updated_at = $2::text WHERE session_id = $3::text",
+                    str(val), now, str(session_id)
+                )
     else:
         import aiosqlite
         set_clause = ", ".join(f"{k} = ?" for k in updates)
@@ -276,7 +263,6 @@ async def save_message(
     if USE_POSTGRES:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
-            # Ensure user exists
             await conn.execute(
                 """INSERT INTO users (session_id, created_at, updated_at)
                    VALUES ($1, $2, $2)
@@ -302,7 +288,6 @@ async def save_message(
 
 
 async def get_recent_history(session_id: str, limit: int = 6) -> list[dict]:
-    """Get last N messages in chronological order."""
     if USE_POSTGRES:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
@@ -448,26 +433,24 @@ async def cleanup_old_conversations(days_to_keep: int = 30):
     if USE_POSTGRES:
         pool = await get_pg_pool()
         async with pool.acquire() as conn:
-            result = await conn.execute(
-                """DELETE FROM conversations
-                   WHERE timestamp < NOW() - INTERVAL '$1 days'""",
-                days_to_keep
+            # ✅ FIX: INTERVAL does not accept $1 parameter — use string format
+            await conn.execute(
+                f"DELETE FROM conversations WHERE timestamp < NOW() - INTERVAL '{days_to_keep} days'"
             )
-            print(f"[DB] Cleaned old conversations (PostgreSQL)")
+            print(f"[DB] Cleaned conversations older than {days_to_keep} days (PostgreSQL)")
     else:
         import aiosqlite
         async with aiosqlite.connect(SQLITE_PATH) as db:
             await db.execute(
-                """DELETE FROM conversations
-                   WHERE timestamp < datetime('now', ?)""",
+                "DELETE FROM conversations WHERE timestamp < datetime('now', ?)",
                 (f"-{days_to_keep} days",)
             )
             await db.commit()
-        print(f"[DB] Cleaned conversations older than {days_to_keep} days")
+        print(f"[DB] Cleaned conversations older than {days_to_keep} days (SQLite)")
 
 
 async def get_db_stats() -> dict:
-    stats = {}
+    stats  = {}
     tables = ["users", "conversations", "user_facts", "scrape_history"]
 
     if USE_POSTGRES:
@@ -477,7 +460,7 @@ async def get_db_stats() -> dict:
                 for table in tables:
                     row = await conn.fetchrow(f"SELECT COUNT(*) as c FROM {table}")
                     stats[table] = row["c"]
-            stats["db_type"] = "PostgreSQL"
+            stats["db_type"]    = "PostgreSQL"
             stats["db_size_kb"] = "N/A (cloud)"
         except Exception as e:
             stats["error"] = str(e)
@@ -492,7 +475,7 @@ async def get_db_stats() -> dict:
                 except Exception:
                     stats[table] = 0
         try:
-            size_bytes = os.path.getsize(SQLITE_PATH)
+            size_bytes          = os.path.getsize(SQLITE_PATH)
             stats["db_size_kb"] = round(size_bytes / 1024, 1)
         except Exception:
             stats["db_size_kb"] = 0
