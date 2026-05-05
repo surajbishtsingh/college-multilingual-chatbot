@@ -415,7 +415,6 @@ export default function App() {
   const [isSpeaking, setIsSpeaking]   = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [currentLang, setCurrentLang] = useState('en');
-  const [backendReady, setBackendReady] = useState(false);
 
 useEffect(() => {
   const wakeUp = async () => {
