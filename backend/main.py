@@ -197,6 +197,75 @@ async def startup_event():
         traceback.print_exc()
     sys.stdout.flush()
 
+    # ═════════════════════════════════════════════════════════════
+# ROUTES
+# ═════════════════════════════════════════════════════════════
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "chatbot": "Diksha", "version": "2.0.0"}
+
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    session_id = request.session_id or str(uuid.uuid4())
+    
+    # Detect language
+    lang = request.language or detect_language(request.question)
+    
+    try:
+        # Build memory context from past messages
+        history = await build_memory_context(session_id)
+        
+        # Save user message
+        await process_user_message(session_id, request.question, lang)
+        
+        # Get answer
+        answer = await run_in_threadpool(
+            get_answer, request.question, lang, history
+        )
+        
+        # Save bot response
+        await process_bot_message(session_id, answer, lang)
+        
+    except Exception as e:
+        print(f"[Chat] ERROR: {e}")
+        traceback.print_exc()
+        answer = "I'm sorry, something went wrong. Please try again."
+    
+    return ChatResponse(
+        answer=answer,
+        language=lang,
+        session_id=session_id,
+    )
+
+
+@app.post("/tts")
+async def text_to_speech(request: TTSRequest):
+    try:
+        audio = await run_in_threadpool(generate_voice, request.text, request.lang)
+        return Response(content=audio, media_type="audio/mpeg")
+    except Exception as e:
+        print(f"[TTS] ERROR: {e}")
+        traceback.print_exc()
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail="TTS generation failed")
+
+
+@app.get("/scrape-status")
+async def scrape_status():
+    try:
+        status = get_scrape_status()
+        return {"status": status}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
+
+@app.post("/scrape-now")
+async def scrape_now(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_scrape_job)
+    return {"message": "Scrape job started"}
+
     # ── SCHEDULER ─────────────────────────────────────────
     print("[Startup] Step 5: Scheduler...")
     sys.stdout.flush()
