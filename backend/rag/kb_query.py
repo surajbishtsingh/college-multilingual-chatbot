@@ -3,7 +3,6 @@ import os
 import json
 import glob
 import re
-import time
 import asyncio
 import concurrent.futures
 
@@ -49,14 +48,7 @@ IDENTITY_RESPONSE = {
 
 
 def groq_call(messages, max_tokens=500, temperature=0.3):
-    """
-    Try Key1 first, then Key2.
-    On rate limit (429): wait 2s and retry on the other key.
-    On other errors: switch key immediately.
-    """
-    clients = [("Key1", _groq1), ("Key2", _groq2)]
-
-    for i, (label, client) in enumerate(clients):
+    for label, client in [("Key1", _groq1), ("Key2", _groq2)]:
         if client is None:
             continue
         try:
@@ -68,40 +60,8 @@ def groq_call(messages, max_tokens=500, temperature=0.3):
             )
             print(f"[LLM] ✅ Groq {label} answered")
             return r.choices[0].message.content.strip()
-
         except Exception as e:
-            err_str = str(e)
             print(f"[LLM] Groq {label} failed: {e}")
-
-            # ✅ FIX: Rate limit hit — wait then try next key
-            if "429" in err_str or "rate_limit" in err_str.lower():
-                print(f"[LLM] Rate limit on {label} — waiting 2s before next key...")
-                time.sleep(2)
-                continue
-
-            # ✅ FIX: Server error — try next key immediately
-            if "500" in err_str or "502" in err_str or "503" in err_str:
-                print(f"[LLM] Server error on {label} — switching key...")
-                continue
-
-            # Other errors — still try next key
-            continue
-
-    # ✅ FIX: Both keys failed — wait 3s and retry Key1 once more
-    print("[LLM] Both keys failed — waiting 3s and retrying Key1...")
-    time.sleep(3)
-    try:
-        r = _groq1.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-        )
-        print("[LLM] ✅ Groq Key1 final retry succeeded")
-        return r.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"[LLM] ❌ Final retry also failed: {e}")
-
     return ""
 
 
@@ -155,8 +115,8 @@ def load_qa_database():
                     if q.strip():
                         _qa_database.append({
                             "question": q.strip(),
-                            "answer":   answer.strip(),
-                            "source":   os.path.basename(filepath),
+                            "answer": answer.strip(),
+                            "source": os.path.basename(filepath),
                         })
         except Exception as e:
             print(f"[DB] Error loading {filepath}: {e}")
@@ -368,8 +328,10 @@ async def rag_search_async(question, lang="en"):
     sources = []
     used_internet = False
     try:
+        # ── BM25 search ───────────────────────────────────
         bm25_results = bm25_search(query=question, top_k=5)
 
+        # ── Vector search ─────────────────────────────────
         collections = get_collection_for_query(question, lang)
         if "website" not in collections:
             collections.append("website")
@@ -382,6 +344,7 @@ async def rag_search_async(question, lang="en"):
             limit=5, lang_filter=lang_filter,
         )
 
+        # ── Fusion ────────────────────────────────────────
         merged = reciprocal_rank_fusion(
             bm25_results=bm25_results, vector_results=vector_results,
             bm25_weight=0.4, vector_weight=0.6,
@@ -394,6 +357,7 @@ async def rag_search_async(question, lang="en"):
                 sources.append(url)
             ctx_parts.append(f"[Score: {r['rrf_score']:.3f}]\n{r['text']}")
 
+        # ── Internet fallback if low confidence ───────────
         top_score = merged[0]["rrf_score"] if merged else 0
         if top_score < 0.05 or not merged:
             print(f"[RAG] Low score ({top_score:.3f}) — trying internet search...")
@@ -420,7 +384,12 @@ async def rag_search_async(question, lang="en"):
 
 
 def rag_search(question, lang="en"):
+    """
+    Run rag_search_async safely from a sync context.
+    Fixes 'There is no current event loop in thread' error on Railway.
+    """
     try:
+        # Always create a fresh event loop — never reuse FastAPI's loop
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
@@ -469,31 +438,37 @@ def llm_answer(question, context, lang, history=""):
 def get_answer(question, lang="en", history=""):
     question = question.strip()
 
+    # ── Greeting handler ──────────────────────────────────
     if question.lower().strip() in GREETINGS:
         print("[RESULT] Greeting")
         return GREETING_RESPONSE.get(lang, GREETING_RESPONSE["en"])
 
+    # ── Identity handler ──────────────────────────────────
     if question.lower().strip() in IDENTITY_Q:
         print("[RESULT] Identity")
         return IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"])
 
     print(f"\n{'='*55}\n[Q/{lang}] {question}\n{'='*55}")
 
+    # ── Role-specific match ───────────────────────────────
     ans = specific_role_answer(question)
     if ans:
         print("[RESULT] Specific role match")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── Direct keyword match ──────────────────────────────
     ans = direct_keyword_answer(question)
     if ans:
         print("[RESULT] Direct keyword")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── Exact match ───────────────────────────────────────
     ans = exact_match(question)
     if ans:
         print("[RESULT] Exact match")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── Keyword match ─────────────────────────────────────
     word_count = len(question.split())
     thresh = 1 if word_count <= 2 else (2 if word_count <= 5 else 3)
     ans = keyword_match(question, thresh)
@@ -501,11 +476,13 @@ def get_answer(question, lang="en", history=""):
         print("[RESULT] Keyword match")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── RAG + LLM (with internet fallback inside) ─────────
     ctx = rag_search(question, lang)
     if ctx:
         print("[RESULT] RAG + LLM")
         return llm_answer(question, ctx, lang, history)
 
+    # ── No match ──────────────────────────────────────────
     print("[RESULT] No match")
     fb = {
         "hi": "माफ़ करें, मैं आपकी क्वेरी समझ नहीं पाई। कृपया अधिक जानकारी के लिए GBPIET की वेबसाइट देखें: https://gbpiet.ac.in",
