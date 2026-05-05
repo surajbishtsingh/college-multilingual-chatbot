@@ -4,7 +4,6 @@ import json
 import glob
 import re
 import asyncio
-import threading
 import concurrent.futures
 
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -28,6 +27,24 @@ _embed_model = None
 _qa_database = []
 
 EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+# ── Greeting / Identity responses ─────────────────────────────────────
+GREETINGS = {"hello", "hi", "hlo", "hey", "hii", "helo", "namaste", "नमस्ते", "हेलो", "हाय"}
+IDENTITY_Q = {"who are you", "what are you", "who r u", "tum kaun ho", "aap kaun hain", "aap kaun ho", "kaun ho tum"}
+
+GREETING_RESPONSE = {
+    "en": "Hello! I'm Diksha 👋, the official AI assistant for GBPIET. You can ask me about admissions, fees, hostel, placements, faculty, courses and more!",
+    "hi": "नमस्ते! मैं दीक्षा हूँ 👋 — GBPIET की आधिकारिक AI सहायक। आप मुझसे admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
+    "ga": "नमस्ते! मैं दीक्षा छू — GBPIET की AI सहायक।",
+    "ku": "नमस्ते! मैं दीक्षा छु — GBPIET की AI सहायक।",
+}
+
+IDENTITY_RESPONSE = {
+    "en": "I'm Diksha 🎓, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering & Technology), Pauri Garhwal, Uttarakhand. I can help you with college information in English, Hindi, Garhwali and Kumauni!",
+    "hi": "मैं दीक्षा हूँ 🎓 — GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot। मैं आपकी मदद हिंदी, अंग्रेज़ी, गढ़वाली और कुमाउनी में कर सकती हूँ!",
+    "ga": "मैं दीक्षा छू — GBPIET की AI chatbot।",
+    "ku": "मैं दीक्षा छु — GBPIET की AI chatbot।",
+}
 
 
 def groq_call(messages, max_tokens=500, temperature=0.3):
@@ -149,6 +166,7 @@ HINDI_MAP = {
     'संपर्क': 'contact', 'रजिस्ट्रार': 'registrar', 'कुलसचिव': 'registrar',
 }
 
+
 def hi_to_en(text):
     t = text.lower()
     for h, e in HINDI_MAP.items():
@@ -186,6 +204,7 @@ SPECIFIC_ROLE_MAP = {
     "warden of kedar": "warden kedar", "warden kedar": "warden kedar",
     "warden of alaknanda": "warden alaknanda", "warden alaknanda": "warden alaknanda",
     "warden of shivalik": "warden shivalik", "warden shivalik": "warden shivalik",
+    "priti dimri": "hod mca", "prof priti dimri": "hod mca",
 }
 
 
@@ -278,6 +297,7 @@ HOSTEL_NAMES = {
     'shivalik','trishul','raman','bhagirathi','viswerwarya','vh'
 }
 
+
 def get_keywords(text):
     words = set(re.findall(r'[\u0900-\u097F]+|[a-zA-Z0-9]+', text.lower()))
     translated = set(re.findall(r'[a-zA-Z0-9]+', hi_to_en(text)))
@@ -304,14 +324,18 @@ def keyword_match(question, threshold=2):
 
 
 async def rag_search_async(question, lang="en"):
-    """Async RAG: BM25 + vector search + internet fallback."""
+    """Full RAG pipeline: BM25 + vector search + internet fallback."""
     sources = []
     used_internet = False
     try:
+        # ── BM25 search ───────────────────────────────────
         bm25_results = bm25_search(query=question, top_k=5)
+
+        # ── Vector search ─────────────────────────────────
         collections = get_collection_for_query(question, lang)
         if "website" not in collections:
             collections.append("website")
+
         vector = get_embed_model().embed_query(question)
         lang_filter = lang if lang in ("en", "hi") else None
         vector_results = multi_collection_search(
@@ -319,31 +343,41 @@ async def rag_search_async(question, lang="en"):
             query_vector=vector, query_text=question,
             limit=5, lang_filter=lang_filter,
         )
+
+        # ── Fusion ────────────────────────────────────────
         merged = reciprocal_rank_fusion(
             bm25_results=bm25_results, vector_results=vector_results,
             bm25_weight=0.4, vector_weight=0.6,
         )
+
         ctx_parts = []
         for r in merged[:3]:
             url = r.get("url") or r.get("metadata", {}).get("source", "")
             if url and url.startswith("http"):
                 sources.append(url)
             ctx_parts.append(f"[Score: {r['rrf_score']:.3f}]\n{r['text']}")
+
+        # ── Internet fallback if low confidence ───────────
         top_score = merged[0]["rrf_score"] if merged else 0
         if top_score < 0.05 or not merged:
+            print(f"[RAG] Low score ({top_score:.3f}) — trying internet search...")
             internet_results = search_college_website(question)
             if internet_results:
                 used_internet = True
+                print(f"[RAG] ✅ Internet search returned {len(internet_results)} results")
                 for r in internet_results[:2]:
                     ctx_parts.append(f"[Web]\n{r['snippet']}\nSource: {r['url']}")
                     sources.append(r["url"])
+
         if not ctx_parts:
             return {"context": None, "sources": [], "used_internet": False}
+
         return {
             "context": "\n\n---\n\n".join(ctx_parts),
             "sources": list(dict.fromkeys(sources)),
             "used_internet": used_internet,
         }
+
     except Exception as e:
         print(f"[RAG] Error: {e}")
         return {"context": None, "sources": [], "used_internet": False}
@@ -351,29 +385,22 @@ async def rag_search_async(question, lang="en"):
 
 def rag_search(question, lang="en"):
     """
-    ✅ FIXED: Runs async RAG in a dedicated thread with its own event loop.
-    Solves 'There is no current event loop in AnyIO worker thread' error.
+    Run rag_search_async safely from a sync context.
+    Fixes 'There is no current event loop in thread' error on Railway.
     """
-    result_container = {}
-
-    def thread_target():
+    try:
+        # Always create a fresh event loop — never reuse FastAPI's loop
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            result_container["result"] = loop.run_until_complete(
-                rag_search_async(question, lang)
-            )
-        except Exception as e:
-            print(f"[RAG] error: {e}")
-            result_container["result"] = {}
+            result = loop.run_until_complete(rag_search_async(question, lang))
         finally:
             loop.close()
-
-    t = threading.Thread(target=thread_target)
-    t.start()
-    t.join(timeout=30)
-
-    return result_container.get("result", {}).get("context")
+            asyncio.set_event_loop(None)
+    except Exception as e:
+        print(f"[RAG] error: {e}")
+        result = {}
+    return result.get("context")
 
 
 def build_prompt(question, context, lang, history=""):
@@ -410,23 +437,38 @@ def llm_answer(question, context, lang, history=""):
 
 def get_answer(question, lang="en", history=""):
     question = question.strip()
+
+    # ── Greeting handler ──────────────────────────────────
+    if question.lower().strip() in GREETINGS:
+        print("[RESULT] Greeting")
+        return GREETING_RESPONSE.get(lang, GREETING_RESPONSE["en"])
+
+    # ── Identity handler ──────────────────────────────────
+    if question.lower().strip() in IDENTITY_Q:
+        print("[RESULT] Identity")
+        return IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"])
+
     print(f"\n{'='*55}\n[Q/{lang}] {question}\n{'='*55}")
 
+    # ── Role-specific match ───────────────────────────────
     ans = specific_role_answer(question)
     if ans:
         print("[RESULT] Specific role match")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── Direct keyword match ──────────────────────────────
     ans = direct_keyword_answer(question)
     if ans:
         print("[RESULT] Direct keyword")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── Exact match ───────────────────────────────────────
     ans = exact_match(question)
     if ans:
         print("[RESULT] Exact match")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── Keyword match ─────────────────────────────────────
     word_count = len(question.split())
     thresh = 1 if word_count <= 2 else (2 if word_count <= 5 else 3)
     ans = keyword_match(question, thresh)
@@ -434,16 +476,18 @@ def get_answer(question, lang="en", history=""):
         print("[RESULT] Keyword match")
         return translate_answer_if_needed(ans, lang, question)
 
+    # ── RAG + LLM (with internet fallback inside) ─────────
     ctx = rag_search(question, lang)
     if ctx:
         print("[RESULT] RAG + LLM")
         return llm_answer(question, ctx, lang, history)
 
+    # ── No match ──────────────────────────────────────────
     print("[RESULT] No match")
     fb = {
-        "hi": "माफ़ करें, मैं आपकी क्वेरी समझ नहीं पाई।",
+        "hi": "माफ़ करें, मैं आपकी क्वेरी समझ नहीं पाई। कृपया अधिक जानकारी के लिए GBPIET की वेबसाइट देखें: https://gbpiet.ac.in",
         "ga": "माफ करा, मी तैं त्वे सवाल समझ नि ऐ।",
         "ku": "माफ करिया! म्यर पास तस के जानकारी न्है़ंं!",
-        "en": "I'm sorry, I'm unable to understand your query.",
+        "en": "I'm sorry, I couldn't find information about that. Please visit https://gbpiet.ac.in or call 01368-228030 for more details.",
     }
     return fb.get(lang, fb["en"])
