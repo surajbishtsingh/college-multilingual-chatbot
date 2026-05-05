@@ -1,6 +1,7 @@
 [variables]
 HF_HOME = "/app/.cache"
 SENTENCE_TRANSFORMERS_HOME = "/app/.cache"
+TRANSFORMERS_CACHE = "/app/.cache"
 HF_HUB_DISABLE_PROGRESS_BARS = "1"
 
 [phases.setup]
