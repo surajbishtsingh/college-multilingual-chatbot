@@ -1,7 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
 
-# Set cache FIRST before anything
 ENV HF_HOME=/app/.cache
 ENV SENTENCE_TRANSFORMERS_HOME=/app/.cache
 ENV TRANSFORMERS_CACHE=/app/.cache
@@ -11,14 +10,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download model to /app/.cache
 RUN python -c "
 import os
 os.environ['HF_HOME'] = '/app/.cache'
 os.environ['SENTENCE_TRANSFORMERS_HOME'] = '/app/.cache'
 from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
-print('Model cached successfully')
+SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+print('Model cached OK')
 "
 
 COPY . .
