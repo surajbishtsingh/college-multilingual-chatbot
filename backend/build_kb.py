@@ -1,99 +1,87 @@
-# build_kb.py — Multi-collection Qdrant index builder
-import json
+# ingest_to_qdrant.py
+# ─────────────────────────────────────────────────────────────
+# Run this ONCE locally to upload all JSON data to Qdrant Cloud
+#
+# Usage:
+#   cd backend
+#   pip install qdrant-client sentence-transformers python-dotenv
+#   python ingest_to_qdrant.py
+# ─────────────────────────────────────────────────────────────
+
 import os
-import uuid
-import shutil
+import json
 import glob
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.documents import Document
-from qdrant_client.models import PointStruct
-try:
-    from backend.qdrant_setup import get_client, ensure_collections, QDRANT_PATH
-    import backend.qdrant_setup as qdrant_setup
-except ImportError:
-    from qdrant_setup import get_client, ensure_collections, QDRANT_PATH
-    import qdrant_setup
+import uuid
+from dotenv import load_dotenv
 
-EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+load_dotenv()
 
-# ── Map filename patterns → collection name ────────────────────────────
-# Files matching a pattern go into a specific collection.
-FILE_TO_COLLECTION = {
-    "admission":   "admissions",
-    "fees":        "fees",
-    "fee":         "fees",
-    "hostel":      "hostel",
-    "hods":        "faq",
-    "hodshi":      "faq",
-    "faculty":     "faq",
-    "facultyhi":   "faq",
-    "placement":   "faq",
-    "placementhi": "faq",
-    "campus":      "faq",
-    "grievance":   "faq",
-    "student":     "faq",
-    "general":     "kb_en",
-    "generalhi":   "kb_hi",
-    "courses":     "kb_en",
-    "courseshi":   "kb_hi",
-    "administration":   "kb_en",
-    "administrationhi": "kb_hi",
+from qdrant_client import QdrantClient
+from qdrant_client.models import (
+    Distance, VectorParams, PointStruct, Filter,
+    FieldCondition, MatchValue,
+)
+from sentence_transformers import SentenceTransformer
+
+# ── Config ────────────────────────────────────────────────────
+QDRANT_URL     = os.getenv("QDRANT_URL", "")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
+DATA_FOLDER    = os.path.join(os.path.dirname(__file__), "data")
+EMBED_MODEL    = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+VECTOR_SIZE    = 384
+BATCH_SIZE     = 50
+
+# ── Collection routing by category/lang ───────────────────────
+COLLECTION_MAP = {
+    ("admission",   "en"): "gbpiet_admissions",
+    ("eligibility", "en"): "gbpiet_admissions",
+    ("fees",        "en"): "gbpiet_fees",
+    ("fee",         "en"): "gbpiet_fees",
+    ("hostel",      "en"): "gbpiet_hostel",
+    ("admission",   "hi"): "gbpiet_kb_hi",
+    ("fees",        "hi"): "gbpiet_kb_hi",
+    ("hostel",      "hi"): "gbpiet_kb_hi",
 }
+DEFAULT_EN = "gbpiet_kb_en"
+DEFAULT_HI = "gbpiet_kb_hi"
+FAQ_COLLECTION = "gbpiet_faq"
 
-HINDI_SUFFIXES = ("hi", "hindi", "hin")
+ALL_COLLECTIONS = [
+    "gbpiet_faq",
+    "gbpiet_kb_en",
+    "gbpiet_kb_hi",
+    "gbpiet_web",
+    "gbpiet_hostel",
+    "gbpiet_fees",
+    "gbpiet_admissions",
+]
 
 
-def detect_course_type(text: str) -> str:
-    t = text.lower()
-    if any(k in t for k in ["btech", "b.tech", "undergraduate", "ug", "12th"]):
-        return "btech"
-    if any(k in t for k in ["mca"]):
-        return "mca"
-    if any(k in t for k in ["mtech", "m.tech", "pg"]):
-        return "mtech"
-    return "general"
+def get_collection(item: dict) -> str:
+    category = item.get("category", "").lower().strip()
+    lang     = item.get("lang", "en").lower().strip()
+
+    # FAQ items go to FAQ collection
+    if category in ("faq", "general", ""):
+        return FAQ_COLLECTION if lang == "en" else DEFAULT_HI
+
+    key = (category, lang)
+    if key in COLLECTION_MAP:
+        return COLLECTION_MAP[key]
+
+    return DEFAULT_EN if lang == "en" else DEFAULT_HI
 
 
-def filename_to_collection(filename: str) -> tuple[str, str]:
-    """
-    Returns (collection_name, language) for a given JSON filename.
-    Falls back to kb_en / kb_hi based on 'hi' suffix.
-    """
-    base = filename.replace("faqs_", "").replace("faqs-", "").replace(".json", "").lower()
+def load_all_json(data_folder: str) -> list[dict]:
+    all_items = []
+    files = sorted(glob.glob(os.path.join(data_folder, "*.json")))
 
-    # Check explicit mapping first
-    for pattern, collection in FILE_TO_COLLECTION.items():
-        if pattern in base:
-            lang = "hi" if any(base.endswith(s) for s in HINDI_SUFFIXES) else "en"
-            return collection, lang
+    if not files:
+        print(f"❌ No JSON files found in {data_folder}")
+        return []
 
-    # Fallback: Hindi suffix → kb_hi, else → kb_en
-    if any(base.endswith(s) for s in HINDI_SUFFIXES):
-        return "kb_hi", "hi"
-    return "kb_en", "en"
-
-def safe_text(value):
-    if isinstance(value, list):
-        return " ".join(str(v) for v in value)
-    if value is None:
-        return ""
-    return str(value)
-def load_documents(data_folder: str) -> dict[str, list[Document]]:
-    """
-    Load all JSON files and bucket Documents by target collection.
-    Returns { collection_name: [Document, ...] }
-    """
-    buckets: dict[str, list[Document]] = {name: [] for name in [
-        "kb_en", "kb_hi", "faq", "admissions", "fees", "hostel"
-    ]}
-
-    total = 0
-    for filepath in sorted(glob.glob(os.path.join(data_folder, "*.json"))):
-        filename   = os.path.basename(filepath)
-        collection, lang = filename_to_collection(filename)
-        cat        = filename.replace("faqs_", "").replace("faqs-", "").replace(".json", "")
-
+    for filepath in files:
+        filename = os.path.basename(filepath)
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -104,168 +92,160 @@ def load_documents(data_folder: str) -> dict[str, list[Document]]:
             for item in items:
                 if not isinstance(item, dict):
                     continue
-                if not item.get("question") or not item.get("answer"):
+
+                answer = item.get("answer", "")
+                if not answer or not answer.strip():
                     continue
 
-                q = safe_text(item.get("question", "")).strip()
-                a = safe_text(item.get("answer", "")).strip()
+                q_field = item.get("question", "")
+                if isinstance(q_field, str):
+                    questions = [q_field] if q_field.strip() else []
+                elif isinstance(q_field, list):
+                    questions = [q for q in q_field if isinstance(q, str) and q.strip()]
+                else:
+                    questions = []
 
-                # Detect Hindi by character ratio
-                hindi_chars = sum(1 for c in q if '\u0900' <= c <= '\u097F')
-                is_hindi    = hindi_chars > len(q) * 0.3
-                lang_tag    = "hi" if is_hindi else lang
-                course_type = detect_course_type(q + " " + a)
+                # Build text for embedding = question + answer
+                primary_q = questions[0] if questions else ""
+                text_for_embed = f"{primary_q}\n{answer}".strip()
 
-                text = (
-                    f"Language: {lang_tag}\n"
-                    f"Course: {course_type}\n"
-                    f"Category: {cat}\n\n"
-                    f"Question: {q}\n"
-                    f"Answer: {a}"
-                )
-
-                doc = Document(
-                    page_content=text,
-                    metadata={
-                        "source":   filename,
-                        "category": cat,
-                        "language": lang_tag,
-                        "course":   course_type,
-                        "question": q,
-                    }
-                )
-                buckets[collection].append(doc)
+                all_items.append({
+                    "text":       text_for_embed,
+                    "question":   primary_q,
+                    "answer":     answer.strip(),
+                    "category":   item.get("category", "general"),
+                    "tags":       item.get("tags", []),
+                    "lang":       item.get("lang", "en"),
+                    "source":     filename,
+                    "item_id":    item.get("id", None),
+                })
                 count += 1
 
-            total += count
-            print(f"  {count:3d} entries → {collection:12s} ← {filename}")
+            print(f"  📄 {filename}: {count} items loaded")
 
         except Exception as e:
-            print(f"  ERROR {filename}: {e}")
+            print(f"  ❌ Error loading {filename}: {e}")
 
-    print(f"\n  Total: {total} entries across {len(buckets)} collections")
-    return buckets
+    print(f"\n✅ Total items loaded: {len(all_items)}")
+    return all_items
 
 
-def build_knowledge_base(recreate: bool = True):
-    print("=" * 60)
-    print("Diksha KB Builder — Multi-Collection Qdrant")
-    print("=" * 60)
+def ensure_collections(client: QdrantClient):
+    existing = {c.name for c in client.get_collections().collections}
+    for name in ALL_COLLECTIONS:
+        if name not in existing:
+            client.create_collection(
+                collection_name=name,
+                vectors_config=VectorParams(
+                    size=VECTOR_SIZE,
+                    distance=Distance.COSINE,
+                ),
+            )
+            print(f"  ✅ Created collection: {name}")
+        else:
+            count = client.get_collection(name).points_count
+            print(f"  📦 {name}: already exists ({count} points)")
 
-    data_folder = os.path.join(os.path.dirname(__file__), "data")
 
-    # ── Step 1: Load and bucket documents ─────────────────────────────
-    print("\n[1/5] Loading JSON files...")
-    buckets = load_documents(data_folder)
+def embed_in_batches(model: SentenceTransformer, texts: list[str]) -> list:
+    all_vectors = []
+    for i in range(0, len(texts), BATCH_SIZE):
+        batch = texts[i:i + BATCH_SIZE]
+        vectors = model.encode(batch, normalize_embeddings=True, show_progress_bar=False)
+        all_vectors.extend(vectors.tolist())
+        print(f"  🔢 Embedded {min(i + BATCH_SIZE, len(texts))}/{len(texts)}")
+    return all_vectors
 
-    # ── Step 2: Chunk documents ────────────────────────────────────────
-    print("\n[2/5] Chunking documents...")
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=400,
-        chunk_overlap=60,
-        separators=["\n\n", "\n", ". ", " "]
-    )
 
-    chunked: dict[str, list] = {}
-    for collection, docs in buckets.items():
-        if not docs:
-            continue
-        chunks = splitter.split_documents(docs)
-        chunked[collection] = chunks
-        print(f"  {collection}: {len(docs)} docs → {len(chunks)} chunks")
+def upload_to_qdrant(client: QdrantClient, items: list[dict], vectors: list):
+    # Group by collection
+    groups: dict[str, list] = {}
+    for item, vector in zip(items, vectors):
+        col = get_collection(item)
+        if col not in groups:
+            groups[col] = []
+        groups[col].append((item, vector))
 
-    # ── Step 3: Embed all chunks ───────────────────────────────────────
-    print("\n[3/5] Creating embeddings...")
-    embeddings = HuggingFaceEmbeddings(
-        model_name=EMBED_MODEL_NAME,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True}
-    )
-
-    all_texts = []
-    for chunks in chunked.values():
-        all_texts.extend([c.page_content for c in chunks])
-
-    print(f"  Embedding {len(all_texts)} total chunks...")
-    all_vectors = embeddings.embed_documents(all_texts)
-    dim         = len(all_vectors[0])
-    print(f"  Embedding dim: {dim}")
-
-    # ── Step 4: Write to temp Qdrant, then swap ────────────────────────
-    print("\n[4/5] Building Qdrant collections...")
-
-    temp_path  = os.path.join(os.path.dirname(__file__), "qdrant_storage_temp")
-    final_path = QDRANT_PATH
-
-    # Clean any leftover temp
-    if os.path.exists(temp_path):
-        shutil.rmtree(temp_path)
-    os.makedirs(temp_path, exist_ok=True)
-
-    # Temporarily point client to temp path
-    import qdrant_setup
-    qdrant_setup.QDRANT_PATH = temp_path
-    qdrant_setup._client     = None   # reset singleton
-
-    ensure_collections(recreate=True)
-    client = get_client()
-
-    # Upsert each collection
-    vector_idx = 0
-    for collection, chunks in chunked.items():
-        if not chunks:
-            continue
-
+    # Upload each group
+    for collection, pairs in groups.items():
         points = []
-        for chunk in chunks:
-            vec = all_vectors[vector_idx]
-            vector_idx += 1
+        for item, vector in pairs:
+            point_id = str(uuid.uuid4())
             points.append(PointStruct(
-                id=str(uuid.uuid4()),
-                vector=vec,
+                id=point_id,
+                vector=vector,
                 payload={
-                    **chunk.metadata,
-                    "text": chunk.page_content,
-                }
+                    "text":     item["text"],
+                    "question": item["question"],
+                    "answer":   item["answer"],
+                    "category": item["category"],
+                    "tags":     item["tags"],
+                    "lang":     item["lang"],
+                    "source":   item["source"],
+                },
             ))
 
-        # Upsert in batches of 256
-        batch_size = 256
-        for start in range(0, len(points), batch_size):
-            batch = points[start:start + batch_size]
+        # Upload in batches
+        for i in range(0, len(points), BATCH_SIZE):
+            batch = points[i:i + BATCH_SIZE]
             client.upsert(collection_name=collection, points=batch)
 
-        print(f"  ✅ {collection}: {len(points)} points upserted")
+        count = client.get_collection(collection).points_count
+        print(f"  ✅ {collection}: {len(pairs)} items uploaded → {count} total points")
 
-    # Close temp client before swapping
-    client.close()
-    qdrant_setup._client = None
 
-    # Atomic swap temp → final
-    print("\n[5/5] Swapping index into place...")
-    if os.path.exists(final_path):
-        shutil.rmtree(final_path)
-    shutil.move(temp_path, final_path)
+def main():
+    print("=" * 55)
+    print("  GBPIET Qdrant Ingestion Script")
+    print("=" * 55)
 
-    # Restore final path in qdrant_setup
-    qdrant_setup.QDRANT_PATH = final_path
+    # ── Validate env ──────────────────────────────────────
+    if not QDRANT_URL or not QDRANT_API_KEY:
+        print("❌ Missing QDRANT_URL or QDRANT_API_KEY in .env")
+        print("   Add them to backend/.env and retry.")
+        return
 
-    print("\n" + "=" * 60)
-    print("✅ Multi-Collection Qdrant KB Built Successfully!")
-    print(f"📁 Saved at: {final_path}")
-    print("=" * 60)
+    print(f"\n🔗 Connecting to Qdrant: {QDRANT_URL[:40]}...")
+    client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=60)
+    print("✅ Connected\n")
 
-    # Print collection stats
-    qdrant_setup._client = None
-    client = get_client()
-    print("\nCollection stats:")
-    for name in chunked:
-        try:
-            info = client.get_collection(name)
-            print(f"  {name:15s}: {info.points_count} points")
-        except Exception:
-            print(f"  {name:15s}: not found")
+    # ── Ensure collections exist ──────────────────────────
+    print("📦 Checking collections...")
+    ensure_collections(client)
+
+    # ── Load JSON data ────────────────────────────────────
+    print(f"\n📂 Loading JSON from: {DATA_FOLDER}")
+    items = load_all_json(DATA_FOLDER)
+    if not items:
+        print("❌ No data found. Check your data/ folder.")
+        return
+
+    # ── Embed ─────────────────────────────────────────────
+    print(f"\n🤖 Loading embedding model: {EMBED_MODEL}")
+    model = SentenceTransformer(EMBED_MODEL)
+    print("✅ Model loaded\n")
+
+    print(f"🔢 Embedding {len(items)} items...")
+    texts   = [item["text"] for item in items]
+    vectors = embed_in_batches(model, texts)
+    print("✅ Embedding complete\n")
+
+    # ── Upload ────────────────────────────────────────────
+    print("⬆️  Uploading to Qdrant Cloud...")
+    upload_to_qdrant(client, items, vectors)
+
+    # ── Final summary ─────────────────────────────────────
+    print("\n" + "=" * 55)
+    print("✅ INGESTION COMPLETE — Collection summary:")
+    print("=" * 55)
+    for name in ALL_COLLECTIONS:
+        count = client.get_collection(name).points_count
+        status = "✅" if count > 0 else "⚠️  empty"
+        print(f"  {status}  {name}: {count} points")
+    print("=" * 55)
+    print("\nYour Qdrant is now populated!")
+    print("Redeploy on Railway — vector search will now work.")
 
 
 if __name__ == "__main__":
-    build_knowledge_base(recreate=True)
+    main()
