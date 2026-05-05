@@ -1,6 +1,10 @@
 import sys
 import traceback
 
+# Global DB vars (set inside try block after load_dotenv)
+DATABASE_URL = ""
+USE_POSTGRES = False
+
 print("=" * 60)
 print("[BOOT] Starting import sequence...")
 sys.stdout.flush()
@@ -75,6 +79,12 @@ try:
     print("[BOOT] ✅ scraper.scheduler OK")
     sys.stdout.flush()
 
+    # ── DATABASE URL (after load_dotenv so env vars are available) ──
+    DATABASE_URL = os.getenv("DATABASE_URL", "")
+    USE_POSTGRES = bool(DATABASE_URL) and "postgresql" in DATABASE_URL
+    print(f"[DB] Using {'PostgreSQL' if USE_POSTGRES else 'SQLite (dev only)'}")
+    sys.stdout.flush()
+
     print("[BOOT] ✅ ALL IMPORTS SUCCESSFUL")
     sys.stdout.flush()
 
@@ -86,61 +96,6 @@ except Exception as e:
     sys.stdout.flush()
     sys.exit(1)
 
-# ─────────────────────────────────────────────────────────────
-# HF CACHE
-# ─────────────────────────────────────────────────────────────
-
-#os.environ.setdefault("HF_HOME", "/app/.cache")
-#os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", "/app/.cache")
-#os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
-
-# ─────────────────────────────────────────────────────────────
-# DATABASE
-# ─────────────────────────────────────────────────────────────
-
-DATABASE_URL = os.getenv("DATABASE_URL", "")
-
-USE_POSTGRES = (
-    bool(DATABASE_URL)
-    and "postgresql" in DATABASE_URL
-)
-
-print(
-    f"[DB] Using "
-    f"{'PostgreSQL' if USE_POSTGRES else 'SQLite (dev only)'}"
-)
-
-# ─────────────────────────────────────────────────────────────
-# IMPORTS
-# ─────────────────────────────────────────────────────────────
-
-from language_detector import detect_language
-
-from rag.kb_query import (
-    get_answer,
-    get_qdrant,
-    get_embed_model,
-)
-
-from voice import generate_voice
-
-from memory.database import (
-    init_db,
-    close_pg_pool,
-)
-
-from memory.memory_manager import (
-    process_user_message,
-    process_bot_message,
-    build_memory_context,
-)
-
-from scraper.scheduler import (
-    start_scheduler,
-    stop_scheduler,
-    get_scrape_status,
-    run_scrape_job,
-)
 
 # ═════════════════════════════════════════════════════════════
 # MODELS
@@ -165,10 +120,23 @@ class ChatResponse(BaseModel):
     chatbot_name: str = "Diksha"
 
 
+# ═════════════════════════════════════════════════════════════
+# APP
+# ═════════════════════════════════════════════════════════════
+
 app = FastAPI(
     title="Diksha - GBPIET Chatbot",
     version="2.0.0"
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # ═════════════════════════════════════════════════════════════
 # STARTUP
@@ -215,14 +183,13 @@ async def startup_event():
     sys.stdout.flush()
     try:
         await asyncio.wait_for(
-            run_in_threadpool(get_embed_model), timeout=60
+            run_in_threadpool(get_embed_model), timeout=30
         )
         print("[Startup] ✅ Embedding model ready")
     except asyncio.TimeoutError:
-        print("[Startup] ❌ Embedding model TIMED OUT after 60s")
+        print("[Startup] ⚠️ Embedding model timed out — will load on first request")
     except Exception as e:
-        print(f"[Startup] ❌ Embedding model ERROR: {e}")
-        traceback.print_exc()
+        print(f"[Startup] ⚠️ Embedding model error: {e} — will load on first request")
     sys.stdout.flush()
 
     # ── QDRANT ────────────────────────────────────────────
@@ -260,4 +227,28 @@ async def startup_event():
 
     print("[Startup] ✅ Diksha Ready!")
     print("=" * 60)
+    sys.stdout.flush()
+
+
+# ═════════════════════════════════════════════════════════════
+# SHUTDOWN
+# ═════════════════════════════════════════════════════════════
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    print("[Shutdown] Stopping scheduler...")
+    try:
+        stop_scheduler()
+        print("[Shutdown] ✅ Scheduler stopped")
+    except Exception as e:
+        print(f"[Shutdown] Scheduler error: {e}")
+
+    print("[Shutdown] Closing DB pool...")
+    try:
+        await close_pg_pool()
+        print("[Shutdown] ✅ DB pool closed")
+    except Exception as e:
+        print(f"[Shutdown] DB pool error: {e}")
+
+    print("[Shutdown] 👋 Diksha stopped")
     sys.stdout.flush()
