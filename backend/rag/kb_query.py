@@ -4,6 +4,7 @@ import json
 import glob
 import re
 import asyncio
+import threading
 import concurrent.futures
 
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -272,7 +273,10 @@ STOP = {
     'क्या','कौन','का','की','के','में','से','है','हैं','और','या','को','ने',
     'मैं','हम','आप','वे','इस','उस','यह','वह','पर','कैसे','कहाँ',
 }
-HOSTEL_NAMES = {'kailash','neelkanth','kedar','rudra','badri','alaknanda','shivalik','trishul','raman','bhagirathi','viswerwarya','vh'}
+HOSTEL_NAMES = {
+    'kailash','neelkanth','kedar','rudra','badri','alaknanda',
+    'shivalik','trishul','raman','bhagirathi','viswerwarya','vh'
+}
 
 def get_keywords(text):
     words = set(re.findall(r'[\u0900-\u097F]+|[a-zA-Z0-9]+', text.lower()))
@@ -300,6 +304,7 @@ def keyword_match(question, threshold=2):
 
 
 async def rag_search_async(question, lang="en"):
+    """Async RAG: BM25 + vector search + internet fallback."""
     sources = []
     used_internet = False
     try:
@@ -334,25 +339,41 @@ async def rag_search_async(question, lang="en"):
                     sources.append(r["url"])
         if not ctx_parts:
             return {"context": None, "sources": [], "used_internet": False}
-        return {"context": "\n\n---\n\n".join(ctx_parts), "sources": list(dict.fromkeys(sources)), "used_internet": used_internet}
+        return {
+            "context": "\n\n---\n\n".join(ctx_parts),
+            "sources": list(dict.fromkeys(sources)),
+            "used_internet": used_internet,
+        }
     except Exception as e:
         print(f"[RAG] Error: {e}")
         return {"context": None, "sources": [], "used_internet": False}
 
 
 def rag_search(question, lang="en"):
-    try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            with concurrent.futures.ThreadPoolExecutor() as pool:
-                future = pool.submit(asyncio.run, rag_search_async(question, lang))
-                result = future.result()
-        else:
-            result = loop.run_until_complete(rag_search_async(question, lang))
-    except Exception as e:
-        print(f"[RAG] error: {e}")
-        result = {}
-    return result.get("context")
+    """
+    ✅ FIXED: Runs async RAG in a dedicated thread with its own event loop.
+    Solves 'There is no current event loop in AnyIO worker thread' error.
+    """
+    result_container = {}
+
+    def thread_target():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result_container["result"] = loop.run_until_complete(
+                rag_search_async(question, lang)
+            )
+        except Exception as e:
+            print(f"[RAG] error: {e}")
+            result_container["result"] = {}
+        finally:
+            loop.close()
+
+    t = threading.Thread(target=thread_target)
+    t.start()
+    t.join(timeout=30)
+
+    return result_container.get("result", {}).get("context")
 
 
 def build_prompt(question, context, lang, history=""):
