@@ -111,6 +111,10 @@ app = FastAPI(
 # STARTUP
 # ═════════════════════════════════════════════════════════════
 
+# ═════════════════════════════════════════════════════════════
+# STARTUP
+# ═════════════════════════════════════════════════════════════
+
 @app.on_event("startup")
 async def startup_event():
 
@@ -150,14 +154,13 @@ async def startup_event():
         print(f"[Startup] BM25 failed: {e}")
 
     # EMBEDDING MODEL
+    # Removed timeout because HuggingFace model loading
+    # can take longer on Railway cold start
 
     try:
         print("[Startup] Loading embedding model...")
 
-        await asyncio.wait_for(
-            run_in_threadpool(get_embed_model),
-            timeout=120
-        )
+        await run_in_threadpool(get_embed_model)
 
         print("[Startup] ✅ Embedding model ready")
 
@@ -187,14 +190,6 @@ async def startup_event():
 
     except Exception as e:
         print(f"[Startup] Scheduler failed: {e}")
-
-    # Change this block — remove the timeout wrapper:
-try:
-    print("[Startup] Loading embedding model...")
-    await run_in_threadpool(get_embed_model)  # No timeout needed, model is cached
-    print("[Startup] ✅ Embedding model ready")
-except Exception as e:
-    print(f"[Startup] Embedding model failed: {e}")
 
     # ENV STATUS
 
