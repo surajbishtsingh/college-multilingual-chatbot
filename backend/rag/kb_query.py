@@ -50,12 +50,17 @@ def groq_call(messages, max_tokens=500, temperature=0.3):
 def get_embed_model():
     global _embed_model
     if _embed_model is None:
-        _embed_model = HuggingFaceEmbeddings(
-            model_name=EMBED_MODEL_NAME,
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
-        )
-        print("[Embed] Model loaded")
+        print("[Embed] Loading model...")
+        try:
+            _embed_model = HuggingFaceEmbeddings(
+                model_name=EMBED_MODEL_NAME,
+                model_kwargs={"device": "cpu"},
+                encode_kwargs={"normalize_embeddings": True},
+            )
+            print("[Embed] ✅ Model loaded")
+        except Exception as e:
+            print(f"[Embed] ❌ Failed: {e}")
+            raise
     return _embed_model
 
 
