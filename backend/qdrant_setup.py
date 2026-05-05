@@ -1,81 +1,98 @@
-# qdrant_setup.py — Qdrant Cloud + Local fallback
+# backend/qdrant_setup.py
 import os
-from dotenv import load_dotenv
+import atexit
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.models import Distance, VectorParams, OptimizersConfigDiff
+from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Config ────────────────────────────────────────────────────────────
-QDRANT_URL    = os.getenv("QDRANT_URL", "")       # Cloud URL
-QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")  # Cloud API key
-QDRANT_LOCAL  = os.path.join(os.path.dirname(__file__), "qdrant_storage")
+# ── Connection settings ────────────────────────────────────────────────
+QDRANT_URL     = os.getenv("QDRANT_URL", "")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
+QDRANT_PATH    = os.path.join(os.path.dirname(__file__), "qdrant_storage")
 
-VECTOR_SIZE   = 384   # paraphrase-multilingual-MiniLM-L12-v2
+USE_CLOUD = bool(QDRANT_URL and "qdrant.io" in QDRANT_URL)
 
-# ── Collection names ──────────────────────────────────────────────────
+EMBED_DIM = 384
+
+# ── Collection names ───────────────────────────────────────────────────
+# Use prefix for cloud to avoid conflicts
+PREFIX = "gbpiet_" if USE_CLOUD else ""
+
 COLLECTIONS = {
-    "faq":      "gbpiet_faq",
-    "kb_en":    "gbpiet_kb_en",
-    "kb_hi":    "gbpiet_kb_hi",
-    "website":  "gbpiet_web",
-    "hostel":   "gbpiet_hostel",
-    "fees":     "gbpiet_fees",
-    "admissions": "gbpiet_admissions",
+    f"{PREFIX}kb_en":      "General English knowledge base",
+    f"{PREFIX}kb_hi":      "General Hindi knowledge base",
+    f"{PREFIX}faq":        "Frequently asked questions",
+    f"{PREFIX}admissions": "Admission process documents",
+    f"{PREFIX}fees":       "Fee structure documents",
+    f"{PREFIX}hostel":     "Hostel information documents",
+    f"{PREFIX}website":    "Live scraped website content",
 }
 
 _client: QdrantClient | None = None
 
 
 def get_client() -> QdrantClient:
-    """
-    Get Qdrant client.
-    WHY LOCAL FAILS ON RAILWAY:
-      Railway filesystem is ephemeral — qdrant_storage/ gets deleted on restart.
-      Use Qdrant Cloud (free tier: 1GB, 1 collection) for production.
-    """
     global _client
-    if _client is not None:
-        return _client
+    if _client is None:
+        if USE_CLOUD:
+            _client = QdrantClient(
+                url=QDRANT_URL,
+                api_key=QDRANT_API_KEY,
+                timeout=30,
+            )
+            print(f"[Qdrant] Connected to Cloud → {QDRANT_URL[:50]}...")
+        else:
+            os.makedirs(QDRANT_PATH, exist_ok=True)
+            _client = QdrantClient(path=QDRANT_PATH)
+            print(f"[Qdrant] Connected to Local → {QDRANT_PATH}")
 
-    if QDRANT_URL and QDRANT_API_KEY:
-        # ── Cloud mode ───────────────────────────────────────────
-        _client = QdrantClient(
-            url=QDRANT_URL,
-            api_key=QDRANT_API_KEY,
-            timeout=30,
-        )
-        print(f"[Qdrant] Connected to Cloud → {QDRANT_URL[:40]}...")
-    elif QDRANT_URL:
-        # ── Self-hosted without API key ───────────────────────────
-        _client = QdrantClient(url=QDRANT_URL, timeout=30)
-        print(f"[Qdrant] Connected to self-hosted → {QDRANT_URL}")
-    else:
-        # ── Local mode (dev only — NOT for Railway) ───────────────
-        os.makedirs(QDRANT_LOCAL, exist_ok=True)
-        _client = QdrantClient(path=QDRANT_LOCAL)
-        print(f"[Qdrant] Local mode → {QDRANT_LOCAL}")
-        print("[Qdrant] ⚠️  WARNING: Local mode not suitable for Railway/production!")
-
-    # Ensure all collections exist
-    _ensure_collections(_client)
+        atexit.register(_close_client)
     return _client
 
 
-def _ensure_collections(client: QdrantClient):
-    """Create collections if they don't exist."""
+def _close_client():
+    global _client
+    if _client is not None:
+        try:
+            _client.close()
+        except Exception:
+            pass
+        _client = None
+
+
+def ensure_collections(recreate: bool = False):
+    client   = get_client()
     existing = {c.name for c in client.get_collections().collections}
 
-    for key, name in COLLECTIONS.items():
-        if name not in existing:
-            client.create_collection(
-                collection_name=name,
-                vectors_config=VectorParams(
-                    size=VECTOR_SIZE,
-                    distance=Distance.COSINE,
-                ),
-            )
-            print(f"[Qdrant] Created collection: {name}")
-        else:
-            count = client.get_collection(name).points_count
-            print(f"[Qdrant] {name}: {count} points")
+    for name in COLLECTIONS:
+        if name in existing:
+            if recreate:
+                client.delete_collection(name)
+                print(f"[Qdrant] Deleted: {name}")
+            else:
+                print(f"[Qdrant] Exists: {name}")
+                continue
+
+        client.create_collection(
+            collection_name=name,
+            vectors_config=VectorParams(
+                size=EMBED_DIM,
+                distance=Distance.COSINE,
+            ),
+            optimizers_config=OptimizersConfigDiff(
+                indexing_threshold=5000
+            ),
+        )
+        print(f"[Qdrant] ✅ Created: {name}")
+
+
+def collection_info():
+    client = get_client()
+    for name in COLLECTIONS:
+        try:
+            info = client.get_collection(name)
+            print(f"  [Qdrant] {name}: {info.points_count} points")
+        except Exception:
+            print(f"  [Qdrant] {name}: NOT FOUND")
