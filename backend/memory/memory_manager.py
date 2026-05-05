@@ -88,7 +88,10 @@ async def process_user_message(
     if lang:                profile_updates["language"]  = lang
 
     if profile_updates:
-        await update_user_profile(session_id, **profile_updates)
+        try:
+            await update_user_profile(session_id, **profile_updates)
+        except Exception as e:
+            print(f"[Memory] Profile update failed (non-fatal): {e}")
 
 
 async def process_bot_message(
@@ -102,8 +105,12 @@ async def process_bot_message(
 
 async def build_memory_context(session_id: str) -> str:
     """Build context string from user memory for LLM prompt."""
-    facts   = await get_user_facts(session_id)
-    history = await get_recent_history(session_id, limit=6)
+    try:
+        facts   = await get_user_facts(session_id)
+        history = await get_recent_history(session_id, limit=6)
+    except Exception as e:
+        print(f"[Memory] Context build failed (non-fatal): {e}")
+        return ""
 
     parts = []
 
