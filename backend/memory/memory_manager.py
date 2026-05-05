@@ -1,10 +1,9 @@
 # memory/memory_manager.py
 import re
-import json
 from memory.database import (
     save_user_fact, get_user_facts,
     update_user_profile, get_recent_history,
-    save_message, get_pg_pool,
+    save_message,
 )
 
 # ── Fact extraction patterns ───────────────────────────────────────────
@@ -62,43 +61,6 @@ def extract_facts(text: str) -> dict[str, str]:
     return facts
 
 
-async def _safe_update_profile(session_id: str, updates: dict):
-    """
-    Directly update user profile using raw SQL with explicit ::text casts
-    to avoid 'could not determine data type of parameter $1' error.
-    """
-    try:
-        pool = await get_pg_pool()
-        async with pool.acquire() as conn:
-            # First ensure row exists
-            await conn.execute(
-                """
-                INSERT INTO user_profiles (session_id)
-                VALUES ($1)
-                ON CONFLICT (session_id) DO NOTHING
-                """,
-                session_id
-            )
-
-            # Update only columns that exist in updates
-            allowed = ["name", "branch", "semester", "course", "language", "year"]
-            for key, value in updates.items():
-                if key not in allowed:
-                    continue
-                # Use explicit ::text cast to fix parameter type error
-                await conn.execute(
-                    f"""
-                    UPDATE user_profiles
-                    SET {key} = $1::text,
-                        updated_at = NOW()
-                    WHERE session_id = $2::text
-                    """,
-                    str(value), str(session_id)
-                )
-    except Exception as e:
-        print(f"[Memory] _safe_update_profile failed (non-fatal): {e}")
-
-
 async def process_user_message(
     session_id: str,
     message:    str,
@@ -108,7 +70,7 @@ async def process_user_message(
     Called every time a user sends a message.
     1. Save to DB
     2. Extract facts
-    3. Update profile
+    3. Update profile — uses 'users' table (not 'user_profiles')
     """
     await save_message(session_id, "user", message, lang)
 
@@ -126,8 +88,11 @@ async def process_user_message(
     if lang:                profile_updates["language"]  = lang
 
     if profile_updates:
-        # Use safe direct SQL instead of update_user_profile(**kwargs)
-        await _safe_update_profile(session_id, profile_updates)
+        try:
+            # update_user_profile in database.py uses 'users' table — correct!
+            await update_user_profile(session_id, **profile_updates)
+        except Exception as e:
+            print(f"[Memory] Profile update failed (non-fatal): {e}")
 
 
 async def process_bot_message(
