@@ -1,27 +1,90 @@
-# =========================
-# main.py (FIXED VERSION)
-# Gemini removed
-# =========================
+import sys
+import traceback
 
-from fastapi import FastAPI, Request, BackgroundTasks, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.concurrency import run_in_threadpool
-from pydantic import BaseModel
+print("=" * 60)
+print("[BOOT] Starting import sequence...")
+sys.stdout.flush()
 
-import os
-import uuid
-import asyncio
-import smtplib
+try:
+    print("[BOOT] importing os, uuid, asyncio...")
+    sys.stdout.flush()
+    import os
+    import uuid
+    import asyncio
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    from datetime import datetime
+    from typing import List, Optional
+    from dotenv import load_dotenv
+    load_dotenv()
+    print("[BOOT] ✅ standard libs OK")
+    sys.stdout.flush()
 
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+    print("[BOOT] importing FastAPI...")
+    sys.stdout.flush()
+    from fastapi import FastAPI, Request, BackgroundTasks, Response
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.concurrency import run_in_threadpool
+    from pydantic import BaseModel
+    print("[BOOT] ✅ FastAPI OK")
+    sys.stdout.flush()
 
-from datetime import datetime
-from typing import List, Optional
+    print("[BOOT] importing language_detector...")
+    sys.stdout.flush()
+    from language_detector import detect_language
+    print("[BOOT] ✅ language_detector OK")
+    sys.stdout.flush()
 
-from dotenv import load_dotenv
+    print("[BOOT] importing rag.kb_query...")
+    sys.stdout.flush()
+    from rag.kb_query import get_answer, get_qdrant, get_embed_model
+    print("[BOOT] ✅ rag.kb_query OK")
+    sys.stdout.flush()
 
-load_dotenv()
+    print("[BOOT] importing voice...")
+    sys.stdout.flush()
+    from voice import generate_voice
+    print("[BOOT] ✅ voice OK")
+    sys.stdout.flush()
+
+    print("[BOOT] importing memory.database...")
+    sys.stdout.flush()
+    from memory.database import init_db, close_pg_pool
+    print("[BOOT] ✅ memory.database OK")
+    sys.stdout.flush()
+
+    print("[BOOT] importing memory.memory_manager...")
+    sys.stdout.flush()
+    from memory.memory_manager import (
+        process_user_message,
+        process_bot_message,
+        build_memory_context,
+    )
+    print("[BOOT] ✅ memory.memory_manager OK")
+    sys.stdout.flush()
+
+    print("[BOOT] importing scraper.scheduler...")
+    sys.stdout.flush()
+    from scraper.scheduler import (
+        start_scheduler,
+        stop_scheduler,
+        get_scrape_status,
+        run_scrape_job,
+    )
+    print("[BOOT] ✅ scraper.scheduler OK")
+    sys.stdout.flush()
+
+    print("[BOOT] ✅ ALL IMPORTS SUCCESSFUL")
+    sys.stdout.flush()
+
+except Exception as e:
+    print("=" * 60)
+    print(f"[BOOT] ❌ IMPORT CRASHED: {e}")
+    traceback.print_exc()
+    print("=" * 60)
+    sys.stdout.flush()
+    sys.exit(1)
 
 # ─────────────────────────────────────────────────────────────
 # HF CACHE
