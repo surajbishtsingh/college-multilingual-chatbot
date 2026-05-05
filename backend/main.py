@@ -27,9 +27,9 @@ load_dotenv()
 # HF CACHE
 # ─────────────────────────────────────────────────────────────
 
-os.environ.setdefault("HF_HOME", "/app/.cache")
-os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", "/app/.cache")
-os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+#os.environ.setdefault("HF_HOME", "/app/.cache")
+#os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", "/app/.cache")
+#os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 
 # ─────────────────────────────────────────────────────────────
 # DATABASE
@@ -187,6 +187,14 @@ async def startup_event():
 
     except Exception as e:
         print(f"[Startup] Scheduler failed: {e}")
+
+    # Change this block — remove the timeout wrapper:
+try:
+    print("[Startup] Loading embedding model...")
+    await run_in_threadpool(get_embed_model)  # No timeout needed, model is cached
+    print("[Startup] ✅ Embedding model ready")
+except Exception as e:
+    print(f"[Startup] Embedding model failed: {e}")
 
     # ENV STATUS
 
