@@ -95,51 +95,73 @@ def search_serpapi(query: str, num: int = 5) -> list[dict]:
 
 
 # ══════════════════════════════════════════════════════
-# METHOD 3 — DuckDuckGo (Free, No Key needed)
+# METHOD 3 — DuckDuckGo via duckduckgo-search library
+# (already in requirements.txt — no API key needed)
 # ══════════════════════════════════════════════════════
 def search_duckduckgo(query: str, num: int = 5) -> list[dict]:
     try:
-        params = {
-            "q":             f"{query} {COLLEGE_NAME}",
-            "format":        "json",
-            "no_html":       "1",
-            "skip_disambig": "1",
-        }
-        with httpx.Client(
-            timeout=10,
-            headers={"User-Agent": "DikshaChatbot/1.0 (Educational)"}
-        ) as client:
-            r    = client.get("https://api.duckduckgo.com/", params=params)
-            data = r.json()
+        from duckduckgo_search import DDGS
 
         results = []
+        with DDGS() as ddgs:
+            search_results = list(ddgs.text(
+                keywords=f"{query} {COLLEGE_NAME}",
+                region="in-en",
+                safesearch="off",
+                max_results=num,
+            ))
 
-        abstract     = data.get("AbstractText", "")
-        abstract_url = data.get("AbstractURL", "")
-        if abstract and len(abstract) > 50:
-            results.append({
-                "title":   data.get("Heading", query),
-                "snippet": abstract,
-                "url":     abstract_url or f"https://{COLLEGE_SITE}",
-                "source":  "duckduckgo",
-            })
-
-        for topic in data.get("RelatedTopics", [])[:num]:
-            if isinstance(topic, dict):
-                text = topic.get("Text", "")
-                url  = topic.get("FirstURL", "")
-                if text and len(text) > 30:
-                    results.append({
-                        "title":   text[:60],
-                        "snippet": text,
-                        "url":     url,
-                        "source":  "duckduckgo",
-                    })
+        for item in search_results:
+            title   = item.get("title", "")
+            snippet = item.get("body", "")
+            url     = item.get("href", "")
+            if snippet and url:
+                results.append({
+                    "title":   title,
+                    "snippet": snippet,
+                    "url":     url,
+                    "source":  "duckduckgo",
+                })
 
         print(f"[DuckDuckGo] {len(results)} results for: {query[:40]}")
         return results
+
     except Exception as e:
         print(f"[DuckDuckGo] Failed: {e}")
+        return []
+
+
+def search_duckduckgo_site(query: str, num: int = 5) -> list[dict]:
+    """Search specifically within gbpiet.ac.in using DDG."""
+    try:
+        from duckduckgo_search import DDGS
+
+        results = []
+        with DDGS() as ddgs:
+            search_results = list(ddgs.text(
+                keywords=f"site:{COLLEGE_SITE} {query}",
+                region="in-en",
+                safesearch="off",
+                max_results=num,
+            ))
+
+        for item in search_results:
+            title   = item.get("title", "")
+            snippet = item.get("body", "")
+            url     = item.get("href", "")
+            if snippet and url:
+                results.append({
+                    "title":   title,
+                    "snippet": snippet,
+                    "url":     url,
+                    "source":  "college_website",
+                })
+
+        print(f"[DuckDuckGo Site] {len(results)} results for: {query[:40]}")
+        return results
+
+    except Exception as e:
+        print(f"[DuckDuckGo Site] Failed: {e}")
         return []
 
 
@@ -170,13 +192,14 @@ def search_internet(query: str, num_results: int = 5) -> list[dict]:
 
 def search_college_website(query: str) -> list[dict]:
     """
-    ✅ This function is imported by kb_query.py
-    Searches specifically within gbpiet.ac.in
+    Search specifically within gbpiet.ac.in
+    Imported by kb_query.py
+    Priority: Google CSE → SerpApi → DuckDuckGo site search
     """
     if not ENABLE_SEARCH:
         return []
 
-    # Try Google CSE with site restriction
+    # ── Google CSE with site restriction ─────────────────
     if GOOGLE_API_KEY and GOOGLE_CSE_ID:
         try:
             params = {
@@ -208,12 +231,12 @@ def search_college_website(query: str) -> list[dict]:
                         "source":  "college_website",
                     })
             if results:
-                print(f"[CollegeSite] {len(results)} results")
+                print(f"[CollegeSite] {len(results)} results via Google CSE")
                 return results
         except Exception as e:
             print(f"[CollegeSite] Google CSE failed: {e}")
 
-    # Try SerpApi with site: operator
+    # ── SerpApi with site: operator ───────────────────────
     if SERPAPI_KEY:
         try:
             params = {
@@ -247,8 +270,13 @@ def search_college_website(query: str) -> list[dict]:
         except Exception as e:
             print(f"[CollegeSite] SerpApi failed: {e}")
 
-    # DuckDuckGo fallback
-    return search_duckduckgo(f"site:{COLLEGE_SITE} {query}", num=5)
+    # ── DuckDuckGo site search fallback ───────────────────
+    results = search_duckduckgo_site(query, num=5)
+    if results:
+        return results
+
+    # ── General DuckDuckGo with college name ──────────────
+    return search_duckduckgo(query, num=5)
 
 
 def format_internet_context(results: list[dict]) -> str:
@@ -269,7 +297,7 @@ def get_search_status() -> dict:
     return {
         "google_cse":    "✅ active" if (GOOGLE_API_KEY and GOOGLE_CSE_ID) else "❌ no key",
         "serpapi":       "✅ active" if SERPAPI_KEY else "❌ no key",
-        "duckduckgo":    "✅ always available",
+        "duckduckgo":    "✅ always available (duckduckgo-search library)",
         "active_method": (
             "Google CSE" if (GOOGLE_API_KEY and GOOGLE_CSE_ID) else
             "SerpApi"    if SERPAPI_KEY else
@@ -284,15 +312,9 @@ if __name__ == "__main__":
     for k, v in get_search_status().items():
         print(f"  {k}: {v}")
 
-    print("\nTesting search_internet...")
-    results = search_internet("admission process btech", num_results=3)
+    print("\nTesting search_college_website('MCA admission')...")
+    results = search_college_website("MCA admission")
     for r in results:
         print(f"\n  Title:   {r['title']}")
-        print(f"  Snippet: {r['snippet'][:100]}")
+        print(f"  Snippet: {r['snippet'][:120]}")
         print(f"  URL:     {r['url']}")
-
-    print("\nTesting search_college_website...")
-    results = search_college_website("hostel facilities")
-    for r in results:
-        print(f"\n  Title:   {r['title']}")
-        print(f"  Snippet: {r['snippet'][:100]}")
