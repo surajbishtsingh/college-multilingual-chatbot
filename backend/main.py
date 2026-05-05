@@ -1,7 +1,7 @@
 import sys
 import traceback
 
-# Global DB vars (set inside try block after load_dotenv)
+# Global DB vars
 DATABASE_URL = ""
 USE_POSTGRES = False
 
@@ -79,7 +79,7 @@ try:
     print("[BOOT] ✅ scraper.scheduler OK")
     sys.stdout.flush()
 
-    # ── DATABASE URL (after load_dotenv so env vars are available) ──
+    # DATABASE URL — read after load_dotenv()
     DATABASE_URL = os.getenv("DATABASE_URL", "")
     USE_POSTGRES = bool(DATABASE_URL) and "postgresql" in DATABASE_URL
     print(f"[DB] Using {'PostgreSQL' if USE_POSTGRES else 'SQLite (dev only)'}")
@@ -157,7 +157,7 @@ async def startup_event():
         await asyncio.wait_for(init_db(), timeout=15)
         print("[Startup] ✅ Database ready")
     except asyncio.TimeoutError:
-        print("[Startup] ❌ Database TIMED OUT after 15s — check DATABASE_URL")
+        print("[Startup] ❌ Database TIMED OUT — check DATABASE_URL")
     except Exception as e:
         print(f"[Startup] ❌ Database ERROR: {e}")
         traceback.print_exc()
@@ -172,24 +172,14 @@ async def startup_event():
         )
         print("[Startup] ✅ BM25 ready")
     except asyncio.TimeoutError:
-        print("[Startup] ❌ BM25 TIMED OUT after 30s")
+        print("[Startup] ❌ BM25 TIMED OUT")
     except Exception as e:
         print(f"[Startup] ❌ BM25 ERROR: {e}")
         traceback.print_exc()
     sys.stdout.flush()
 
-    # ── EMBEDDING MODEL ───────────────────────────────────
-    print("[Startup] Step 3: Embedding model...")
-    sys.stdout.flush()
-    try:
-        await asyncio.wait_for(
-            run_in_threadpool(get_embed_model), timeout=30
-        )
-        print("[Startup] ✅ Embedding model ready")
-    except asyncio.TimeoutError:
-        print("[Startup] ⚠️ Embedding model timed out — will load on first request")
-    except Exception as e:
-        print(f"[Startup] ⚠️ Embedding model error: {e} — will load on first request")
+    # ── EMBEDDING MODEL — skipped, loads lazily on first request ──
+    print("[Startup] Step 3: Embedding model — skipped at startup, loads on first request ⚡")
     sys.stdout.flush()
 
     # ── QDRANT ────────────────────────────────────────────
@@ -201,7 +191,7 @@ async def startup_event():
         )
         print("[Startup] ✅ Qdrant connected")
     except asyncio.TimeoutError:
-        print("[Startup] ❌ Qdrant TIMED OUT after 15s — check QDRANT_URL and QDRANT_API_KEY")
+        print("[Startup] ❌ Qdrant TIMED OUT — check QDRANT_URL and QDRANT_API_KEY")
     except Exception as e:
         print(f"[Startup] ❌ Qdrant ERROR: {e}")
         traceback.print_exc()
