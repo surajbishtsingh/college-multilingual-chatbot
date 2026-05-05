@@ -415,6 +415,22 @@ export default function App() {
   const [isSpeaking, setIsSpeaking]   = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [currentLang, setCurrentLang] = useState('en');
+  const [backendReady, setBackendReady] = useState(false);
+
+useEffect(() => {
+  const wakeUp = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/health`);
+      const data = await res.json();
+      console.log('[Diksha] Backend awake:', data.status);
+      setBackendReady(true);
+    } catch (err) {
+      console.warn('[Diksha] Wake-up failed:', err.message);
+      setBackendReady(true); // allow anyway
+    }
+  };
+  wakeUp();
+}, []);
   const messagesEndRef = useRef(null);
   const audioRef       = useRef(null);
 
@@ -433,12 +449,20 @@ export default function App() {
   }, []);
 
   // ✅ FIX: Wake up Railway backend on app load so first message is fast
-  useEffect(() => {
-    fetch(`${BACKEND_URL}/health`)
-      .then(res => res.json())
-      .then(data => console.log('[Diksha] Backend awake:', data.status))
-      .catch(err => console.warn('[Diksha] Backend wake-up ping failed:', err.message));
-  }, []);
+useEffect(() => {
+  const wakeUp = async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/health`);
+      const data = await res.json();
+      console.log('[Diksha] Backend awake:', data.status);
+      setBackendReady(true);
+    } catch (err) {
+      console.warn('[Diksha] Wake-up failed:', err.message);
+      setBackendReady(true); // allow anyway
+    }
+  };
+  wakeUp();
+}, []);
 
   // ✅ Stop audio when tab is hidden
   useEffect(() => {
