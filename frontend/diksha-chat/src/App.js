@@ -415,21 +415,7 @@ export default function App() {
   const [isSpeaking, setIsSpeaking]   = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [currentLang, setCurrentLang] = useState('en');
-
-useEffect(() => {
-  const wakeUp = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/health`);
-      const data = await res.json();
-      console.log('[Diksha] Backend awake:', data.status);
-      setBackendReady(true);
-    } catch (err) {
-      console.warn('[Diksha] Wake-up failed:', err.message);
-      setBackendReady(true); // allow anyway
-    }
-  };
-  wakeUp();
-}, []);
+  const [backendReady, setBackendReady] = useState(false);  // ✅ NEW
   const messagesEndRef = useRef(null);
   const audioRef       = useRef(null);
 
@@ -437,7 +423,7 @@ useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ✅ FIX: Single sessionId effect (removed duplicate)
+  // ✅ Single sessionId effect
   useEffect(() => {
     let sid = localStorage.getItem('session_id');
     if (!sid) {
@@ -447,21 +433,21 @@ useEffect(() => {
     setSessionId(sid);
   }, []);
 
-  // ✅ FIX: Wake up Railway backend on app load so first message is fast
-useEffect(() => {
-  const wakeUp = async () => {
-    try {
-      const res = await fetch(`${BACKEND_URL}/health`);
-      const data = await res.json();
-      console.log('[Diksha] Backend awake:', data.status);
-      setBackendReady(true);
-    } catch (err) {
-      console.warn('[Diksha] Wake-up failed:', err.message);
-      setBackendReady(true); // allow anyway
-    }
-  };
-  wakeUp();
-}, []);
+  // ✅ Wake up Railway backend — single effect, sets backendReady
+  useEffect(() => {
+    const wakeUp = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/health`);
+        const data = await res.json();
+        console.log('[Diksha] Backend awake:', data.status);
+        setBackendReady(true);
+      } catch (err) {
+        console.warn('[Diksha] Wake-up failed:', err.message);
+        setBackendReady(true); // allow anyway so UI isn't stuck
+      }
+    };
+    wakeUp();
+  }, []);
 
   // ✅ Stop audio when tab is hidden
   useEffect(() => {
@@ -675,9 +661,8 @@ useEffect(() => {
 
     // ── Backend call ───────────────────────────────────────────────────────
     try {
-      // ✅ FIX: 30-second timeout so Railway slow starts don't silently fail
       const controller = new AbortController();
-      const timeoutId  = setTimeout(() => controller.abort(), 30000);
+      const timeoutId  = setTimeout(() => controller.abort(), 90000); // ✅ 90s timeout
 
       const res = await fetch(`${BACKEND_URL}/chat`, {
         method: 'POST',
@@ -693,7 +678,6 @@ useEffect(() => {
 
       clearTimeout(timeoutId);
 
-      // ✅ FIX: Check HTTP status explicitly
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
@@ -707,7 +691,6 @@ useEffect(() => {
       }]);
 
     } catch (err) {
-      // ✅ FIX: Log the REAL error so you can debug from browser console
       console.error('[Diksha] Fetch error →', err.name, ':', err.message);
 
       const isTimeout = err.name === 'AbortError';
@@ -858,9 +841,11 @@ useEffect(() => {
               <DikshaAvatar speaking={isSpeaking} size="big"/>
               <div>
                 <div className="drawer-name">Diksha — दीक्षा</div>
+                {/* ✅ Shows connecting status until backend is ready */}
                 <div className="drawer-status">
-                  {isSpeaking   ? '🔊 Speaking...'
-                  : isListening ? '🎤 Listening...'
+                  {!backendReady     ? '⏳ Connecting to server...'
+                  : isSpeaking       ? '🔊 Speaking...'
+                  : isListening      ? '🎤 Listening...'
                   : '● GBPIET Collegemate-your tour guide'}
                 </div>
               </div>
@@ -1004,15 +989,18 @@ useEffect(() => {
               {input && (
                 <button onClick={() => setInput('')} title="Clear">✕</button>
               )}
+              {/* ✅ Disabled until backend is ready */}
               <button
                 className="send-btn"
                 onClick={() => handleSend()}
-                disabled={loading || !language || !input.trim()}
+                disabled={loading || !language || !input.trim() || !backendReady}
               >
                 {loading ? '⏳' : '➤'}
               </button>
             </div>
-            <p className="input-hint">Press Enter to send</p>
+            <p className="input-hint">
+              {!backendReady ? '⏳ Waiting for server...' : 'Press Enter to send'}
+            </p>
           </div>
 
           <div className="drawer-disclaimer">
