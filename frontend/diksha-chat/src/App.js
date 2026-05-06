@@ -1004,7 +1004,7 @@ export default function App() {
           </div>
 
           <div className="drawer-disclaimer">
-            Beta V26.1 (24/04/26) &nbsp;|&nbsp; Team MCA Supervised by KDN
+            Beta V26.2 (06/05/26) &nbsp;|&nbsp; Team MCA Supervised by KDN
           </div>
         </div>
       )}
