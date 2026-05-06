@@ -6,16 +6,17 @@ from langchain_huggingface import HuggingFaceEmbeddings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 _embed_model = None
-EMBED_MODEL_NAME = (
-    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-)
+
+# Lightweight multilingual model — supports Hindi + English (and 50+ languages)
+# 6 layers, ~120MB, fast on CPU — lightest option with strong Hindi/English quality
+EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L6-v2"
 
 
 def get_embed_model() -> HuggingFaceEmbeddings:
     """
     Singleton embedding model.
     Loaded once, reused everywhere.
-    Saves ~380MB RAM by not loading multiple times.
+    Saves ~120MB RAM by not loading multiple times.
     """
     global _embed_model
     if _embed_model is None:
@@ -24,7 +25,7 @@ def get_embed_model() -> HuggingFaceEmbeddings:
             model_kwargs={"device": "cpu"},
             encode_kwargs={
                 "normalize_embeddings": True,
-                "batch_size": 8,
+                "batch_size": 32,  # increased — smaller model handles larger batches easily
             },
         )
         print("[Embed] Model loaded")
