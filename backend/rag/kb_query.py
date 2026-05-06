@@ -26,7 +26,7 @@ _groq2 = Groq(api_key=_groq2_key) if _groq2_key else None
 _embed_model = None
 _qa_database = []
 
-EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+EMBED_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 # ── Greeting / Identity responses ─────────────────────────────────────
 GREETINGS = {"hello", "hi", "hlo", "hey", "hii", "helo", "namaste", "नमस्ते", "हेलो", "हाय"}
