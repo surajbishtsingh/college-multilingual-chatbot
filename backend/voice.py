@@ -80,6 +80,8 @@ def clean_tts_text(text: str, lang: str = "en") -> str:
     if lang == "ga":
         text = text.replace("छ", "छ ")
         text = text.replace("च", "च ")
+        text = text.replace("एआई", "A I")
+        text = text.replace("AI", "A I")
 
     # ── Remove extra spaces ────────────────────────────────
     text = re.sub(r'\s+', ' ', text).strip()
