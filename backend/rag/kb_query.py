@@ -839,7 +839,7 @@ def build_prompt(question: str, context: str, lang: str, history: str = "") -> s
     website_note = f"\nCollege Website: {GBPIET_URL}"
 
     if lang == "hi":
-        return f"""Aap Diksha hain — GBPIET ke liye helpful AI chatbot.
+        return f"""Aap दीक्षा (Diksha) hain — GBPIET ke liye helpful AI chatbot.
 
 RULES:
 - HAMESHA shuddh Hindi mein jawab dein
@@ -856,7 +856,7 @@ Sawaal: {question}
 Jawab (Hindi mein):"""
 
     elif lang == "ga":
-        return f"""Tu Diksha chhe — GBPIET chatbot. Garhwali mein jawab de.
+        return f"""Tu दीक्षा (Diksha) chhe — GBPIET chatbot. Garhwali mein jawab de.
 Sirf context use kar. Website: {GBPIET_URL}
 Nahi mila: "माफ करा, {GBPIET_URL} देखो।"
 {history}
@@ -865,7 +865,7 @@ Sawaal: {question}
 Jawab:"""
 
     elif lang == "ku":
-        return f"""Tu Diksha chhu — GBPIET chatbot. Kumauni mein jawab de.
+        return f"""Tu दीक्षा (Diksha) chhu — GBPIET chatbot. Kumauni mein jawab de.
 Sirf context use kar. Website: {GBPIET_URL}
 Nahi mila: "माफ करो, {GBPIET_URL} देखो।"
 {history}
@@ -874,7 +874,7 @@ Sawaal: {question}
 Jawab:"""
 
     else:
-        return f"""You are Diksha — official AI assistant for GBPIET
+        return f"""You are (Diksha) — official AI assistant for GBPIET
 (Govind Ballabh Pant Institute of Engineering and Technology),
 Pauri Garhwal, Uttarakhand. Website: {GBPIET_URL}
 
