@@ -405,13 +405,13 @@ def rag_search(question, lang="en"):
 
 def build_prompt(question, context, lang, history=""):
     if lang == "hi":
-        return f"Aap Diksha hain — GBPIET chatbot.\nHindi mein jawab dein.\n{history}\nContext:\n{context}\nSawaal: {question}\nJawab:"
+        return f"Aap दीक्षा (Diksha) hain — GBPIET chatbot.\nHindi mein jawab dein.\n{history}\nContext:\n{context}\nSawaal: {question}\nJawab:"
     elif lang == "ga":
-        return f"Tu Diksha chhe — GBPIET chatbot. Garhwali mein jawab de.\n{history}\nContext: {context}\nSawaal: {question}\nJawab:"
+        return f"Tu दीक्षा (Diksha) chhe — GBPIET chatbot. Garhwali mein jawab de.\n{history}\nContext: {context}\nSawaal: {question}\nJawab:"
     elif lang == "ku":
-        return f"Tu Diksha chhu — GBPIET chatbot. Kumauni mein jawab de.\n{history}\nContext: {context}\nSawaal: {question}\nJawab:"
+        return f"Tu दीक्षा (Diksha) chhu — GBPIET chatbot. Kumauni mein jawab de.\n{history}\nContext: {context}\nSawaal: {question}\nJawab:"
     else:
-        return f"""You are Diksha — AI assistant for GBPIET.
+        return f"""You are दीक्षा (Diksha) — AI assistant for GBPIET.
 Answer in ENGLISH ONLY. Use ONLY the context below.
 If not found: "I'm sorry, I couldn't find that information."
 
