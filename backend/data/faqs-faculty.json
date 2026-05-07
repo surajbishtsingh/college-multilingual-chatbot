@@ -28,7 +28,7 @@
     "question": "Who are the faculty of Mechanical Engineering department at GBPIET?",
     "answer": "Mechanical Engineering Faculty at GBPIET: HOD: Dr. K. K. S. Mer, Dr. Ashutosh Gupta, Dr. Nitin Kumar Baliyan, Dr. Amit Joshi, Dr. Vinay Kumar Patel, Dr. Hemant Kumar, Dr. Pawan Kumar Pant, Dr. Sanjay Singh Samant, Dr. Sachin Tejyan, Dr. Sunil Chamoli, Dr. Manoj Kumar Pathak, Mr. Lokesh Nair, Mr. Sumit Rana.",
     "category": "faculty",
-    "tags": ["mechanical", "department"],
+    "tags": ["mechanical", "department","ME"],
     "lang": "en"
   },
   {
@@ -44,7 +44,7 @@
     "question": "Who are the faculty of Electrical Engineering department at GBPIET?",
     "answer": "Electrical Engineering Faculty at GBPIET: HOD: Dr. Sanjay Gairola, Dr. Vishnu Mohan Mishra, Dr. Yatindra Kumar, Mr. Atul Katiyar, Mr. Satyaveer Singh Rawat, Mr. Nitish Rawat, Ms. Sudheeksha Misra, Mr. Prashant Prakash.",
     "category": "faculty",
-    "tags": ["electrical", "department"],
+    "tags": ["electrical", "department","EED"],
     "lang": "en"
   },
   {
@@ -52,7 +52,7 @@
     "question": "Who are the faculty of Biotechnology department at GBPIET?",
     "answer": "Biotechnology Faculty at GBPIET: HOD: Dr. Arun Bhatt, Dr. Mamta Baunthiyal, Dr. Pavan Kumar Agrawal, Dr. Suresh Chandra Phulara, Mr. Sumit Kumar Rai, Mr. Rahul Kumar Arya, Mr. Pranshu Dangwal, Ms. Preeti Semwal, Dr. Kajal Gautam.",
     "category": "faculty",
-    "tags": ["biotechnology", "department"],
+    "tags": ["biotechnology", "department","biotech"],
     "lang": "en"
   },
   {
