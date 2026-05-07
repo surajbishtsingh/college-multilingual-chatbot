@@ -695,8 +695,8 @@
   },
   {
     "id": 10,
-    "question": "GBPIET मा परिणाम कसे देखें?",
-    "answer": "परिणाम यख देखे: https://gbpiet.ac.in/result/ या ERP पोर्टल। सहायता खुणि: 01368-228030।",
+    "question": "GBPIET मा result कसे देखें?",
+    "answer": "result यख देखे: https://gbpiet.ac.in/result/ या ERP पोर्टल। सहायता खुणि: 01368-228030।",
     "category": "academic",
     "tags": ["results"],
     "lang": "ga"
@@ -1056,7 +1056,7 @@
     "question": "GBPIET मा कति हॉस्टल छन्?",
     "answer": "GBPIET मा कुल 11 हॉस्टल छन्: 8 नौना का अर 3 नौन्यिँ का।",
     "category": "hostel",
-    "tags": ["hindi"],
+    "tags": ["total hostels"],
     "lang": "ga"
   },
   {
@@ -1064,7 +1064,7 @@
     "question": "GBPIET मा नौन्यिँ का हॉस्टल कौन-कौन छन्?",
     "answer": "नौन्यिँ का हॉस्टल: रमन, भागीरथी अर विश्वेश्वरैया।",
     "category": "hostel",
-    "tags": ["hindi"],
+    "tags": ["girls"],
     "lang": "ga"
   },
   {
@@ -1072,7 +1072,7 @@
     "question": "GBPIET मा नौना का हॉस्टल कौन-कौन छन्?",
     "answer": "नौना का हॉस्टल: नीलकंठ, केदार ABC, कैलाश, रुद्र, बद्री, अलकनंदा, शिवालिक अर त्रिशूल।",
     "category": "hostel",
-    "tags": ["hindi"],
+    "tags": ["boys"],
     "lang": "ga"
   },
   {
@@ -1080,7 +1080,7 @@
     "question": "पैलि साल की नौन्यिँ का हॉस्टल कौन सा च?",
     "answer": "पैलि साल की नौन्यिँ का हॉस्टल विश्वेश्वरैया च।",
     "category": "hostel",
-    "tags": ["hindi"],
+    "tags": ["girls"],
     "lang": "ga"
   },
   {
@@ -1088,7 +1088,22 @@
     "question": "पैलि साल का नौना का हॉस्टल कौन सा च?",
     "answer": "पैलि साल का नौना का हॉस्टल त्रिशूल अर कैलाश छन्।",
     "category": "hostel",
-    "tags": ["hindi"],
+    "tags": ["boys"],
     "lang": "ga"
-  }
+  },
+  {
+  "question": "sabi nauna hostel ku ku chhin",
+  "answer": "नीलकंठ, केदार ABC, कैलाश, रूद्र, बद्री, अलकनंदा...",
+  "category": "hostel",
+  "tags": ["boys"],
+  "lang": "ga"
+ },
+{
+  "id": 803,
+  "question": "sabi nauni hostel ku ku chhin ?",
+  "answer": "नौन्यिँ का हॉस्टल छन्: रमन हॉस्टल, भागीरथी हॉस्टल अर विश्वेश्वरैया हॉस्टल।",
+  "category": "hostel",
+  "tags": ["girls"],
+  "lang": "ga"
+}
 ]
