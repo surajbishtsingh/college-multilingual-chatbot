@@ -1,7 +1,6 @@
-# hybrid_search.py — Fixed for new Qdrant client API
+# hybrid_search.py — Fixed: removed language filter (no index on Qdrant Cloud)
 import re
 from qdrant_client import QdrantClient
-from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 STOP = {
     'what','who','is','are','the','at','in','of','a','an','and','or',
@@ -33,41 +32,27 @@ def hybrid_search(
     query_vector: list[float],
     query_text: str,
     limit: int = 5,
-    lang_filter: str | None = None,
+    lang_filter: str | None = None,   # kept for API compatibility but NOT used
     vector_weight: float = 0.7,
     keyword_weight: float = 0.3,
 ) -> list[dict]:
     try:
-        # ── Build optional language filter ──────────────────────────
-        search_filter = None
-        if lang_filter:
-            search_filter = Filter(
-                must=[
-                    FieldCondition(
-                        key="language",
-                        match=MatchValue(value=lang_filter)
-                    )
-                ]
-            )
-
-        # ── ✅ Use query_points (new Qdrant API) ─────────────────────
+        # ── No language filter — Qdrant Cloud has no index on 'language' ──
         response = client.query_points(
             collection_name=collection_name,
             query=query_vector,
-            query_filter=search_filter,
             limit=limit * 2,
             with_payload=True,
             with_vectors=False,
         )
 
-        # query_points returns a QueryResponse — results are in .points
         raw_results = response.points
         if not raw_results:
             return []
 
-        # ── Re-rank with keyword overlap ─────────────────────────────
+        # ── Re-rank with keyword overlap ──────────────────────────────
         q_keywords = extract_keywords(query_text)
-        scored     = []
+        scored = []
 
         for hit in raw_results:
             text         = hit.payload.get("text", "")
@@ -80,11 +65,11 @@ def hybrid_search(
                 "score":        hybrid_score,
                 "vector_score": vector_sim,
                 "kw_score":     kw_sim,
+                "url":          hit.payload.get("url", ""),
                 "metadata": {
                     "source":   hit.payload.get("source",   ""),
                     "category": hit.payload.get("category", ""),
                     "language": hit.payload.get("language", ""),
-                    "course":   hit.payload.get("course",   ""),
                 }
             })
 
@@ -111,7 +96,7 @@ def multi_collection_search(
     query_vector: list[float],
     query_text: str,
     limit: int = 3,
-    lang_filter: str | None = None,
+    lang_filter: str | None = None,   # kept for API compatibility but NOT used
 ) -> list[dict]:
     all_results = []
 
@@ -123,7 +108,6 @@ def multi_collection_search(
                 query_vector=query_vector,
                 query_text=query_text,
                 limit=limit,
-                lang_filter=lang_filter,
             )
             all_results.extend(results)
         except Exception as e:
