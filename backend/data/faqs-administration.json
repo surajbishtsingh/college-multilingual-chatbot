@@ -166,5 +166,85 @@
     "category": "administration",
     "tags": ["vice chancellor", "utu", "dr tripta thakur"],
     "lang": "en"
-    }
+    },
+  {
+    "id": 1,
+    "question": "List all Deans at GBPIET",
+    "answer": "Deans at GBPIET: 1. Dean (Administration & Faculty Affairs): Prof. Vijay Kumar Banga — director@gbpiet.ac.in — 01368-228030 2. Dean (Planning and Development): Prof. K. K. S. Mer — kks_mer@yahoo.com — 9412957015 3. Dean (Academics): Prof. Ashutosh Gupta — ashuaec72@yahoo.com — 9412500990 4. Dean (Research and Development): Prof. Mamta Baunthiyal — mamtabaunthiyal@yahoo.co.in — 8006913000 5. Dean (Student Welfare): Prof. H. Goel — dsw@gbpiet.ac.in — 8755068959 6. Dean Alumni: Dr. Sanjeev Naithani — naithani.iitk@gmail.com — 9410563544 Associate Deans: 1. Associate Dean (Student Welfare): Dr. P. K. Pant — pawanpant@gmail.com — 9557002032 2. Associate Dean (Research and Development): Dr. Suresh Chandra Phulara — phulara.biotech@gmail.com — 9589104247",
+    "category": "administration",
+    "tags": ["deans", "faculty", "administration"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "Who is the Dean of Administration and Faculty Affairs at GBPIET?",
+    "answer": "The Dean (Administration & Faculty Affairs) at GBPIET is Prof. Vijay Kumar Banga. Email: director@gbpiet.ac.in, Phone: 01368-228030, Fax: 01368-228062.",
+    "category": "administration",
+    "tags": ["dean", "administration", "faculty affairs"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "dean administration faculty affairs",
+    "answer": "The Dean (Administration & Faculty Affairs) at GBPIET is Prof. Vijay Kumar Banga. Email: director@gbpiet.ac.in, Phone: 01368-228030.",
+    "category": "administration",
+    "tags": ["dean", "administration"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "Who is the Dean of Planning and Development at GBPIET?",
+    "answer": "The Dean (Planning and Development) at GBPIET is Prof. K. K. S. Mer. Email: kks_mer@yahoo.com, Phone: 9412957015, Fax: 01368-228062.",
+    "category": "administration",
+    "tags": ["planning", "development", "dean"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "dean planning development",
+    "answer": "The Dean (Planning and Development) at GBPIET is Prof. K. K. S. Mer. Phone: 9412957015.",
+    "category": "administration",
+    "tags": ["planning", "development"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "Who is the Dean of Academics at GBPIET?",
+    "answer": "The Dean (Academics) at GBPIET is Prof. Ashutosh Gupta. Email: ashuaec72@yahoo.com, Phone: 9412500990, Fax: 01368-228062.",
+    "category": "academics",
+    "tags": ["academics", "dean"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "dean academics",
+    "answer": "The Dean (Academics) at GBPIET is Prof. Ashutosh Gupta. Phone: 9412500990.",
+    "category": "academics",
+    "tags": ["academics", "dean"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "Who is the Dean of Research and Development at GBPIET?",
+    "answer": "The Dean (Research and Development) at GBPIET is Prof. Mamta Baunthiyal. Email: mamtabaunthiyal@yahoo.co.in, Phone: 8006913000, Fax: 01368-228062.",
+    "category": "research",
+    "tags": ["research", "development", "dean"],
+    "lang": "en"
+  },
+  {
+    "id": 9,
+    "question": "dean research development",
+    "answer": "The Dean (Research and Development) at GBPIET is Prof. Mamta Baunthiyal. Phone: 8006913000.",
+    "category": "research",
+    "tags": ["research", "development"],
+    "lang": "en"
+  },
+  {
+    "id": 10,
+    "question": "Who is the Dean of Student Welfare at GBPIET?",
+    "answer": "The Dean (Student Welfare) at GBPIET is Prof. H. Goel. Email: dsw@gbpiet.ac.in, Phone: 8755068959, Fax: 01368-228062.",
+    "category": "student welfare",
+    "tags": ["student welfare", "dean"],
+    "lang": "en"
+  }
 ]
