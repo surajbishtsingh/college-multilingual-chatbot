@@ -1,1 +1,1094 @@
-
+[
+  {
+    "id": 1,
+    "question": "GBPIET म शासी परिषद क अध्यक्ष कु छन्?",
+    "answer": "GBPIET म शासी परिषद क अध्यक्ष प्रो. बी. एस. बिष्ट छन, जि राज्य सरकार द्वारा नामित शिक्षाविद छन।",
+    "category": "governing_council",
+    "tags": ["chairman"],
+    "lang": "ga"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET म शासी परिषद क सदस्य सचिव कु छन्?",
+    "answer": "GBPIET म शासी परिषद क सदस्य सचिव प्रो. विजय कुमार बंगा छन, जि GBPIET, पौड़ी गढ़वाल क निदेशक छन।",
+    "category": "governing_council",
+    "tags": ["member secretary"],
+    "lang": "ga"
+  },
+  {
+    "id": 3,
+    "question": "GBPIET म शासी परिषद क सदस्य कु-कु छन?",
+    "answer": "GBPIET म शासी परिषद क सदस्य छन: प्रो. बी. एस. बिष्ट, प्रमुख सचिव तकनीकी शिक्षा, निदेशक तकनीकी शिक्षा, कुलपति UTU देहरादून, श्री पंकज गुप्ता, प्रो. एम. वाई. शाह, प्रो. एम. पी. सिंह, प्रो. एस. पी. सिंह, प्रो. ए. के. आहूजा, सचिव वित्त उत्तराखंड सरकार, प्रो. एम. के. पांडा, प्रो. आशुतोष गुप्ता, डॉ. यतेन्द्र कुमार, अर प्रो. विजय कुमार बंगा।",
+    "category": "governing_council",
+    "tags": ["members"],
+    "lang": "ga"
+  },
+  {
+    "id": 4,
+    "question": "GBPIET शासी परिषद म प्रो. विजय कुमार बंगा कु छन?",
+    "answer": "प्रो. विजय कुमार बंगा शासी परिषद क सदस्य सचिव छन अर GBPIET, पौड़ी गढ़वाल क निदेशक भी छन।",
+    "category": "governing_council",
+    "tags": ["member secretary", "director"],
+    "lang": "ga"
+  },
+  {
+    "id": 5,
+    "question": "GBPIET शासी परिषद म प्रो. बी. एस. बिष्ट कु छन?",
+    "answer": "प्रो. बी. एस. बिष्ट GBPIET म शासी परिषद क अध्यक्ष छन।",
+    "category": "governing_council",
+    "tags": ["chairman"],
+    "lang": "ga"
+  },
+  {
+    "id": 6,
+    "question": "GBPIET शासी परिषद म श्री पंकज गुप्ता कु छन?",
+    "answer": "श्री पंकज गुप्ता GBPIET म शासी परिषद क सदस्य छन अर एक उद्योगपति छन।",
+    "category": "governing_council",
+    "tags": ["member"],
+    "lang": "ga"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET म गवर्निंग बोर्ड क अध्यक्ष कु छन?",
+    "answer": "GBPIET म गवर्निंग बोर्ड क अध्यक्ष श्री सुबोध उनियाल छन, जि उत्तराखंड क तकनीकी शिक्षा मंत्री छन।",
+    "category": "board_of_governors",
+    "tags": ["chairman"],
+    "lang": "ga"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET म गवर्निंग बोर्ड क उपाध्यक्ष कु छन?",
+    "answer": "गवर्निंग बोर्ड क उपाध्यक्ष डॉ. रंजित कुमार सिन्हा (IAS) छन, जि तकनीकी शिक्षा क प्रमुख सचिव छन।",
+    "category": "board_of_governors",
+    "tags": ["vice chairman"],
+    "lang": "ga"
+  },
+  {
+    "id": 9,
+    "question": "GBPIET म गवर्निंग बोर्ड क सदस्य सचिव कु छन?",
+    "answer": "गवर्निंग बोर्ड क सदस्य सचिव प्रो. विजय कुमार बंगा छन, जि GBPIET क निदेशक छन।",
+    "category": "board_of_governors",
+    "tags": ["member secretary"],
+    "lang": "ga"
+  },
+  {
+    "id": 10,
+    "question": "GBPIET म गवर्निंग बोर्ड क सदस्य कु-कु छन?",
+    "answer": "सदस्य छन: श्री सुबोध उनियाल, डॉ. रंजित कुमार सिन्हा, श्री आर. पी. गुप्ता, प्रो. ओंकार सिंह, प्रो. वाई. एन. सिंह, श्री पंकज गुप्ता, श्री संजय सिंह तोलिया, प्रो. के. के. एस. मेर, अर प्रो. विजय कुमार बंगा।",
+    "category": "board_of_governors",
+    "tags": ["members"],
+    "lang": "ga"
+  },
+  {
+    "id": 11,
+    "question": "GBPIET म डीन कु-कु छन?",
+    "answer": "डीन छन: प्रो. विजय कुमार बंगा, प्रो. आशुतोष गुप्ता, प्रो. ममता बौंथियाल, प्रो. एच. गोयल, अर डॉ. अमित जोशी।",
+    "category": "academics",
+    "tags": ["deans"],
+    "lang": "ga"
+  },
+  {
+    "id": 12,
+    "question": "GBPIET म डीन (शैक्षणिक) कु छन?",
+    "answer": "डीन (शैक्षणिक) प्रो. आशुतोष गुप्ता छन।",
+    "category": "academics",
+    "tags": ["academics"],
+    "lang": "ga"
+  },
+  {
+    "id": 13,
+    "question": "GBPIET म डीन (शोध अर विकास) कु छन?",
+    "answer": "डीन (शोध अर विकास) प्रो. ममता बौंथियाल छन।",
+    "category": "academics",
+    "tags": ["research"],
+    "lang": "ga"
+  },
+  {
+    "id": 14,
+    "question": "GBPIET म डीन (छात्र कल्याण) कु छन?",
+    "answer": "डीन (छात्र कल्याण) प्रो. एच. गोयल छन।",
+    "category": "academics",
+    "tags": ["student welfare"],
+    "lang": "ga"
+  },
+  {
+    "id": 15,
+    "question": "GBPIET म डीन (PG) कु छन?",
+    "answer": "डीन (PG) डॉ. अमित जोशी छन।",
+    "category": "academics",
+    "tags": ["pg"],
+    "lang": "ga"
+  },
+  {
+    "id": 16,
+    "question": "GBPIET म उप-डीन कु-कु छन?",
+    "answer": "उप-डीन छन: डॉ. पी. के. पंत, डॉ. एस. एस. समंत, डॉ. वाई. एस. चौहान, डॉ. मनोज कुमार, डॉ. सुनील चमोली, श्री रमेश कुमार, अर श्री सत्यवीर सिंह रावत।",
+    "category": "academics",
+    "tags": ["deputy dean"],
+    "lang": "ga"
+  },
+  {
+    "id": 17,
+    "question": "GBPIET म रजिस्ट्रार कु छन?",
+    "answer": "GBPIET म रजिस्ट्रार श्री संदीप कुमार छन।",
+    "category": "administration",
+    "tags": ["registrar"],
+    "lang": "ga"
+  },
+  {
+    "id": 18,
+    "question": "GBPIET म प्रशिक्षण अर प्लेसमेंट क प्रमुख कु छन?",
+    "answer": "प्रशिक्षण अर प्लेसमेंट क प्रमुख डॉ. कमलजीत सिंह भाटिया छन।",
+    "category": "placement",
+    "tags": ["placement"],
+    "lang": "ga"
+  },
+  {
+    "id": 19,
+    "question": "GBPIET म PG क उप-डीन कु छन?",
+    "answer": "PG क उप-डीन श्री रमेश कुमार अर श्री सत्यवीर सिंह रावत छन।",
+    "category": "academics",
+    "tags": ["pg"],
+    "lang": "ga"
+  },
+  {
+    "id": 20,
+    "question": "GBPIET म सब डीन अर उनकै विभाग बताओ",
+    "answer": "प्रो. विजय कुमार बंगा - प्रशासन, प्रो. आशुतोष गुप्ता - शैक्षणिक, प्रो. ममता बौंथियाल - शोध अर विकास, प्रो. एच. गोयल - छात्र कल्याण, डॉ. अमित जोशी - PG।",
+    "category": "academics",
+    "tags": ["deans"],
+    "lang": "ga"
+  },
+  {
+    "id": 1,
+    "question": "GBPIET म्यं एडमिशन खतिर कना आवेदन करणो?",
+    "answer": "GBPIET एडमिशन प्रक्रिया: 1. बी.टेक एडमिशन कन लिजि JEE Main परीक्षा द्यावा, 2. www.uktech.ac.in क माध्यम से UKTECH काउंसलिंग म्यं आवेदन करा, 3. जरूरी कागज-पत्तर: 10वीं अर 12वीं की मार्कशीट, JEE स्कोरकार्ड, फोटो आईडी, 6 पासपोर्ट साइज फोटो, ट्रांसफर सर्टिफिकेट, कैरेक्टर सर्टिफिकेट, जाति प्रमाण पत्र (जख जरूरत होय)। 4. SBI Collect पोर्टल क माध्यम से फीस जमा करा। ज्यादा जानकारी कन: https://gbpiet.ac.in/admission/ या फोन करा 01368-228030",
+    "category": "admission",
+    "tags": ["application", "process"],
+    "lang": "ga"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET म्यं बी.टेक का एडमिशन प्रक्रिया क्या च?",
+    "answer": "GBPIET म्यं बी.टेक एडमिशन: प्रवेश परीक्षा: JEE Main। काउंसलिंग: उत्तराखंड तकनीकी विश्वविद्यालय (UKTECH) क माध्यम से। उपलब्ध शाखा (हर एक म्यं 60 सीट): CSE, CSE AI अर ML, ECE, मैकेनिकल, मैन्युफैक्चरिंग, इलेक्ट्रिकल, सिविल, बायोटेक्नोलॉजी। ज्यादा जानकारी: https://gbpiet.ac.in/admission/",
+    "category": "admission",
+    "tags": ["btech", "process"],
+    "lang": "ga"
+  },
+  {
+    "id": 3,
+    "question": "GBPIET म्यं M.Tech का एडमिशन प्रक्रिया क्या च?",
+    "answer": "GBPIET म्यं एम.टेक एडमिशन: प्रवेश परीक्षा: GATE। काउंसलिंग कॉलेज द्वारा सीधे करी जांदी। उपलब्ध प्रोग्राम: CSE (18 सीट), डिजिटल सिग्नल प्रोसेसिंग (10 सीट), बायोटेक्नोलॉजी (25 सीट), प्रोडक्शन इंजीनियरिंग (18 सीट), थर्मल इंजीनियरिंग (18 सीट), जियोटेक्नोलॉजी (18 सीट), इंफ्रास्ट्रक्चर (18 सीट)। योग्यता: स्नातक डिग्री म्यं कम से कम 50% अंक।",
+    "category": "admission",
+    "tags": ["mtech", "process"],
+    "lang": "ga"
+  },
+  {
+    "id": 4,
+    "question": "GBPIET म्यं MCA का एडमिशन प्रक्रिया क्या च?",
+    "answer": "GBPIET म्यं एमसीए एडमिशन: प्रवेश परीक्षा: VMSB उत्तराखंड तकनीकी विश्वविद्यालय, देहरादून द्वारा आयोजित करी जांदी। कुल सीट: 60। विभागाध्यक्ष: प्रो. प्रीति डिमरी। ज्यादा जानकारी: https://gbpiet.ac.in/admission/",
+    "category": "admission",
+    "tags": ["mca", "process"],
+    "lang": "ga"
+  },
+  {
+    "id": 5,
+    "question": "GBPIET म्यं PhD का एडमिशन प्रक्रिया क्या च?",
+    "answer": "GBPIET म्यं पीएचडी एडमिशन: कॉलेज द्वारा आयोजित लिखित परीक्षा अर इंटरव्यू क आधार पर चयन होंदो। उपलब्ध शाखा: CSE, ECE अर बायोटेक्नोलॉजी। कुल सीट: लगभग 60 छात्र। संपर्क: 01368-228030",
+    "category": "admission",
+    "tags": ["phd", "process"],
+    "lang": "ga"
+  },
+  {
+    "id": 6,
+    "question": "GBPIET म्यं एडमिशन कन लिजि कन-कन कागज-पत्तर चैंदन?",
+    "answer": "जरूरी कागज-पत्तर: 10वीं अर 12वीं की मार्कशीट, JEE Main स्कोरकार्ड, फोटो आईडी (आधार/पासपोर्ट), 6 पासपोर्ट साइज फोटो, ट्रांसफर सर्टिफिकेट, कैरेक्टर सर्टिफिकेट, जाति प्रमाण पत्र (SC/ST/OBC) जख जरूरत होय।",
+    "category": "admission",
+    "tags": ["documents"],
+    "lang": "ga"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET म्यं बी.टेक कन लिजि योग्यता क्या च?",
+    "answer": "बी.टेक कन लिजि योग्यता: 10+2 म्यं भौतिकी, रसायन विज्ञान अर गणित सहित पास होण जरूरी च। JEE Main परीक्षा द्याणी पड़दी। एडमिशन UKTECH स्टेट काउंसलिंग क माध्यम से होंदो। ज्यादा जानकारी: www.uktech.ac.in",
+    "category": "eligibility",
+    "tags": ["btech"],
+    "lang": "ga"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET म्यं MCA कन लिजि योग्यता क्या च?",
+    "answer": "एमसीए कन लिजि योग्यता: BCA, B.Sc (कंप्यूटर साइंस/आईटी/गणित) या B.Tech म्यं स्नातक डिग्री। UTUEE परीक्षा द्याणी जरूरी च। योग्यता परीक्षा म्यं कम से कम 50% अंक चैंदन।",
+    "category": "eligibility",
+    "tags": ["mca"],
+    "lang": "ga"
+  },
+  {
+    "id": 101,
+    "question": "क्या GBPIET कैम्पस म बैंक छ?",
+    "answer": "हाँ! GBPIET कैम्पस म Bank of Baroda की शाखा अर ATM सुविधा छ। छात्र कैम्पस नि छोड़िक आसानी से बैंकिंग सेवाओं क फायदा उठाण सकदन।",
+    "category": "facilities",
+    "tags": ["bank", "atm", "finance"],
+    "lang": "ga"
+  },
+  {
+    "id": 102,
+    "question": "क्या GBPIET म डाकघर छ?",
+    "answer": "हाँ! GBPIET म छात्रों अर कर्मचारियों खुणि कैम्पस म डाकघर की सुविधा छ। विवरण: https://gbpiet.ac.in/post-office/",
+    "category": "facilities",
+    "tags": ["post office", "services"],
+    "lang": "ga"
+  },
+  {
+    "id": 103,
+    "question": "GBPIET म खाणु-पीणु खुणि क्या-क्या सुविधाएं छन?",
+    "answer": "GBPIET म कैम्पस म छात्रों अर कर्मचारियों खुणि कई खाण-पीण की दुकानें अर कैंटीन सुविधाएं छन। विवरण: https://gbpiet.ac.in/eateries/",
+    "category": "facilities",
+    "tags": ["canteen", "food", "eateries"],
+    "lang": "ga"
+  },
+  {
+    "id": 104,
+    "question": "क्या GBPIET म शॉपिंग सेंटर छ?",
+    "answer": "हाँ! GBPIET म कैम्पस म रोजमर्रा की जरूरत की दुकानों वाळ शॉपिंग सेंटर छ। विवरण: https://gbpiet.ac.in/shopping-centre/",
+    "category": "facilities",
+    "tags": ["shopping", "store", "daily needs"],
+    "lang": "ga"
+  },
+  {
+    "id": 105,
+    "question": "GBPIET म M.G. ऑडिटोरियम क्या छ?",
+    "answer": "M.G. ऑडिटोरियम GBPIET क मुख्य सभागार छ, जि सांस्कृतिक कार्यक्रम, सेमिनार, दीक्षांत समारोह अर कॉलेज क अन्य कार्यक्रम खुणि उपयोग होंद। विवरण: https://gbpiet.ac.in/m-g-auditorium/",
+    "category": "infrastructure",
+    "tags": ["auditorium", "events"],
+    "lang": "ga"
+  },
+  {
+    "id": 106,
+    "question": "GBPIET म इंटरनेट की क्या सुविधा छ?",
+    "answer": "GBPIET म पूरे कैम्पस म, छात्रावास समेत, हाई-स्पीड इंटरनेट कनेक्टिविटी छ। शैक्षणिक भवन अर आवासीय क्षेत्रों म WiFi उपलब्ध छ। विवरण: https://gbpiet.ac.in/internet/",
+    "category": "facilities",
+    "tags": ["wifi", "internet", "network"],
+    "lang": "ga"
+  },
+  {
+    "id": 107,
+    "question": "क्या GBPIET म पूजा-अर्चना की जगह छ?",
+    "answer": "हाँ! GBPIET कैम्पस म सब धर्मों क छात्रों अर कर्मचारियों खुणि पूजा-अर्चना की जगह छ। विवरण: https://gbpiet.ac.in/places-of-worships/",
+    "category": "facilities",
+    "tags": ["worship", "religion"],
+    "lang": "ga"
+  },
+  {
+    "id": 301,
+    "question": "GBPIET मा कु-कु विभाग छन?",
+    "answer": "GBPIET मा 8 विभाग छन: Applied Science and Humanities, Biotechnology, Civil Engineering, Computer Science and Applications, Computer Science and Engineering, Electronics and Communication Engineering, Electrical Engineering, अर Mechanical Engineering।",
+    "category": "academics",
+    "tags": ["departments"],
+    "url": "https://gbpiet.ac.in/departments/",
+    "lang": "ga"
+  },
+  {
+    "id": 302,
+    "question": "GBPIET म कुणसे स्नातक कोर्स छन?",
+    "answer": "GBPIET मा B.Tech प्रोग्राम उपलब्ध छन: Civil, CSE, CSA, ECE, Electrical, Mechanical, Biotechnology, अर Applied Science।",
+    "category": "academics",
+    "tags": ["btech"],
+    "lang": "ga"
+  },
+  {
+    "id": 303,
+    "question": "GBPIET म B.Tech क्या-क्या शाखा छन?",
+    "answer": "B.Tech शाखा छन: CSE, CSE (AI & ML), ECE, Mechanical, Manufacturing, Electrical, Civil, अर Biotechnology। एडमिशन JEE Main अर UKTECH काउंसलिंग द्वारा होन्द।",
+    "category": "academics",
+    "tags": ["btech", "branches"],
+    "url": "https://gbpiet.ac.in/admission/",
+    "lang": "ga"
+  },
+  {
+    "id": 304,
+    "question": "GBPIET म B.Tech CSE AI ML क्या छ?",
+    "answer": "यो CSE अन्तर्गत Artificial Intelligence अर Machine Learning को specialization छ, जिमा AI, ML, Deep Learning अर Data Science मा ध्यान दियूं छ।",
+    "category": "academics",
+    "tags": ["ai", "ml"],
+    "lang": "ga"
+  },
+  {
+    "id": 305,
+    "question": "GBPIET म कुणसे स्नातकोत्तर कोर्स छन?",
+    "answer": "GBPIET मा M.Tech प्रोग्राम छन: CSE, DSP, Biotechnology, Production, Thermal, Geotechnology, Infrastructure अर MCA प्रोग्राम।",
+    "category": "academics",
+    "tags": ["mtech", "mca"],
+    "url": "https://gbpiet.ac.in/academic-programmes/postgraduate/",
+    "lang": "ga"
+  },
+  {
+    "id": 306,
+    "question": "क्या GBPIET म PhD प्रोग्राम छ?",
+    "answer": "हाँ! GBPIET मा Engineering अर Science विषयां मा PhD प्रोग्राम उपलब्ध छन, जिमा research support अर assistantship भी मिल्द।",
+    "category": "academics",
+    "tags": ["phd"],
+    "url": "https://gbpiet.ac.in/academic-programmes/doctoral/",
+    "lang": "ga"
+  },
+  {
+    "id": 307,
+    "question": "GBPIET म MCA प्रोग्राम क्या छ?",
+    "answer": "MCA एक 2 साल को postgraduate प्रोग्राम छ जिमा 60 सीट छन, यो Computer Science and Applications विभाग द्वारा चलायूं जांद।",
+    "category": "academics",
+    "tags": ["mca"],
+    "url": "https://gbpiet.ac.in/departments/computer-science-and-applications/",
+    "lang": "ga"
+  },
+  {
+    "id": 308,
+    "question": "GBPIET म CSE विभाग क्या छ?",
+    "answer": "CSE विभाग मा B.Tech CSE, B.Tech CSE (AI & ML) अर M.Tech CSE प्रोग्राम उपलब्ध छन।",
+    "category": "departments",
+    "tags": ["cse"],
+    "url": "https://gbpiet.ac.in/departments/computer-science-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 309,
+    "question": "GBPIET म ECE विभाग क्या छ?",
+    "answer": "ECE विभाग मा B.Tech ECE अर M.Tech Digital Signal Processing (DSP) प्रोग्राम उपलब्ध छन।",
+    "category": "departments",
+    "tags": ["ece"],
+    "url": "https://gbpiet.ac.in/departments/electronics-and-communication-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 310,
+    "question": "GBPIET म मैकेनिकल इंजीनियरिंग क्या छ?",
+    "answer": "Mechanical विभाग मा B.Tech Mechanical, B.Tech Manufacturing अर M.Tech Production अर Thermal Engineering प्रोग्राम उपलब्ध छन।",
+    "category": "departments",
+    "tags": ["mechanical"],
+    "url": "https://gbpiet.ac.in/departments/mechanical-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 311,
+    "question": "GBPIET म सिविल इंजीनियरिंग क्या छ?",
+    "answer": "Civil विभाग मा B.Tech Civil, M.Tech Geotechnology अर M.Tech Infrastructure प्रोग्राम उपलब्ध छन।",
+    "category": "departments",
+    "tags": ["civil"],
+    "url": "https://gbpiet.ac.in/departments/civil-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 312,
+    "question": "GBPIET म जैवप्रौद्योगिकी क्या छ?",
+    "answer": "Biotechnology विभाग मा B.Tech Biotechnology अर M.Tech Biotechnology प्रोग्राम उपलब्ध छन।",
+    "category": "departments",
+    "tags": ["biotech"],
+    "url": "https://gbpiet.ac.in/departments/biotechnology/",
+    "lang": "ga"
+  },
+  {
+    "id": 313,
+    "question": "GBPIET म विद्युत इंजीनियरिंग क्या छ?",
+    "answer": "Electrical Engineering विभाग मा B.Tech Electrical Engineering प्रोग्राम उपलब्ध छ।",
+    "category": "departments",
+    "tags": ["electrical"],
+    "url": "https://gbpiet.ac.in/departments/electrical-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 314,
+    "question": "GBPIET म PhD खुणि दाखिला प्रक्रिया क्या छ?",
+    "answer": "PhD दाखिला लिखित परीक्षा अर इंटरव्यू द्वारा होन्द। उम्मीदवार खुणि संबंधित विषय मा Master डिग्री जरूरी छ।",
+    "category": "academics",
+    "tags": ["phd"],
+    "url": "https://gbpiet.ac.in/academic-programmes/doctoral/",
+    "lang": "ga"
+  },
+  {
+    "id": 315,
+    "question": "GBPIET म PhD खुणि शोध क्षेत्र कुणसे छन?",
+    "answer": "PhD शोध क्षेत्र मा Computer Science, Electronics, Biotechnology अर Applied Science जैं गणित, भौतिकी अर रसायन शामिल छन।",
+    "category": "academics",
+    "tags": ["research"],
+    "lang": "ga"
+  },
+  {
+    "id": 316,
+    "question": "GBPIET म PhD विद्यार्थियों खुणि क्या-क्या सुविधाएं छन?",
+    "answer": "PhD छात्रां खुणि advanced labs, faculty guidance, research facilities अर publication अवसर मिल्द।",
+    "category": "academics",
+    "tags": ["phd"],
+    "lang": "ga"
+  },
+  {
+    "id": 317,
+    "question": "क्या GBPIET PhD शोध खुणि सहायता करद?",
+    "answer": "हाँ, सहायता मा assistantship, QIP program, funded projects अर industry collaboration शामिल छन।",
+    "category": "academics",
+    "tags": ["phd"],
+    "lang": "ga"
+  },
+  {
+    "id": 1,
+    "question": "GBPIET म CSE विभाग क शिक्षक कु-कु छन?",
+    "answer": "CSE विभाग क शिक्षक: HOD: डॉ. भूमिका गुप्ता, प्रो. एच. एस. भदौरिया, श्री पपेन्द्र कुमार, श्रीमती रुचि तेलवाल, डॉ. गरिमा सिंह, श्रीमती रश्मि सैनी, श्री विवेक तम्टा, श्री अभिषेक गुप्ता, श्री जितेन्द्र सिंह रौथाण।",
+    "category": "faculty",
+    "tags": ["cse", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET म CSA/MCA विभाग क शिक्षक कु-कु छन?",
+    "answer": "CSA/MCA विभाग क शिक्षक: HOD: डॉ. प्रीति डिमरी, डॉ. आशीष नेगी, डॉ. यशवंत सिंह चौहान, श्री दीपक डंगवाल, डॉ. शैल के. दिनकर, डॉ. सिद्धार्थ घनसेला, श्री कुंवर दीप नारायण।",
+    "category": "faculty",
+    "tags": ["csa", "mca", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 3,
+    "question": "GBPIET म ECE विभाग क शिक्षक कु-कु छन?",
+    "answer": "ECE विभाग क शिक्षक: HOD: डॉ. महेश कुमार अग्रवाल, डॉ. वाई. सिंह, डॉ. अनिल कुमार गौतम, डॉ. राजेश कुमार, डॉ. संजीव नैथानी, डॉ. कमलजीत सिंह भाटिया, श्री पुष्कर प्रवीन, डॉ. मनोज कुमार, डॉ. बलराज सिंह, श्री गगन सिंह, श्री संदीप कुमार।",
+    "category": "faculty",
+    "tags": ["ece", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 4,
+    "question": "GBPIET म मैकेनिकल विभाग क शिक्षक कु-कु छन?",
+    "answer": "मैकेनिकल विभाग क शिक्षक: HOD: डॉ. के. के. एस. मेर, डॉ. आशुतोष गुप्ता, डॉ. नितिन कुमार बलियान, डॉ. अमित जोशी, डॉ. विनय कुमार पटेल, डॉ. हेमन्त कुमार, डॉ. पवन कुमार पंत, डॉ. संजय सिंह समंत, डॉ. सचिन तेजयान, डॉ. सुनील चमोली, डॉ. मनोज कुमार पाठक, श्री लोकेश नायर, श्री सुमित राणा।",
+    "category": "faculty",
+    "tags": ["mechanical", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 5,
+    "question": "GBPIET म सिविल विभाग क शिक्षक कु-कु छन?",
+    "answer": "सिविल विभाग क शिक्षक: HOD: डॉ. भीष्म सिंह खाती, डॉ. हीरा लाल यादव, डॉ. दिलीप कुमार झा, श्री दिव्येश शर्मा, श्री हिमांशु झिंक्वाण, डॉ. सरीश चंद्रवंशी, श्रीमती रजनी।",
+    "category": "faculty",
+    "tags": ["civil", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 6,
+    "question": "GBPIET म इलेक्ट्रिकल विभाग क शिक्षक कु-कु छन?",
+    "answer": "इलेक्ट्रिकल विभाग क शिक्षक: HOD: डॉ. संजय गैरोला, डॉ. विष्णु मोहन मिश्रा, डॉ. यतेन्द्र कुमार, श्री अतुल कटियार, श्री सत्यवीर सिंह रावत, श्री नितीश रावत, सुश्री सुधीक्षा मिश्रा, श्री प्रशांत प्रकाश।",
+    "category": "faculty",
+    "tags": ["electrical", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET म बायोटेक्नोलॉजी विभाग क शिक्षक कु-कु छन?",
+    "answer": "बायोटेक्नोलॉजी विभाग क शिक्षक: HOD: डॉ. अरुण भट्ट, डॉ. ममता बौंथियाल, डॉ. पवन कुमार अग्रवाल, डॉ. सुरेश चंद्र फुलारा, श्री सुमित कुमार राय, श्री राहुल कुमार आर्य, श्री प्रांशु डंगवाल, सुश्री प्रीति सेमवाल, डॉ. काजल गौतम।",
+    "category": "faculty",
+    "tags": ["biotechnology", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET म एप्लाइड साइंस विभाग क शिक्षक कु-कु छन?",
+    "answer": "एप्लाइड साइंस विभाग क शिक्षक: HOD: डॉ. बी. एस. तिवारी, डॉ. विजय नंद कला, डॉ. हरमेंद्र गोयल, डॉ. किरीट सेमवाल, डॉ. अजीत सिंह नेगी, डॉ. मंगल सिंह बिष्ट, डॉ. आलोक दर्शन कोठियाल, डॉ. बलवंत सिंह नेगी, डॉ. महिपाल सिंह बिष्ट, डॉ. सिद्धार्थ कश्यप, डॉ. निमिषा रावत।",
+    "category": "faculty",
+    "tags": ["applied_sciences", "department"],
+    "lang": "ga"
+  },
+  {
+    "id": 9,
+    "question": "संस्थान म सबतै ज्यादा वेतन पाण वाला कर्मचारी कु छ?",
+    "answer": "यह जानकारी उपलब्ध नि छ (Out of Syllabus)।",
+    "category": "general",
+    "tags": ["unknown"],
+    "lang": "ga"
+  },
+  {
+    "id": 501,
+    "question": "गु.बी. पंत इंजीनियरिंग कॉलेज म्य बि.टेक करन खार्च कति छ??",
+    "answer": "बी.टेक फीस सेमेस्टर अनुसार छ: 1st: 37980, 2nd: 31035, 3rd: 32280, 4th: 31035, 5th: 32280, 6th: 31035, 7th: 32280, 8th: 31535। मेस फीस 16000 प्रति सेमेस्टर छ और होस्टल फीस 1980 से 2480 तक छ।",
+    "category": "fees",
+    "tags": ["btech", "fees"],
+    "lang": "ga"
+  },
+  {
+    "id": 502,
+    "question": "GBPIET म M.Tech खुणि फीस ढांचा क्या छ?",
+    "answer": "M.Tech फीस सेमेस्टर अनुसार छ: 1st: 43480, 2nd: 36535, 3rd: 37780, 4th: 36835। मेस फीस 16000 प्रति सेमेस्टर छ और होस्टल फीस 1980 से 2480 तक छ।",
+    "category": "fees",
+    "tags": ["mtech"],
+    "lang": "ga"
+  },
+  {
+    "id": 503,
+    "question": "GBPIET म MCA खुणि फीस ढांचा क्या छ?",
+    "answer": "MCA फीस सेमेस्टर अनुसार छ: 1st: 43480, 2nd: 36535, 3rd: 37780, 4th: 36835। मेस फीस 16000 प्रति सेमेस्टर छ और होस्टल फीस 1980 से 2480 तक छ।",
+    "category": "fees",
+    "tags": ["mca"],
+    "lang": "ga"
+  },
+  {
+    "id": 504,
+    "question": "GBPIET म B.Tech पैलि सेमेस्टर खुणि फीस ढांचा क्या छ?",
+    "answer": "संस्थान शुल्क: 37980, मेस शुल्क: 16000, होस्टल शुल्क: 2480।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 505,
+    "question": "बी.टेक दुसरि सेमेस्टर का फीस ढाँचा कणु छा",
+    "answer": "संस्थान शुल्क: 31035, मेस शुल्क: 16000, होस्टल शुल्क: 1980।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 506,
+    "question": "बी.टेक तीसरी सेमेस्टर की फीस संरचना कां छ?",
+    "answer": "संस्थान शुल्क: 32280, मेस शुल्क: 16000, होस्टल शुल्क: 2480।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 507,
+    "question": "B.Tech चौथी सेमेस्टर खुणि फीस ढांचा क्या छ?",
+    "answer": "संस्थान शुल्क: 31035, मेस शुल्क: 16000, होस्टल शुल्क: 1980।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 508,
+    "question": "B.Tech पांचवीं सेमेस्टर खुणि फीस ढांचा क्या छ?",
+    "answer": "संस्थान शुल्क: 32280, मेस शुल्क: 16000, होस्टल शुल्क: 2480।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 509,
+    "question": "B.Tech छठी सेमेस्टर खुणि फीस ढांचा क्या छ?",
+    "answer": "संस्थान शुल्क: 31035, मेस शुल्क: 16000, होस्टल शुल्क: 1980।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 510,
+    "question": "बी.टेक सातवें सेमेस्टर की फीस संरचना कैसे छी?",
+    "answer": "संस्थान शुल्क: 32280, मेस शुल्क: 16000, होस्टल शुल्क: 2480।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 511,
+    "question": "B.Tech आठौं सेमेस्टरख़ु फीस ढाँचा क्या छ?",
+    "answer": "संस्थान शुल्क: 31535, मेस शुल्क: 16000, होस्टल शुल्क: 1980।",
+    "category": "fees",
+    "tags": ["btech", "semester"],
+    "lang": "ga"
+  },
+  {
+    "id": 512,
+    "question": "GBPIET म्याँ मेस फिस किणा छन??",
+    "answer": "सभी कोर्सन खातिर मेस फीस 16000 प्रति सेमेस्टर छ।",
+    "category": "fees",
+    "tags": ["mess"],
+    "lang": "ga"
+  },
+  {
+    "id": 513,
+    "question": "GBPIET मॅं होस्टल फी कति छै?",
+    "answer": "होस्टल फीस 1980 सै 2480 प्रति सेमेस्टर तक छ, सेमेस्टर अनुसार बदलदी।",
+    "category": "fees",
+    "tags": ["hostel"],
+    "lang": "ga"
+  },
+  {
+    "id": 514,
+    "question": "GBPIET म’ं कॉलेज फी कसि दिनु?",
+    "answer": "कॉलेज फीस SBI Collect पोर्टल रै माध्यम स ऑनलाइन जमा कर सकदा।",
+    "category": "fees",
+    "tags": ["payment"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332",
+    "lang": "ga"
+  },
+  {
+    "id": 515,
+    "question": "GBPIET म’ं होस्टल अर मेस फीस कसि दिनु?",
+    "answer": "होस्टल अर मेस फीस SBI Collect पोर्टल रै माध्यम स ऑनलाइन जमा कर सकदा।",
+    "category": "fees",
+    "tags": ["payment"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "ga"
+  },
+  {
+    "id": 1,
+    "question": "GBPIET क्या च?",
+    "answer": "गोविंद बल्लभ पंत इंजीनियरिंग एंड टेक्नोलॉजी इंस्टीट्यूट (GBPIET), पौड़ी गढ़वाल, उत्तराखंड, उत्तराखंड सरकार कु एक प्रमुख स्वायत्त संस्थान च। यु 1989 मा स्थापित हौछ, अर पहिल शैक्षणिक सत्र 1991-92 मा शुरू हौ। यख B.Tech, M.Tech, MCA अर PhD प्रोग्राम चलदन। यु संस्थान UGC स्वायत्त अर AICTE अनुमोदित च।",
+    "category": "general",
+    "tags": ["about"],
+    "lang": "ga"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET कखे च?",
+    "answer": "GBPIET पौड़ी गढ़वाल, उत्तराखंड - 246194 मा च। हरिद्वार बटे: 145 किमी, देहरादून बटे: 155 किमी, ऋषिकेश बटे: 100 किमी। नजदीकी रेलवे स्टेशन: कोटद्वार (75 किमी)। अधिक जानकारी: https://gbpiet.ac.in/about/how-to-reach/",
+    "category": "general",
+    "tags": ["location"],
+    "lang": "ga"
+  },
+  {
+    "id": 3,
+    "question": "GBPIET कु संपर्क नंबर क्या च?",
+    "answer": "जरूरी संपर्क: DSW (डॉ. एच. गोयल): +91 8755068959, मुख्य वार्डन (डॉ. एम.के. अग्रवाल): +91 9410323549, डीन एकेडमिक्स (डॉ. आशुतोष गुप्ता): +91 9639890767।",
+    "category": "contact",
+    "tags": ["phone"],
+    "lang": "ga"
+  },
+  {
+    "id": 4,
+    "question": "GBPIET कु निदेशक कौन च?",
+    "answer": "GBPIET कु निदेशक प्रो. (डॉ.) वी.के. बंगा छन।",
+    "category": "administration",
+    "tags": ["director"],
+    "lang": "ga"
+  },
+  {
+    "id": 5,
+    "question": "GBPIET मान्यता प्राप्त च कि नी?",
+    "answer": "हाँ! GBPIET कु UGC स्वायत्तता 2024-25 बटे 2028-29 तक छ, AICTE अनुमोदित छ अर VMSBUTU स संबद्ध छ।",
+    "category": "general",
+    "tags": ["accreditation"],
+    "lang": "ga"
+  },
+  {
+    "id": 6,
+    "question": "GBPIET कु दृष्टिकोण क्या च?",
+    "answer": "दृष्टिकोण: तकनीकी शिक्षा मा उत्कृष्टता कु केंद्र बणनु अर वैश्विक स्तर पर सक्षम पेशेवर तैयार करनु। उद्देश्य: गुणवत्तापूर्ण शिक्षा, शोध सुविधा, नवाचार अर सतत विकास।",
+    "category": "general",
+    "tags": ["vision", "mission"],
+    "lang": "ga"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET कु सोशल मीडिया हैंडल क्या-क्या छन?",
+    "answer": "Twitter/X: @gbpietpauri, Instagram: @officialgbpietpauri, Facebook: GBPIET Pauri, Website: https://gbpiet.ac.in",
+    "category": "general",
+    "tags": ["social media"],
+    "lang": "ga"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET मा एंटी-रैगिंग नीति क्या च?",
+    "answer": "GBPIET मा रैगिंग खुणि जीरो टॉलरेंस च। हेल्पलाइन: 7017059887, 8126565328। सुरक्षा नंबर: 8791884847। विवरण: https://gbpiet.ac.in/conduct-rules/anti-ragging-measures/",
+    "category": "rules",
+    "tags": ["anti-ragging"],
+    "lang": "ga"
+  },
+  {
+    "id": 9,
+    "question": "GBPIET ERP पोर्टल मा लॉगिन कसे करें?",
+    "answer": "ERP पोर्टल: https://gbpiet.sitslive.com/Login। यख उपस्थिति, परिणाम, रजिस्ट्रेशन, फीस अर टाइमटेबल देखे जांद।",
+    "category": "erp",
+    "tags": ["login"],
+    "lang": "ga"
+  },
+  {
+    "id": 10,
+    "question": "GBPIET मा परिणाम कसे देखें?",
+    "answer": "परिणाम यख देखे: https://gbpiet.ac.in/result/ या ERP पोर्टल। सहायता खुणि: 01368-228030।",
+    "category": "academic",
+    "tags": ["results"],
+    "lang": "ga"
+  },
+  {
+    "id": 11,
+    "question": "GBPIET मा कौन-कौन सा सांस्कृतिक कार्यक्रम होंदन?",
+    "answer": "GBPIET मा गूंज (वार्षिक सांस्कृतिक उत्सव), टेक्नो-मैनेजमेंट फेस्ट, हैकाथॉन, डिजाइन प्रतियोगिता अर इंटरकॉलेजिएट टूर्नामेंट आयोजित होंदन।",
+    "category": "student_life",
+    "tags": ["events"],
+    "lang": "ga"
+  },
+  {
+    "id": 12,
+    "question": "क्या GBPIET मा IEEE स्टूडेंट ब्रांच च?",
+    "answer": "हाँ! GBPIET मा सक्रिय IEEE स्टूडेंट ब्रांच छ जि तकनीकी कार्यक्रम अर कार्यशालाएं करद।",
+    "category": "student_life",
+    "tags": ["ieee"],
+    "lang": "ga"
+  },
+  {
+    "id": 13,
+    "question": "GBPIET मा NPTEL क्या च?",
+    "answer": "GBPIET मा NPTEL लोकल चैप्टर छ जि IIT अर IISc क 1000+ ऑनलाइन कोर्स उपलब्ध करावद अर सर्टिफिकेट मौका देद।",
+    "category": "academic",
+    "tags": ["nptel"],
+    "lang": "ga"
+  },
+  {
+    "id": 14,
+    "question": "GBPIET कु पूर्व छात्र नेटवर्क कसु च?",
+    "answer": "GBPIET कु एलुमनाई नेटवर्क मजबूत छ। छात्र Amazon, Microsoft, Infosys, TCS, BEL, BHEL, NTPC मा कार्यरत छन।",
+    "category": "general",
+    "tags": ["alumni"],
+    "lang": "ga"
+  },
+  {
+    "id": 15,
+    "question": "क्या GBPIET मा गेस्ट हाउस च?",
+    "answer": "हाँ! GBPIET मा आगंतुक अर शिक्षकों खुणि गेस्ट हाउस सुविधा उपलब्ध छ।",
+    "category": "facilities",
+    "tags": ["guest house"],
+    "lang": "ga"
+  },
+  {
+    "id": 16,
+    "question": "GBPIET मा परिवहन सुविधा क्या च?",
+    "answer": "GBPIET निर्धारित मार्गों पर छात्रों अर कर्मचारियों खुणि परिवहन सेवा देद।",
+    "category": "facilities",
+    "tags": ["transport"],
+    "lang": "ga"
+  },
+  {
+    "id": 17,
+    "question": "क्या GBPIET मा स्वास्थ्य केंद्र च?",
+    "answer": "हाँ! GBPIET मा कैंपस स्वास्थ्य केंद्र अर चिकित्सा स्टाफ उपलब्ध छ।",
+    "category": "facilities",
+    "tags": ["health"],
+    "lang": "ga"
+  },
+  {
+    "id": 18,
+    "question": "GBPIET मा कु-कु सी खेल सुविधाएं छन?",
+    "answer": "खेल सुविधा मा क्रिकेट, फुटबॉल, बास्केटबॉल, वॉलीबॉल, बैडमिंटन, टेबल टेनिस अर शतरंज शामिल छन।",
+    "category": "facilities",
+    "tags": ["sports"],
+    "lang": "ga"
+  },
+  {
+    "id": 19,
+    "question": "GBPIET मा पुस्तकालय सुविधा क्या च?",
+    "answer": "केंद्रीय पुस्तकालय मा 50000+ किताबें, ई-बुक्स, जर्नल, IEEE डिजिटल लाइब्रेरी अर NPTEL संसाधन उपलब्ध छन।",
+    "category": "facilities",
+    "tags": ["library"],
+    "lang": "ga"
+  },
+  {
+    "id": 20,
+    "question": "GBPIET मा कु-कु सी कैंपस सुविधाएं छन?",
+    "answer": "सुविधाएं: पुस्तकालय, कंप्यूटर सेंटर, कार्यशाला, हॉस्टल, स्वास्थ्य केंद्र, बैंक, ऑडिटोरियम, स्पोर्ट्स कॉम्प्लेक्स, इंटरनेट, परिवहन, डाकघर, खाने-पीने की जगह अर गेस्ट हाउस।",
+    "category": "facilities",
+    "tags": ["campus"],
+    "lang": "ga"
+  },
+  {
+    "id": 21,
+    "question": "GBPIET मा कु-कु सी छात्रवृत्तियां उपलब्ध छन?",
+    "answer": "छात्रवृत्ति: SC/ST/OBC राज्य छात्रवृत्ति, मेरिट छात्रवृत्ति, केंद्रीय क्षेत्र छात्रवृत्ति अर पोस्ट मैट्रिक छात्रवृत्ति।",
+    "category": "scholarship",
+    "tags": ["financial aid"],
+    "lang": "ga"
+  },
+  {
+    "id": 22,
+    "question": "GBPIET मा सेमेस्टर परीक्षाएं कब होंदन?",
+    "answer": "विषम सेमेस्टर परीक्षा नवंबर-दिसंबर मा अर सम सेमेस्टर परीक्षा मई-जून मा होंदन।",
+    "category": "academic",
+    "tags": ["exam"],
+    "lang": "ga"
+  },
+  {
+    "id": 601,
+    "question": "GBPIET कौ सब्बि विभागूँ कौ HOD को-को छन?",
+    "answer": "GBPIET विभाग HOD कि सूची: अनुप्रयुक्त विज्ञान – डॉ. बी. एस. तिवारी, जैव प्रौद्योगिकी – डॉ. अरुण भट्ट, सिविल इंजीनियरिंग – डॉ. बी. एस. खाती, CSE – डॉ. भूमिका गुप्ता, CSA/MCA – प्रो. प्रीति डिमरी, विद्युत इंजीनियरिंग – प्रो. संजय गैरोला, ECE – डॉ. महेश कु. अग्रवाल, यांत्रिक इंजीनियरिंग – प्रो. के. के. एस. मेर।",
+    "category": "administration",
+    "tags": ["hod"],
+    "url": "https://gbpiet.ac.in/administration/heads-of-departments/",
+    "lang": "ga"
+  },
+  {
+    "id": 602,
+    "question": "GBPIET मा अनुप्रयुक्त विज्ञान विभागौ HOD को छन?",
+    "answer": "अनुप्रयुक्त विज्ञान अर मानविकी विभागौ HOD डॉ. बी. एस. तिवारी छन। यो विभाग गणित, भौतिकी, रसायन अर अंग्रेजी जैं विषय पढ़ौंदन।",
+    "category": "administration",
+    "tags": ["hod", "applied sciences"],
+    "lang": "ga"
+  },
+  {
+    "id": 603,
+    "question": [
+      "जैव प्रौद्योगिकी विभागौ HOD को छन?",
+      "biotech hod",
+      "hod biotech",
+      "biotech विभाग HOD",
+      "जैव प्रौद्योगिकी को HOD",
+      "biotechnology department head"
+    ],
+    "answer": "जैव प्रौद्योगिकी विभागौ HOD डॉ. अरुण भट्ट छन। शोध क्षेत्र: आनुवंशिकी, आण्विक प्रजनन, पादप जैवप्रौद्योगिकी अर जीनोमिक्स।",
+    "category": ["administration", "biotech", "biotechnology"],
+    "tags": ["hod of biotechnology", "biotechnology", "hod of biotech"],
+    "url": "https://gbpiet.ac.in/departments/biotechnology/",
+    "lang": "ga"
+  },
+  {
+    "id": 604,
+    "question": "सिविल इंजीनियरिंग विभागौ HOD को छन?",
+    "answer": "सिविल इंजीनियरिंग विभागौ HOD डॉ. बी. एस. खाती छन। शोध क्षेत्र: संरचनात्मक इंजीनियरिंग, भू-प्रौद्योगिकी अर अवसंरचना।",
+    "category": "administration",
+    "tags": ["hod", "civil"],
+    "url": "https://gbpiet.ac.in/departments/civil-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 605,
+    "question": "CSA या MCA विभागौ HOD को छन?",
+    "answer": "कम्प्यूटर विज्ञान अर अनुप्रयोग (CSA/MCA) विभागौ HOD प्रो. प्रीति डिमरी छन। वो MCA कार्यक्रम कु संचालन करदन।",
+    "category": "administration",
+    "tags": ["hod", "csa", "mca"],
+    "url": "https://gbpiet.ac.in/departments/computer-science-and-applications/",
+    "lang": "ga"
+  },
+  {
+    "id": 606,
+    "question": [
+      "CSE विभागौ HOD को छन?",
+      "cse hod",
+      "hod of cse",
+      "computer science hod",
+      "cse department",
+      "computer science engineering department",
+      "cse"
+    ],
+    "answer": "कम्प्यूटर विज्ञान अर इंजीनियरिंग (CSE) विभागौ HOD डॉ. भूमिका गुप्ता छन। शोध क्षेत्र: मशीन लर्निंग, एआई, डेटा माइनिंग अर नेटवर्क सुरक्षा।",
+    "category": "administration",
+    "tags": ["hod", "cse"],
+    "url": "https://gbpiet.ac.in/departments/computer-science-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 607,
+    "question": [
+      "विद्युत इंजीनियरिंग विभागौ HOD को छन?",
+      "electrical hod",
+      "hod of electrical engineering",
+      "electrical department",
+      "ee department",
+      "electrical engineering"
+    ],
+    "answer": "विद्युत इंजीनियरिंग विभागौ HOD प्रो. संजय गैरोला छन। शोध क्षेत्र: विद्युत प्रणाली, नियंत्रण प्रणाली अर नवीकरणीय ऊर्जा।",
+    "category": "administration",
+    "tags": ["hod", "electrical"],
+    "url": "https://gbpiet.ac.in/departments/electrical-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 608,
+    "question": [
+      "ECE विभागौ HOD को छन?",
+      "ece hod",
+      "hod of ece",
+      "electronics and communication hod",
+      "ece department"
+    ],
+    "answer": "इलेक्ट्रॉनिक्स अर संचार इंजीनियरिंग (ECE) विभागौ HOD डॉ. महेश कु. अग्रवाल छन। शोध क्षेत्र: VLSI डिज़ाइन, सिग्नल प्रोसेसिंग अर एम्बेडेड सिस्टम।",
+    "category": "administration",
+    "tags": ["hod", "ece"],
+    "url": "https://gbpiet.ac.in/departments/electronics-and-communication-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 609,
+    "question": "यांत्रिक इंजीनियरिंग विभागौ HOD को छन?",
+    "answer": "यांत्रिक इंजीनियरिंग विभागौ HOD प्रो. के. के. एस. मेर छन। शोध क्षेत्र: CAD/CAM, तापीय इंजीनियरिंग अर उत्पादन इंजीनियरिंग।",
+    "category": "administration",
+    "tags": ["hod", "mechanical"],
+    "url": "https://gbpiet.ac.in/departments/mechanical-engineering/",
+    "lang": "ga"
+  },
+  {
+    "id": 801,
+    "question": "GBPIET मा कति हॉस्टल छन्?",
+    "answer": "GBPIET मा कुल 11 हॉस्टल छन्: 8 नौना का हॉस्टल (1200 सीट) अर 3 नौन्यिँ का हॉस्टल (405 सीट)।",
+    "category": "hostel",
+    "tags": ["overview"],
+    "lang": "ga"
+  },
+  {
+    "id": 802,
+    "question": "GBPIET मा नौना का हॉस्टल कु-कु छन्?",
+    "answer": "नौना का हॉस्टल छन्: नीलकंठ, केदार ABC, कैलाश, रुद्र, बद्री, अलकनंदा, शिवालिक अर त्रिशूल।",
+    "category": "hostel",
+    "tags": ["boys"],
+    "lang": "ga"
+  },
+  {
+    "id": 803,
+    "question": "GBPIET मा नौन्यिँ का हॉस्टल कौन-कौन छन्?",
+    "answer": "नौन्यिँ का हॉस्टल छन्: रमन हॉस्टल, भागीरथी हॉस्टल अर विश्वेश्वरैया हॉस्टल।",
+    "category": "hostel",
+    "tags": ["girls"],
+    "lang": "ga"
+  },
+  {
+    "id": 804,
+    "question": "GBPIET मा पैलि साल का नौना वास्ति कौन सा हॉस्टल च?",
+    "answer": "पैलि साल का नौना वास्ति त्रिशूल हॉस्टल अर कैलाश हॉस्टल दिई जान्दन।",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "ga"
+  },
+  {
+    "id": 805,
+    "question": "GBPIET मा पैलि साल की नौन्यिँ वास्ति कौन सा हॉस्टल च?",
+    "answer": "पैलि साल की नौन्यिँ वास्ति विश्वेश्वरैया हॉस्टल दिई जान्दन।",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "ga"
+  },
+  {
+    "id": 806,
+    "question": "GBPIET का हॉस्टलों मा कु-कु सुविधा मिलदीन?",
+    "answer": "सुविधा: साफ पाणी, हाई-स्पीड वाई-फाई, टीवी रूम, अखबार, साफ शाकाहारी मेस अर 24/7 सुरक्षा।",
+    "category": "hostel",
+    "tags": ["facilities"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "ga"
+  },
+  {
+    "id": 807,
+    "question": "नीलकंठ हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: श्री लोकेश नायर अर श्री भानु प्रताप।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 808,
+    "question": "केदार ABC हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: डॉ. अजीत नेगी अर श्री सुमित राणा।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 809,
+    "question": "कैलाश हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: डॉ. किरीट सेमवाल अर श्री नीम सागर।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 810,
+    "question": "रुद्र हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: श्री दिव्येश शर्मा अर डॉ. अमित कुमार।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 811,
+    "question": "बद्री हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: श्री एस.एस. रावत अर डॉ. संदीप कुमार।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 812,
+    "question": "अलकनंदा हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: श्री अश्वनी सैनी अर श्री अश्वनी सैनी।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 813,
+    "question": "शिवालिक हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: डॉ. आर. बी. यादव अर डॉ. अजय कुमार।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 814,
+    "question": "त्रिशूल हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: डॉ. सचिन तेज्यान अर श्री के. डी. नारायण।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 815,
+    "question": "रमन हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: डॉ. रश्मि सैनी अर रुचि तैलवाल।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 816,
+    "question": "भागीरथी हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: श्रीमती मीनाक्षी काथायत अर डॉ. गरिमा सिंह।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 817,
+    "question": "विश्वेश्वरैया हॉस्टल का वार्डन कु छन्?",
+    "answer": "वार्डन: डॉ. प्रीति डिमरी अर श्रीमती ओ.एल. देवी।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ga"
+  },
+  {
+    "id": 818,
+    "question": "GBPIET मा हॉस्टल फीस कनि जमा करूँ?",
+    "answer": "हॉस्टल फीस SBI Collect मार्फत ऑनलाइन जमा कर सकदो।",
+    "category": "hostel",
+    "tags": ["fees"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "ga"
+  },
+  {
+    "id": 819,
+    "question": "GBPIET मा कति हॉस्टल छन्?",
+    "answer": "GBPIET मा कुल 11 हॉस्टल छन्: 8 नौना का अर 3 नौन्यिँ का।",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "ga"
+  },
+  {
+    "id": 820,
+    "question": "GBPIET मा नौन्यिँ का हॉस्टल कौन-कौन छन्?",
+    "answer": "नौन्यिँ का हॉस्टल: रमन, भागीरथी अर विश्वेश्वरैया।",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "ga"
+  },
+  {
+    "id": 821,
+    "question": "GBPIET मा नौना का हॉस्टल कौन-कौन छन्?",
+    "answer": "नौना का हॉस्टल: नीलकंठ, केदार ABC, कैलाश, रुद्र, बद्री, अलकनंदा, शिवालिक अर त्रिशूल।",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "ga"
+  },
+  {
+    "id": 822,
+    "question": "पैलि साल की नौन्यिँ का हॉस्टल कौन सा च?",
+    "answer": "पैलि साल की नौन्यिँ का हॉस्टल विश्वेश्वरैया च।",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "ga"
+  },
+  {
+    "id": 823,
+    "question": "पैलि साल का नौना का हॉस्टल कौन सा च?",
+    "answer": "पैलि साल का नौना का हॉस्टल त्रिशूल अर कैलाश छन्।",
+    "category": "hostel",
+    "tags": ["hindi"],
+    "lang": "ga"
+  }
+]
