@@ -1,54 +1,130 @@
 [
   {
-    "question": "जीबीपीआईईटी कैं च?",
-    "answer": "जीबीपीआईईटी (Govind Ballabh Pant Institute of Engineering and Technology) पौड़ी गढ़वाल, उत्तराखंड में च। यो एक autonomous सरकारी इंजीनियरिंग कॉलेज च।"
+    "id": 1001,
+    "question": "GBPIET में बी.टेक क फीस कतु छ?",
+    "answer": "बी.टेक क फीस सेमेस्टर क हिसाब ले छ: पैल सेमेस्टर क इंस्टीट्यूट फीस 37980, दूसर क 31035, तीसर क 32280, चौथ क 31035, पाँचौ क 32280, छटौ क 31035, सातौ क 32280, और आठौ क 31535 छ। मेस फीस हर सेमेस्टर 16000 छ। हॉस्टल फीस 1980 बटे 2480 तक हर सेमेस्टर छ।",
+    "category": "fees",
+    "tags": ["btech", "fees"],
+    "lang": "ku"
   },
   {
-    "question": "बीटेक में प्रवेश कसिक होंछ?",
-    "answer": "बीटेक में प्रवेश JEE Main और UKTECH काउंसलिंग द्वारा होंछ। 7 branch छन — CSE, ECE, EE, ME, Civil, Biotech, CSE AI&ML।"
+    "id": 1002,
+    "question": "GBPIET में एम.टेक क फीस कति छ?",
+    "answer": "एम.टेक क फीस सेमेस्टर क हिसाब ले छ: पैल सेमेस्टर क इंस्टीट्यूट फीस 43480, दूसर क 36535, तीसर क 37780, और चौथ क 36835 छ। मेस फीस हर सेमेस्टर 16000 छ। हॉस्टल फीस 1980 बटे 2480 तक हर सेमेस्टर छ।",
+    "category": "fees",
+    "tags": ["mtech", "fees"],
+    "lang": "ku"
   },
   {
-    "question": "फीस कति च?",
-    "answer": "बीटेक पैल semester फीस ₹37,980 च। MCA पैल semester ₹43,480 च। Hostel और mess फीस अलग च।"
+    "id": 1003,
+    "question": "GBPIET में MCA क फीस कति छ?",
+    "answer": "एमसीए क फीस सेमेस्टर क हिसाब ले छ: पैल सेमेस्टर क इंस्टीट्यूट फीस 43480, दूसर क 36535, तीसर क 37780, और चौथ क 36835 छ। मेस फीस हर सेमेस्टर 16000 छ। हॉस्टल फीस 1980 बटे 2480 तक हर सेमेस्टर छ।",
+    "category": "fees",
+    "tags": ["mca", "fees"],
+    "lang": "ku"
   },
   {
-    "question": "हॉस्टल कति छन?",
-    "answer": "GBPIET में 11 hostel छन — 8 लड़कों क और 3 लड़कियों क। कुल 1588 seat छन।"
+    "id": 1004,
+    "question": "GBPIET में बी.टेक पैल सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 37980, मेस फीस: 16000, हॉस्टल फीस: 2480 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_1"],
+    "lang": "ku"
   },
   {
-    "question": "registrar कौन च?",
-    "answer": "GBPIET क registrar Mr. Sandeep Kumar छन।"
+    "id": 1005,
+    "question": "GBPIET में बी.टेक दूसर सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 31035, मेस फीस: 16000, हॉस्टल फीस: 1980 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_2"],
+    "lang": "ku"
   },
   {
-    "question": "placement कसि च?",
-    "answer": "GBPIET क placement बड़ि राम्रि च। AWS ल 92 LPA, Microsoft ल 47 LPA offer दे। जानकारी: https://gbpiet.ac.in/placement-records/"
+    "id": 1006,
+    "question": "GBPIET में बी.टेक तीसर सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 32280, मेस फीस: 16000, हॉस्टल फीस: 2480 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_3"],
+    "lang": "ku"
   },
   {
-    "question": "ECE HOD कौन छन?",
-    "answer": "ECE क HOD Dr. Mahesh Kumar Agrawal छन।"
+    "id": 1007,
+    "question": "GBPIET में बी.टेक चौथ सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 31035, मेस फीस: 16000, हॉस्टल फीस: 1980 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_4"],
+    "lang": "ku"
   },
   {
-    "question": "CSE HOD कौन छन?",
-    "answer": "CSE क HOD Dr. Bhumika Gupta छन।"
+    "id": 1008,
+    "question": "GBPIET में बी.टेक पाँचौ सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 32280, मेस फीस: 16000, हॉस्टल फीस: 2480 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_5"],
+    "lang": "ku"
   },
   {
-    "question": "MCA HOD कौन छन?",
-    "answer": "MCA/CSA क HOD Prof. Priti Dimri छन।"
+    "id": 1009,
+    "question": "GBPIET में बी.टेक छटौ सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 31035, मेस फीस: 16000, हॉस्टल फीस: 1980 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_6"],
+    "lang": "ku"
   },
   {
-    "question": "Biotech HOD कौन छन?",
-    "answer": "Biotechnology क HOD Prof. Arun Bhatt छन।"
+    "id": 1010,
+    "question": "GBPIET में बी.टेक सातौ सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 32280, मेस फीस: 16000, हॉस्टल फीस: 2480 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_7"],
+    "lang": "ku"
   },
   {
-    "question": "college कैं पौंछण?",
-    "answer": "GBPIET पौड़ी गढ़वाल में च। ऋषिकेश से 70km, देहरादून से 100km। बस सेवा उपलब्ध च।"
+    "id": 1011,
+    "question": "GBPIET में बी.टेक आठौ सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 31535, मेस फीस: 16000, हॉस्टल फीस: 1980 छ।",
+    "category": "fees",
+    "tags": ["btech", "semester_8"],
+    "lang": "ku"
   },
   {
-    "question": "Dean academic कौन छन?",
-    "answer": "Dean Academic Prof. Vijay Kumar Banga छन।"
+    "id": 1012,
+    "question": "GBPIET में एम.टेक पैल सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 43480, मेस फीस: 16000, हॉस्टल फीस: 2480 छ।",
+    "category": "fees",
+    "tags": ["mtech", "semester_1"],
+    "lang": "ku"
   },
   {
-    "question": "scholarship मिलछ?",
-    "answer": "हाँ, SC/ST/OBC छात्रों कुण सरकारी scholarship मिलछ। Merit scholarship बि मिलछ।"
+    "id": 1013,
+    "question": "GBPIET में MCA पैल सेमेस्टर क फीस कति छ?",
+    "answer": "इंस्टीट्यूट फीस: 43480, मेस फीस: 16000, हॉस्टल फीस: 2480 छ।",
+    "category": "fees",
+    "tags": ["mca", "semester_1"],
+    "lang": "ku"
+  },
+  {
+    "id": 1014,
+    "question": "GBPIET में मेस क फीस कति छ?",
+    "answer": "मेस क फीस सब कोर्सों लिजी हर सेमेस्टर 16000 छ।",
+    "category": "fees",
+    "tags": ["mess"],
+    "lang": "ku"
+  },
+  {
+    "id": 1015,
+    "question": "GBPIET में हॉस्टल क फीस कति छ?",
+    "answer": "हॉस्टल क फीस हर सेमेस्टर 1980 बटे 2480 क बीच में हूँछ।",
+    "category": "fees",
+    "tags": ["hostel"],
+    "lang": "ku"
+  },
+  {
+    "id": 1016,
+    "question": "GBPIET में कॉलेज क फीस कसि जमा करणी?",
+    "answer": "कॉलेज फीस ऑनलाइन SBI Collect क माध्यम ले जमा कर सकिन्छ: https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=823332। हॉस्टल और मेस फीस यहाँ बटा: https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435।",
+    "category": "fees",
+    "tags": ["payment", "sbi_collect"],
+    "lang": "ku"
   }
 ]
