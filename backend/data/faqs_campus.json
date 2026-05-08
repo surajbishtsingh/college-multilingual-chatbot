@@ -1,12 +1,5 @@
 [
-  {
-    "id": 101,
-    "question": "Does GBPIET have a bank on campus?",
-    "answer": "Yes! GBPIET has a Bank of Baroda branch and ATM facility on campus. Students can easily access banking services without leaving campus.",
-    "category": "facilities",
-    "tags": ["bank", "atm", "finance"],
-    "lang": "en"
-  },
+
   {
     "id": 102,
     "question": "Does GBPIET have a post office?",
