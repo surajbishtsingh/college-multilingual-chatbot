@@ -70,6 +70,18 @@ except Exception as e:
 
 
 # ═══════════════════════════════════════════════
+# SECTION → LANG MAPPING
+# ═══════════════════════════════════════════════
+
+SECTION_TO_LANG = {
+    "garhwali": "ga",
+    "kumauni":  "ku",
+    "hindi":    "hi",
+    "english":  "en",
+}
+
+
+# ═══════════════════════════════════════════════
 # MODELS
 # ═══════════════════════════════════════════════
 
@@ -83,6 +95,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = None
     is_first_message: bool = False
     language: Optional[str] = None
+    section: Optional[str] = None   # "garhwali" | "kumauni" | "hindi" | "english"
 
 
 class ChatResponse(BaseModel):
@@ -165,11 +178,17 @@ async def startup_event():
         print(f"[Startup] ⚠️ Scheduler: {e}")
     sys.stdout.flush()
 
-    print(f"  Groq Key 1 : {'✅' if os.getenv('GROQ_API_KEY') else '❌'}")
-    print(f"  Groq Key 2 : {'✅' if os.getenv('GROQ_API_KEY_2') else '⚠️'}")
-    print(f"  SerpAPI    : {'✅' if os.getenv('SERPAPI_KEY') else '⚠️'}")
+    # ── Environment summary ────────────────────────────────────────────
+    print("-" * 60)
+    print("[Startup] Environment:")
+    print(f"  Groq Key 1 : {'✅' if os.getenv('GROQ_API_KEY')   else '❌ NOT SET'}")
+    print(f"  Groq Key 2 : {'✅' if os.getenv('GROQ_API_KEY_2') else '⚠️  not set'}")
+    print(f"  Groq Key 3 : {'✅' if os.getenv('GROQ_API_KEY_3') else '⚠️  not set'}")
+    print(f"  Groq Key 4 : {'✅' if os.getenv('GROQ_API_KEY_4') else '⚠️  not set'}")
+    print(f"  SerpAPI    : {'✅' if os.getenv('SERPAPI_KEY')     else '⚠️  not set'}")
     print(f"  DB         : {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
     print(f"  Qdrant     : {'Cloud' if os.getenv('QDRANT_URL') else 'Local'}")
+    print("-" * 60)
     print("[Startup] ✅ Diksha Ready!")
     print("=" * 60)
     sys.stdout.flush()
@@ -207,26 +226,49 @@ async def shutdown_event():
 def home():
     return {
         "chatbot": "Diksha",
-        "status": "running",
-        "db": "PostgreSQL" if USE_POSTGRES else "SQLite",
+        "status":  "running",
+        "db":      "PostgreSQL" if USE_POSTGRES else "SQLite",
     }
 
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "chatbot": "Diksha", "version": "2.0.0"}
+    """Detailed health check — shows all 4 Groq key statuses."""
+    return {
+        "status":    "ok",
+        "chatbot":   "Diksha",
+        "version":   "2.0.0",
+        "groq_keys": {
+            "key1": bool(os.getenv("GROQ_API_KEY")),
+            "key2": bool(os.getenv("GROQ_API_KEY_2")),
+            "key3": bool(os.getenv("GROQ_API_KEY_3")),
+            "key4": bool(os.getenv("GROQ_API_KEY_4")),
+        },
+        "serpapi": bool(os.getenv("SERPAPI_KEY")),
+        "db":      "PostgreSQL" if USE_POSTGRES else "SQLite",
+        "qdrant":  "Cloud" if os.getenv("QDRANT_URL") else "Local",
+    }
 
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, req: Request):
     session_id = request.session_id or str(uuid.uuid4())
-    lang = request.language if request.language in ["en", "hi", "ga", "ku"] \
-           else detect_language(request.question)
+
+    # ── Language resolution (priority: section > language > auto-detect) ──
+    if request.section and request.section.lower().strip() in SECTION_TO_LANG:
+        lang = SECTION_TO_LANG[request.section.lower().strip()]
+        print(f"[Chat] Lang from section='{request.section}' → '{lang}'")
+    elif request.language in ("en", "hi", "ga", "ku"):
+        lang = request.language
+        print(f"[Chat] Lang from request.language='{lang}'")
+    else:
+        lang = detect_language(request.question)
+        print(f"[Chat] Lang auto-detected='{lang}'")
 
     try:
         history = await build_memory_context(session_id)
         await process_user_message(session_id, request.question, lang)
-        answer = await run_in_threadpool(get_answer, request.question, lang, history)
+        answer  = await run_in_threadpool(get_answer, request.question, lang, history)
         await process_bot_message(session_id, answer, lang)
     except Exception as e:
         print(f"[Chat] ERROR: {e}")
@@ -239,7 +281,7 @@ async def chat(request: ChatRequest, req: Request):
 @app.post("/tts")
 async def text_to_speech(request: TTSRequest):
     """
-    ✅ Returns {"audio_base64": "..."} — matches frontend expectation.
+    Returns {"audio_base64": "..."} — matches frontend expectation.
     """
     try:
         audio_bytes = await run_in_threadpool(generate_voice, request.text, request.lang)
