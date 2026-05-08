@@ -1,5 +1,189 @@
 [
   {
+    "id": 1,
+    "question": "GBPIET के छ?",
+    "answer": "गोविंद बल्लभ पंत इंजीनियरिंग और टेक्नोलॉजी संस्थान (GBPIET), पौड़ी गढ़वाल, उत्तराखंड सरकार क एक मुख्य स्वायत्त संस्थान छ। यो 1989 में बणो और पैल शैक्षणिक सत्र 1991-92 में शुरू भयो। यहाँ B.Tech, M.Tech, MCA और PhD क पढ़ाई हूँछ। यो संस्थान UGC स्वायत्त और AICTE ले मान्यता प्राप्त छ।",
+    "category": "general",
+    "tags": ["about"],
+    "lang": "ku"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET कते छ?",
+    "answer": "GBPIET पौड़ी गढ़वाल, उत्तराखंड (246194) में छ। हरिद्वार बटे यो 145 किमी, देहरादून बटे 155 किमी और ऋषिकेश बटे 100 किमी दूर छ। सबले नजीक रेलवे स्टेशन कोटद्वार (75 किमी) छ। और जानकारी लिजी: https://gbpiet.ac.in/about/how-to-reach/ देखा।",
+    "category": "general",
+    "tags": ["location"],
+    "lang": "ku"
+  },
+  {
+    "id": 3,
+    "question": "GBPIET क संपर्क नंबर के छ?",
+    "answer": "मुख्य नंबर: DSW (डॉ. एच. गोयल): +91 8755068959, चीफ वार्डन (डॉ. एम.के. अग्रवाल): +91 9410323549, डीन एकेडमिक्स (डॉ. आशुतोष गुप्ता): +91 9639890767 छन।",
+    "category": "contact",
+    "tags": ["phone"],
+    "lang": "ku"
+  },
+  {
+    "id": 4,
+    "question": "GBPIET क डायरेक्टर को छन?",
+    "answer": "GBPIET क डायरेक्टर प्रो. (डॉ.) वी.के. बंगा ज्यू छन।",
+    "category": "administration",
+    "tags": ["director"],
+    "lang": "ku"
+  },
+  {
+    "id": 5,
+    "question": "के GBPIET मान्यता प्राप्त छ?",
+    "answer": "हाँ, GBPIET क पास UGC स्वायत्तता (2024-25 बटे 2028-29 तक) छ, यो AICTE ले अप्रूव्ड छ और VMSBUTU ले संबद्ध छ।",
+    "category": "general",
+    "tags": ["accreditation"],
+    "lang": "ku"
+  },
+  {
+    "id": 6,
+    "question": "GBPIET क लक्ष्य (Vision) के छ?",
+    "answer": "विज़न: तकनीकी शिक्षा में श्रेष्ठता और काबिल पेशेवर तैयार करण। मिशन: अच्छी शिक्षा और रिसर्च सुविधा, नई खोज और विकास करण छ।",
+    "category": "general",
+    "tags": ["vision", "mission"],
+    "lang": "ku"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET क सोशल मीडिया हैंडल के-के छन?",
+    "answer": "Twitter/X: @gbpietpauri, Instagram: @officialgbpietpauri, Facebook: GBPIET Pauri, वेबसाइट: https://gbpiet.ac.in छ।",
+    "category": "general",
+    "tags": ["social media"],
+    "lang": "ku"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET में रैगिंग लिजी के नियम छन?",
+    "answer": "GBPIET में रैगिंग क कतई अनुमति न्हा। हेल्पलाइन: 7017059887, 8126565328। सुरक्षा: 8791884847। और जानकारी: https://gbpiet.ac.in/conduct-rules/anti-ragging-measures/ में छ।",
+    "category": "rules",
+    "tags": ["anti-ragging"],
+    "lang": "ku"
+  },
+  {
+    "id": 9,
+    "question": "GBPIET ERP पोर्टल में लॉगिन कसि करण?",
+    "answer": "ERP पोर्टल: https://gbpiet.sitslive.com/Login छ। यहाँ बटा तुम हाजिरी, रिजल्ट, रजिस्ट्रेशन, फीस और टाइमटेबल देख सको।",
+    "category": "erp",
+    "tags": ["login"],
+    "lang": "ku"
+  },
+  {
+    "id": 10,
+    "question": "GBPIET में रिजल्ट कसि चेक करण?",
+    "answer": "रिजल्ट https://gbpiet.ac.in/result/ या ERP पोर्टल में देख सको। केंई पूछण लिजी 01368-228030 में फोन करा।",
+    "category": "academic",
+    "tags": ["results"],
+    "lang": "ku"
+  },
+  {
+    "id": 11,
+    "question": "GBPIET में के-के सांस्कृतिक कार्यक्रम हूँछन?",
+    "answer": "GBPIET में 'गूंज' (सालाना सांस्कृतिक कार्यक्रम), तकनीकी मैनेजमेंट कार्यक्रम, हैकाथॉन, डिजाइन प्रतियोगिता और खेल-कूद हूँछन।",
+    "category": "student_life",
+    "tags": ["events"],
+    "lang": "ku"
+  },
+  {
+    "id": 12,
+    "question": "के GBPIET में IEEE स्टूडेंट ब्रांच छ?",
+    "answer": "हाँ, GBPIET में एक सक्रिय IEEE स्टूडेंट ब्रांच छ जो तकनीकी वर्कशॉप और कार्यक्रम कराती रौंछ।",
+    "category": "student_life",
+    "tags": ["ieee"],
+    "lang": "ku"
+  },
+  {
+    "id": 13,
+    "question": "GBPIET में NPTEL के छ?",
+    "answer": "GBPIET में NPTEL लोकल चैप्टर छ जो IIT और IISc क 1000 बटे ज्यादा ऑनलाइन कोर्स और सर्टिफिकेट क मौका दिन्छ।",
+    "category": "academic",
+    "tags": ["nptel"],
+    "lang": "ku"
+  },
+  {
+    "id": 14,
+    "question": "GBPIET क पूर्व छात्र (Alumni) कहाँ-कहाँ छन?",
+    "answer": "GBPIET क पूर्व छात्र Amazon, Microsoft, Infosys, TCS, BEL, BHEL, NTPC जैसी ठुल कंपनियों में छन।",
+    "category": "general",
+    "tags": ["alumni"],
+    "lang": "ku"
+  },
+  {
+    "id": 15,
+    "question": "के GBPIET में गेस्ट हाउस छ?",
+    "answer": "हाँ, GBPIET में मेहमानों और फैकल्टी लिजी गेस्ट हाउस छ।",
+    "category": "facilities",
+    "tags": ["guest house"],
+    "lang": "ku"
+  },
+  {
+    "id": 16,
+    "question": "GBPIET में बस/ट्रांसपोर्ट क सुविधा के छ?",
+    "answer": "GBPIET छात्रों और स्टाफ लिजी तय रास्तों में बस क सुविधा दिन्छ।",
+    "category": "facilities",
+    "tags": ["transport"],
+    "lang": "ku"
+  },
+  {
+    "id": 17,
+    "question": "के GBPIET में स्वास्थ्य केंद्र छ?",
+    "answer": "हाँ, कैंपस क भीतर एक स्वास्थ्य केंद्र छ जहाँ मेडिकल स्टाफ रौंछ।",
+    "category": "facilities",
+    "tags": ["health"],
+    "lang": "ku"
+  },
+  {
+    "id": 18,
+    "question": "GBPIET में खेल-कूद क के सुविधा छन?",
+    "answer": "यहाँ क्रिकेट, फुटबॉल, बास्केटबॉल, वॉलीबॉल, बैडमिंटन, टेबल टेनिस और शतरंज क सुविधा छ।",
+    "category": "facilities",
+    "tags": ["sports"],
+    "lang": "ku"
+  },
+  {
+    "id": 19,
+    "question": "GBPIET में लाइब्रेरी क सुविधा कसि छ?",
+    "answer": "सेंट्रल लाइब्रेरी में 50,000 बटे ज्यादा किताब, ई-बुक्स, जर्नल्स, IEEE डिजिटल लाइब्रेरी और NPTEL क सुविधा छ।",
+    "category": "facilities",
+    "tags": ["library"],
+    "lang": "ku"
+  },
+  {
+    "id": 20,
+    "question": "GBPIET कैंपस में के-के सुविधा छन?",
+    "answer": "कैंपस में लाइब्रेरी, कंप्यूटर सेंटर, वर्कशॉप, हॉस्टल, स्वास्थ्य केंद्र, बैंक, ऑडिटोरियम, स्पोर्ट्स कॉम्प्लेक्स, इंटरनेट, बस सुविधा, पोस्ट ऑफिस, कैंटीन और गेस्ट हाउस छ।",
+    "category": "facilities",
+    "tags": ["campus"],
+    "lang": "ku"
+  },
+  {
+    "id": 21,
+    "question": "GBPIET में कति स्कॉलरशिप मिलिन्छन?",
+    "answer": "यहाँ राज्य सरकार क स्कॉलरशिप (SC/ST/OBC), मेरिट स्कॉलरशिप, सेंट्रल सेक्टर स्कॉलरशिप और पोस्ट-मेट्रिक स्कॉलरशिप मिलिन्छन।",
+    "category": "scholarship",
+    "tags": ["financial aid"],
+    "lang": "ku"
+  },
+  {
+    "id": 22,
+    "question": "GBPIET में सेमेस्टर परीक्षा कब हूँछन?",
+    "answer": "विषम (Odd) सेमेस्टर क परीक्षा नवंबर-दिसंबर में और सम (Even) सेमेस्टर क परीक्षा मई-जून में हूँछन।",
+    "category": "academic",
+    "tags": ["exam"],
+    "lang": "ku"
+  },
+  {
+    "question": "GBPIET में को बैंक छ?",
+    "answer": "GBPIET कैंपस क भीतर स्टेट बैंक ऑफ इंडिया (SBI) क ब्रांच और ATM छ। छात्रों लिजी बैंक क काम कैंपस मेंै हूँछ।"
+  },
+  {
+    "question": "बैंक ATM कहाँ छ?",
+    "answer": "कैंपस में स्टेट बैंक ऑफ इंडिया (SBI) क ब्रांच और ATM क सुविधा छ।"
+  },
+  {
     "id": 1001,
     "question": "GBPIET में बी.टेक क फीस कतु छ?",
     "answer": "बी.टेक क फीस सेमेस्टर क हिसाब ले छ: पैल सेमेस्टर क इंस्टीट्यूट फीस 37980, दूसर क 31035, तीसर क 32280, चौथ क 31035, पाँचौ क 32280, छटौ क 31035, सातौ क 32280, और आठौ क 31535 छ। मेस फीस हर सेमेस्टर 16000 छ। हॉस्टल फीस 1980 बटे 2480 तक हर सेमेस्टर छ।",
