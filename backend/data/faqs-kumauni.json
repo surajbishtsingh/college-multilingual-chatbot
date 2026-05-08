@@ -390,5 +390,159 @@
     "category": "fees",
     "tags": ["payment", "sbi_collect"],
     "lang": "ku"
+  },
+  {
+    "id": 1081,
+    "question": "GBPIET में कति हॉस्टल छन?",
+    "answer": "GBPIET में सब मिलायबर 11 हॉस्टल छन: 8 चेलों (Boys) लिजी (1172 सीटें) और 3 चेलियों (Girls) लिजी (416 सीटें) छन।",
+    "category": "hostel",
+    "tags": ["overview"],
+    "lang": "ku"
+  },
+  {
+    "id": 1082,
+    "question": "GBPIET में चेलों (Boys) क हॉस्टल को-को छन?",
+    "answer": "चेलों क हॉस्टल छन: नीलकंठ, केदार ABC, कैलाश, रुद्र, बद्री, अलकनंदा, शिवालिक और त्रिशूल।",
+    "category": "hostel",
+    "tags": ["boys"],
+    "lang": "ku"
+  },
+  {
+    "id": 1083,
+    "question": "GBPIET में चेलियों (Girls) क हॉस्टल को-को छन?",
+    "answer": "चेलियों क हॉस्टल छन: रमन हॉस्टल, भागीरथी हॉस्टल और विश्वेश्वरैया हॉस्टल।",
+    "category": "hostel",
+    "tags": ["girls"],
+    "lang": "ku"
+  },
+  {
+    "id": 1084,
+    "question": "GBPIET में पैल साल क चेलों लिजी को हॉस्टल छ?",
+    "answer": "पैल साल क चेलों क लिजी आमतौर पर त्रिशूल हॉस्टल और कैलाश हॉस्टल दियूँ जान।",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "ku"
+  },
+  {
+    "id": 1085,
+    "question": "GBPIET में पैल साल क चेलियों लिजी को हॉस्टल छ?",
+    "answer": "पैल साल क चेलियों लिजी विश्वेश्वरैया हॉस्टल दियूँ जाँछ।",
+    "category": "hostel",
+    "tags": ["first_year"],
+    "lang": "ku"
+  },
+  {
+    "id": 1086,
+    "question": "GBPIET क हॉस्टल में के-के सुविधा छन?",
+    "answer": "हॉस्टल में WiFi, साफ पिलै (पानी), टीवी रूम, अखबार, साफ मेस और 24/7 सुरक्षा क सुविधा छ।",
+    "category": "hostel",
+    "tags": ["facilities"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "ku"
+  },
+  {
+    "id": 1087,
+    "question": "नीलकंठ हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन श्री लोकेश नायर ज्यू और श्री भानु प्रताप ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1088,
+    "question": "केदार ABC हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन डॉ. अजीत नेगी ज्यू और श्री सुमित राणा ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1089,
+    "question": "कैलाश हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन डॉ. किरीट सेमवाल ज्यू और श्री नीम सागर ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1090,
+    "question": "रुद्र हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन श्री दिव्येश शर्मा ज्यू और डॉ. अमित कुमार ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1091,
+    "question": "बद्री हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन श्री एस. एस. रावत ज्यू और डॉ. संदीप कुमार ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1092,
+    "question": "अलकनंदा हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन श्री अश्विनी सैनी ज्यू और श्री संदीप राणा ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1093,
+    "question": "शिवालिक हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन डॉ. आर. बी. यादव ज्यू और डॉ. अजय कुमार ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1094,
+    "question": "त्रिशूल हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन श्री के. डी. नारायण ज्यू और डॉ. सचिन तेजयान ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1095,
+    "question": "रमन हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन डॉ. रश्मि सैनी ज्यू और श्रीमती रुचि तेलवाल ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1096,
+    "question": "भागीरथी हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन श्रीमती मीनाक्षी कठायत ज्यू और डॉ. गरिमा सिंह ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1097,
+    "question": "विश्वेश्वरैया हॉस्टल क वार्डन को छन?",
+    "answer": "यहाँ क वार्डन डॉ. प्रीति डिमरी ज्यू और श्रीमती ओ. एल. देवी ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
+  },
+  {
+    "id": 1098,
+    "question": "GBPIET में हॉस्टल क फीस कसि जमा करणी?",
+    "answer": "हॉस्टल क फीस SBI Collect क माध्यम ले ऑनलाइन जमा कर सकिन्छ।",
+    "category": "hostel",
+    "tags": ["fees"],
+    "url": "https://onlinesbi.sbi.bank.in/sbicollect/icollecthome.htm?corpID=908435",
+    "lang": "ku"
+  },
+  {
+    "id": 1100,
+    "question": "GBPIET में मुख्य वार्डन (Chief Warden) को छन?",
+    "answer": "मुख्य वार्डन डॉ. एम. के. अग्रवाल ज्यू छन।",
+    "category": "hostel",
+    "tags": ["warden"],
+    "lang": "ku"
   }
 ]
