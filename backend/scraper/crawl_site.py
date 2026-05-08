@@ -80,19 +80,18 @@ def needs_javascript(url: str) -> bool:
 def fetch_with_selenium(url: str) -> dict | None:
     """
     Fetch JavaScript-rendered page using Selenium.
-    Uses smarter waiting strategy for React/Next.js sites.
+    Railway ke liye chromium system path se use karta hai.
     """
     try:
+        import shutil
         from selenium import webdriver
         from selenium.webdriver.chrome.service import Service
         from selenium.webdriver.chrome.options import Options
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-        from webdriver_manager.chrome import ChromeDriverManager
 
         options = Options()
-        options.add_argument("--headless=new")      # newer headless mode
+        options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
@@ -101,41 +100,52 @@ def fetch_with_selenium(url: str) -> dict | None:
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-infobars")
+        options.add_argument("--remote-debugging-port=9222")
+
+        # ✅ Railway ke liye — system chromium use karo (webdriver-manager nahi)
+        chrome_path = (
+            shutil.which("chromium") or
+            shutil.which("chromium-browser") or
+            shutil.which("google-chrome") or
+            "/usr/bin/chromium"
+        )
+        chromedriver_path = (
+            shutil.which("chromedriver") or
+            "/usr/bin/chromedriver"
+        )
+
+        print(f"  [Selenium] Chrome: {chrome_path}")
+        print(f"  [Selenium] Driver: {chromedriver_path}")
+
+        options.binary_location = chrome_path
+        service = Service(chromedriver_path)
+
         # Disable images — faster loading
         prefs = {"profile.managed_default_content_settings.images": 2}
         options.add_experimental_option("prefs", prefs)
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
-        service = Service(ChromeDriverManager().install())
-        driver  = webdriver.Chrome(service=service, options=options)
+        driver = webdriver.Chrome(service=service, options=options)
         driver.set_page_load_timeout(30)
 
         try:
             driver.get(url)
 
-            # ── Smart wait strategy for React/Next.js ──────────────
-            # Step 1: Wait for page load state
             WebDriverWait(driver, 15).until(
                 lambda d: d.execute_script("return document.readyState") == "complete"
             )
+            time.sleep(3)
 
-            # Step 2: Wait for network to be idle (React done rendering)
-            # Check if jQuery/fetch requests are done
-            time.sleep(3)   # base wait for React to hydrate
-
-            # Step 3: Scroll to trigger lazy-loaded content
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
             time.sleep(1)
             driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(1)
 
-            # Step 4: Get final rendered HTML
             html      = driver.page_source
             body_text = driver.find_element(By.TAG_NAME, "body").text
 
             print(f"  [Selenium] Got {len(body_text)} chars from {url[:50]}")
 
-            # If still empty, wait more
             if len(body_text) < 200:
                 time.sleep(4)
                 html      = driver.page_source
