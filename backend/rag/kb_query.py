@@ -2,10 +2,13 @@
 # Fixes:
 #   ✅ 4 Groq keys (8-attempt fallback)
 #   ✅ Garhwali answers returned correctly (GA_MARKERS detection)
+#   ✅ Kumauni answers returned correctly (KU_MARKERS detection)
 #   ✅ Emoji stripped before TTS / response
 #   ✅ Feminine grammar enforced
 #   ✅ दीक्षा spelling fixed
 #   ✅ lang preference in all matching steps
+#   ✅ Strict lang routing: ga→kb_ga, ku→kb_ku, hi→kb_hi, en→kb_en
+#   ✅ Kumauni synonym expansion added
 
 import os
 import re
@@ -72,35 +75,20 @@ GBPIET_URL       = "https://gbpiet.ac.in"
 
 
 # ══════════════════════════════════════════════════════════════════════
-# EMOJI STRIPPER — fix: TTS was reading emojis aloud
+# EMOJI STRIPPER
 # ══════════════════════════════════════════════════════════════════════
-def strip_emojis(text: str) -> str:
-    """
-    Remove all emoji and special Unicode symbols from text.
-    Called before returning any answer so TTS doesn't read them.
-    """
-    return "".join(
-        c for c in text
-        if not unicodedata.category(c).startswith("So")   # Symbol, Other
-        and unicodedata.category(c) != "Cs"               # Surrogate
-        and ord(c) < 0x1F600 or (                         # below emoji range
-            ord(c) >= 0x1F600 and False                   # always strip emoji range
-        )
-    )
-
-# Simpler, more reliable emoji stripper using regex
 _EMOJI_PATTERN = re.compile(
     "["
-    "\U0001F600-\U0001F64F"  # emoticons
-    "\U0001F300-\U0001F5FF"  # symbols & pictographs
-    "\U0001F680-\U0001F6FF"  # transport & map
-    "\U0001F1E0-\U0001F1FF"  # flags
-    "\U00002702-\U000027B0"  # dingbats
-    "\U000024C2-\U0001F251"  # enclosed chars
-    "\U0001F900-\U0001F9FF"  # supplemental symbols
-    "\U00002600-\U000026FF"  # misc symbols
-    "\U0000200D"             # zero width joiner
-    "\U0000FE0F"             # variation selector
+    "\U0001F600-\U0001F64F"
+    "\U0001F300-\U0001F5FF"
+    "\U0001F680-\U0001F6FF"
+    "\U0001F1E0-\U0001F1FF"
+    "\U00002702-\U000027B0"
+    "\U000024C2-\U0001F251"
+    "\U0001F900-\U0001F9FF"
+    "\U00002600-\U000026FF"
+    "\U0000200D"
+    "\U0000FE0F"
     "]+",
     flags=re.UNICODE
 )
@@ -113,7 +101,7 @@ def clean_response(text: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# GARHWALI MARKERS — module-level constant
+# GARHWALI MARKERS
 # ══════════════════════════════════════════════════════════════════════
 GA_MARKERS = [
     'छन', 'छ।', 'हूँद', 'कुण', 'मिलद', 'पैलू', 'अर',
@@ -124,35 +112,46 @@ GA_MARKERS = [
 
 
 # ══════════════════════════════════════════════════════════════════════
+# KUMAUNI MARKERS
+# ══════════════════════════════════════════════════════════════════════
+KU_MARKERS = [
+    'छौ', 'छन', 'छौँ', 'छा', 'लै', 'बटा', 'हैबर', 'कन',
+    'कसि', 'कै', 'म्यूँ', 'त्यूँ', 'यो', 'वो', 'को', 'के',
+    'भयो', 'ज्यू', 'भल', 'नानी', 'ठुली', 'हिटा', 'तल्लि', 'मल्लि'
+]
+
+
+# ══════════════════════════════════════════════════════════════════════
 # GREETING / IDENTITY
 # ══════════════════════════════════════════════════════════════════════
 GREETINGS = {
     "hello","hi","hlo","hey","hii","helo","namaste",
     "नमस्ते","हेलो","हाय","good morning","good afternoon","good evening",
-    # Garhwali greetings
     "नमस्कार","राम राम","जय हो",
 }
 IDENTITY_Q = {
     "who are you","what are you","who r u","tum kaun ho",
     "aap kaun hain","aap kaun ho","kaun ho tum","who made you",
     "who created you","who made diksha","diksha kaun hai",
-    # Garhwali identity queries
     "को च","कु च","कू च","को छ","कु छ","को cha","ko cha",
     "तू को छ","तू कु छ","तू को च",
+    # Kumauni identity queries
+    "को छै", "के छै", "तू को छै", "तुम को छौ", "तुमार नाम के छ",
+    "ko chai", "tumar naam ke cha", "tu ko chai",
 }
 
 GREETING_RESPONSE = {
     "en": "Hello! I'm Diksha, the official AI assistant for GBPIET, Pauri Garhwal. Ask me about admissions, fees, hostel, placements, faculty, courses and more!",
     "hi": "नमस्ते! मैं दीक्षा हूँ — GBPIET की आधिकारिक AI सहायिका। आप मुझसे admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
-    "ga": "समन्या! मैं दीक्षा छूँ — जीबीपीआईईटी की AI दगड़िया। कुछ भी पुछि ल्या।!",
-    "ku": "नमस्कार! मैं दीक्षा छूँ — जीबीपीआईईटी की AI दगड़िया। कुछ भी पूछिया।",
+    "ga": "समन्या! मैं दीक्षा छुं — जीबीपीआईईटी की AI दगड़िया। कुछ भी पुछि ल्या।",
+    "ku": "नमस्कार! मैं दीक्षा छु — जीबीपीआईईटी की AI दगड़िया। कुछ भी पूछिया।",
 }
 
 IDENTITY_RESPONSE = {
     "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal, Uttarakhand. I help with college information in English, Hindi, Garhwali and Kumauni. Visit: {GBPIET_URL}",
     "hi": f"मैं दीक्षा हूँ — GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot। वेबसाइट: {GBPIET_URL}",
     "ga": f"मी दीक्षा छुं — तुमर AI दगड़िया। वेबसाइट: {GBPIET_URL}",
-    "ku": f"मी दीक्षा छु — तुमर AI दगड़िया। वेबसाइट: {GBPIET_URL}",
+    "ku": f"मी दीक्षा छु — तुमर AI साथी। वेबसाइट: {GBPIET_URL}",
 }
 
 
@@ -263,12 +262,15 @@ def is_hindi_text(text: str) -> bool:
 def detect_answer_lang(answer_text: str, item_lang: str = "") -> str:
     """
     Detect language of a DB answer.
-    Priority: item 'lang' tag → GA_MARKERS → script ratio
+    Priority: item 'lang' tag → KU_MARKERS → GA_MARKERS → script ratio
     """
-    if item_lang in ("ga", "garhwali"): return "ga"
-    if item_lang in ("hi", "hindi"):    return "hi"
-    if item_lang == "en":               return "en"
+    if item_lang in ("ga", "garhwali"):  return "ga"
+    if item_lang in ("ku", "kumauni"):   return "ku"
+    if item_lang in ("hi", "hindi"):     return "hi"
+    if item_lang == "en":                return "en"
+    # marker-based detection only if no lang tag
     if any(m in answer_text for m in GA_MARKERS): return "ga"
+    if any(m in answer_text for m in KU_MARKERS): return "ku"
     latin = sum(1 for c in answer_text if c.isascii() and c.isalpha())
     total = len(answer_text.replace(" ", ""))
     if total > 0 and (latin / total) > 0.5: return "en"
@@ -395,6 +397,45 @@ def ga_ku_to_hi_en(text: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════
+# KUMAUNI SYNONYM MAP
+# ══════════════════════════════════════════════════════════════════════
+KUMAUNI_SYNONYM_MAP = {
+    'लिजी': 'ke liye for', 'काज': 'ke liye for', 'वास्ते': 'ke liye',
+    'छन': 'hain are', 'छ': 'hai is', 'छौ': 'ho are',
+    'रैण': 'rehna live', 'बौण': 'baithna sit',
+    'को': 'kaun who', 'के': 'kya what',
+    'कहाँ': 'kahan where', 'कते': 'kahan where', 'कहाँबटा': 'kahan se',
+    'कसि': 'kaise how', 'कन': 'kaise how',
+    'कतु': 'kitna how much', 'कै': 'kitne how many',
+    'ज्याणी': 'jankari information', 'बात': 'baat details',
+    'भर्ति': 'admission', 'नाम लिखाण': 'admission',
+    'पैलि': 'pehla first', 'पैली': 'pahle before',
+    'चेलो': 'ladka boy', 'नान': 'bachcha kid', 'चेली': 'ladki girl',
+    'दाम': 'fees price', 'टक': 'paisa money',
+    'रैण-बौण': 'hostel stay', 'कमरा': 'room hostel',
+    'खाण-पीण': 'mess food', 'भोजन': 'food',
+    'सुबिद': 'facility convenience', 'इंतजाम': 'arrangement',
+    'फारम': 'form application', 'अर्जी': 'apply',
+    'लायक': 'eligibility', 'पास': 'exam pass',
+    'पड़ै': 'padhai study', 'इम्तिहान': 'exam',
+    'काज': 'job work', 'नौकरी': 'job placement',
+    'कमाइ': 'salary income', 'पगार': 'salary',
+    'मैं': 'main I', 'म्यूँ': 'mera my', 'तुमार': 'tumhara your',
+    'बुलण': 'bolna speak', 'बताण': 'batao tell', 'कौण': 'kehna say',
+    'और': 'aur and', 'बटा': 'se from', 'हैबर': 'se from/after',
+}
+
+
+def ku_to_hi_en(text: str) -> str:
+    """Expand Kumauni words to Hindi/English for better search matching."""
+    t = text.lower()
+    for ku_word, translation in sorted(KUMAUNI_SYNONYM_MAP.items(), key=lambda x: -len(x[0])):
+        if ku_word in t:
+            t = t.replace(ku_word, ' ' + translation + ' ')
+    return re.sub(r'\s+', ' ', t).strip()
+
+
+# ══════════════════════════════════════════════════════════════════════
 # TYPO MAP
 # ══════════════════════════════════════════════════════════════════════
 TYPO_MAP = {
@@ -425,6 +466,7 @@ def fix_typos(text: str) -> str:
             fixed.append(w_clean if w_clean != w else w)
     result = " ".join(fixed)
     result = ga_ku_to_hi_en(result)
+    result = ku_to_hi_en(result)   # ← Kumauni expansion
     return result
 
 
@@ -522,11 +564,10 @@ def specific_role_answer(question: str, preferred_lang: str = "en"):
         if any(p in q_lower for p in ROLE_BLACKLIST):
             continue
         score = 0
-        if all(w in q_lower for w in topic_words):                          score += 3
-        elif mapped.lower() in q_lower:                                       score += 2
-        elif len(topic_words) >= 2 and sum(1 for w in topic_words if w in q_lower) >= 2:
-                                                                              score += 1
-        if any(w in a_lower for w in topic_words):                           score += 1
+        if all(w in q_lower for w in topic_words):                                              score += 3
+        elif mapped.lower() in q_lower:                                                          score += 2
+        elif len(topic_words) >= 2 and sum(1 for w in topic_words if w in q_lower) >= 2:        score += 1
+        if any(w in a_lower for w in topic_words):                                               score += 1
         if score >= 2:
             candidates.append({
                 "answer": item["answer"],
@@ -574,6 +615,9 @@ DIRECT_KEYWORD_MAP = {
     # Garhwali/Kumauni
     "एडमिशन":       "admission",  "भर्ती":    "admission",
     "नौकरी":         "placement",  "सुविधा":   "facility",
+    # Kumauni specific
+    "भर्ति":         "admission",  "सुबिद":    "facility",
+    "ज्याणी":        "information","दाम":      "fees",
 }
 
 
@@ -658,6 +702,10 @@ STOP = {
     'मी','आम','तुम','तुमुं','वु','वे',
     'यैसैं','यें','वैसें','वैन','यु',
     'पर','बारे','तक','जु',
+    # Kumauni stop words
+    'को','के','कन','कसि','कै','छौ','छन','छा',
+    'लै','बटा','हैबर','यो','वो','भयो',
+    'म्यूँ','त्यूँ','ज्यू','भल',
 }
 
 HOSTEL_NAMES = {
@@ -670,7 +718,8 @@ def get_keywords(text: str) -> set:
     words         = set(re.findall(r'[\u0900-\u097F]+|[a-zA-Z0-9]+', text.lower()))
     translated    = set(re.findall(r'[a-zA-Z0-9]+', hi_to_en(text)))
     ga_translated = set(re.findall(r'[a-zA-Z0-9]+', ga_ku_to_hi_en(text)))
-    return (words | translated | ga_translated) - STOP
+    ku_translated = set(re.findall(r'[a-zA-Z0-9]+', ku_to_hi_en(text)))
+    return (words | translated | ga_translated | ku_translated) - STOP
 
 
 def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en"):
@@ -719,11 +768,30 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
     try:
         bm25_results = bm25_search(query=question, top_k=5)
         collections  = get_collection_for_query(question, lang)
+
+        # ── Force correct collection by lang ──────────────────────────
+        if lang == "ga":
+            if "kb_ga" in COLLECTIONS and "kb_ga" not in collections:
+                collections = ["kb_ga"] + [c for c in collections if c not in ("kb_hi", "kb_ku")]
+            print(f"[RAG] Lang=ga → collections: {collections}")
+        elif lang == "ku":
+            if "kb_ku" in COLLECTIONS and "kb_ku" not in collections:
+                collections = ["kb_ku"] + [c for c in collections if c not in ("kb_hi", "kb_ga")]
+            print(f"[RAG] Lang=ku → collections: {collections}")
+        elif lang == "hi":
+            if "kb_hi" not in collections:
+                collections.insert(0, "kb_hi")
+            print(f"[RAG] Lang=hi → collections: {collections}")
+        elif lang == "en":
+            if "kb_en" not in collections and "kb_en" in COLLECTIONS:
+                collections.insert(0, "kb_en")
+            print(f"[RAG] Lang=en → collections: {collections}")
+
         if "website" not in collections:
             collections.append("website")
 
         vector      = get_embed_model().embed_query(question)
-        lang_filter = lang if lang in ("en", "hi", "ga") else None
+        lang_filter = lang if lang in ("en", "hi", "ga", "ku") else None
 
         vector_results = multi_collection_search(
             client=get_client(), collections=collections,
@@ -826,18 +894,20 @@ Sawaal: {question}
 Jawab (गढ़वाली मा — MUST be Garhwali, NOT Hindi):"""
 
     elif lang == "ku":
-        return f"""तू दीक्षा छु — GBPIET, पौड़ी गढ़वाल की official AI chatbot।
-RULES:
-- हमेशा कुमाउनी मा जवाब दे।
-- तू एक लड़की छु — feminine forms use कर।
-- अपणु नाम हमेशा "दीक्षा" लिख।
+        return f"""तू दीक्षा छु — जीबीपीआईईटी, पौड़ी गढ़वाल कि official AI chatbot।
+
+RULES (बहुत जरूरी):
+- हमेशा कुमाउनी मा जवाब दे — Hindi या English मा नि।
+- तू एक छोरी छु — feminine forms use कर।
+- अपणु नाम हमेशा "दीक्षा" लिख — कभी "डिक्षा" या "Diksha" नि लिखण।
 - Sirf context use kar।
 - Website: {GBPIET_URL}
+- Jawab नि मिलो: "माफ करिया, यु ज्याणी मीथे नि मिलि। {GBPIET_URL} देखो।"
 {history}
 Context: {context}
 
 Sawaal: {question}
-Jawab (कुमाउनी मा):"""
+Jawab (कुमाउनी मा — MUST be Kumauni, NOT Hindi):"""
 
     else:
         return f"""You are दीक्षा (Diksha) — official AI assistant for GBPIET
@@ -862,13 +932,36 @@ Answer (ENGLISH ONLY):"""
 # ══════════════════════════════════════════════════════════════════════
 def llm_answer(question: str, context: str, lang: str, history: str = "") -> str:
     prompt = build_prompt(question, context, lang, history)
-    system = (
-        f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
-        "You are female — always use feminine Hindi grammar: "
-        "सकती हूँ (not सकता हूँ), करूँगी (not करूँगा). "
-        "When responding in Garhwali, ALWAYS write in Garhwali script/dialect, NOT Hindi. "
-        "Always spell your name as दीक्षा. Be helpful, accurate and concise."
-    )
+
+    # ── System prompt — language-specific strict instruction ──────────
+    if lang == "ga":
+        system = (
+            f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
+            "You MUST respond ONLY in Garhwali dialect. DO NOT respond in Hindi or English. "
+            "You are female — use feminine Garhwali grammar. "
+            "Always spell your name as दीक्षा."
+        )
+    elif lang == "ku":
+        system = (
+            f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
+            "You MUST respond ONLY in Kumauni dialect. DO NOT respond in Hindi or English. "
+            "You are female — use feminine Kumauni grammar. "
+            "Always spell your name as दीक्षा."
+        )
+    elif lang == "hi":
+        system = (
+            f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
+            "You MUST respond ONLY in Hindi. "
+            "You are female — always use feminine Hindi grammar: "
+            "सकती हूँ (not सकता हूँ), करूँगी (not करूँगा). "
+            "Always spell your name as दीक्षा."
+        )
+    else:
+        system = (
+            f"You are Diksha, official female AI assistant for GBPIET ({GBPIET_URL}). "
+            "You MUST respond ONLY in English. Be helpful, accurate and concise."
+        )
+
     result = groq_call(
         messages=[
             {"role": "system", "content": system},
@@ -877,7 +970,7 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
         max_tokens=500, temperature=0.3,
     )
     if result:
-        return clean_response(result)   # strip emojis before returning
+        return clean_response(result)
 
     if context:
         lines = [l.strip() for l in context.split('\n') if len(l.strip()) > 30]
@@ -944,7 +1037,7 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     fb = {
         "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।",
         "ga": f"माफ करा, यु जानकारी मीथे नि मिलि। {GBPIET_URL} देखो।",
-        "ku": f"माफ करिया! जानकारी नैं च। {GBPIET_URL} देखो।",
+        "ku": f"माफ करिया! यु ज्याणी नैं मिलि। {GBPIET_URL} देखो।",
         "en": f"I'm sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030.",
     }
     return fb.get(lang, fb["en"])
