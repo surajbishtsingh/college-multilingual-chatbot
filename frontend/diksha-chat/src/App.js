@@ -61,8 +61,8 @@ const getWelcomeMessage = (langCode) => {
   const msgs = {
     en: `${greeting}! I am your friend Diksha. How may I help you?`,
     hi: `नमस्ते 🙏! मैं आपकी दोस्त दीक्षा क्या सहायता कर सकती हूँ।।`,
-    ga: `समन्या 🙏! हम लग्यां छां,जल्दही अपडेटदेंला`,
-    ku: `नमस्कार 🙏! हम काम करनी, जल्दी अपडेट करूँल`
+    ga: `समन्या 🙏! हम लग्यां छां......`,
+    ku: `नमस्कार 🙏! हम काम करनी......`
   };
   return msgs[langCode];
 };
