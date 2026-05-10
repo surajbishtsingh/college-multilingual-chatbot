@@ -91,17 +91,17 @@ class TTSRequest(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    question: str
-    session_id: Optional[str] = None
-    is_first_message: bool = False
-    language: Optional[str] = None
-    section: Optional[str] = None   # "garhwali" | "kumauni" | "hindi" | "english"
+    question:         str
+    session_id:       Optional[str] = None
+    is_first_message: bool          = False
+    language:         Optional[str] = None
+    section:          Optional[str] = None   # "garhwali"|"kumauni"|"hindi"|"english"
 
 
 class ChatResponse(BaseModel):
-    answer: str
-    language: str
-    session_id: str
+    answer:       str
+    language:     str
+    session_id:   str
     chatbot_name: str = "Diksha"
 
 
@@ -111,12 +111,15 @@ class ChatResponse(BaseModel):
 
 app = FastAPI(title="Diksha - GBPIET Chatbot", version="2.0.0")
 
+# ── CORS — allow ALL origins, ALL networks ────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],        # every domain/IP allowed
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 
@@ -151,11 +154,11 @@ async def startup_event():
         print(f"[Startup] ⚠️ BM25: {e}")
     sys.stdout.flush()
 
-    # 3. QA Database only — embedding model loads lazily (saves ~500MB RAM)
+    # 3. QA Database — embedding model loads lazily (saves ~500MB RAM)
     print("[Startup] Step 3: Loading QA database...")
     try:
         await run_in_threadpool(load_qa_database)
-        print("[Startup] ✅ QA database ready (embedding model loads on first RAG request)")
+        print("[Startup] ✅ QA database ready")
     except Exception as e:
         print(f"[Startup] ⚠️ QA database: {e}")
     sys.stdout.flush()
@@ -178,7 +181,7 @@ async def startup_event():
         print(f"[Startup] ⚠️ Scheduler: {e}")
     sys.stdout.flush()
 
-    # ── Environment summary ────────────────────────────────────────────
+    # ── API Keys & Environment Summary ────────────────────────────────
     print("-" * 60)
     print("[Startup] Environment:")
     print(f"  Groq Key 1 : {'✅' if os.getenv('GROQ_API_KEY')   else '❌ NOT SET'}")
@@ -188,6 +191,7 @@ async def startup_event():
     print(f"  SerpAPI    : {'✅' if os.getenv('SERPAPI_KEY')     else '⚠️  not set'}")
     print(f"  DB         : {'PostgreSQL' if USE_POSTGRES else 'SQLite'}")
     print(f"  Qdrant     : {'Cloud' if os.getenv('QDRANT_URL') else 'Local'}")
+    print(f"  Env        : {os.getenv('ENVIRONMENT', 'development')}")
     print("-" * 60)
     print("[Startup] ✅ Diksha Ready!")
     print("=" * 60)
@@ -226,8 +230,11 @@ async def shutdown_event():
 def home():
     return {
         "chatbot": "Diksha",
+        "college": "GBPIET, Pauri Garhwal",
         "status":  "running",
+        "version": "2.0.0",
         "db":      "PostgreSQL" if USE_POSTGRES else "SQLite",
+        "qdrant":  "Cloud" if os.getenv("QDRANT_URL") else "Local",
     }
 
 
@@ -235,9 +242,9 @@ def home():
 async def health_check():
     """Detailed health check — shows all 4 Groq key statuses."""
     return {
-        "status":    "ok",
-        "chatbot":   "Diksha",
-        "version":   "2.0.0",
+        "status":  "ok",
+        "chatbot": "Diksha",
+        "version": "2.0.0",
         "groq_keys": {
             "key1": bool(os.getenv("GROQ_API_KEY")),
             "key2": bool(os.getenv("GROQ_API_KEY_2")),
@@ -254,7 +261,10 @@ async def health_check():
 async def chat(request: ChatRequest, req: Request):
     session_id = request.session_id or str(uuid.uuid4())
 
-    # ── Language resolution (priority: section > language > auto-detect) ──
+    # ── Language resolution — 3 level priority ────────────────────────
+    # Priority 1: section field  → user ne language choose ki
+    # Priority 2: language field → explicit lang code
+    # Priority 3: auto-detect   → question text se detect
     if request.section and request.section.lower().strip() in SECTION_TO_LANG:
         lang = SECTION_TO_LANG[request.section.lower().strip()]
         print(f"[Chat] Lang from section='{request.section}' → '{lang}'")
@@ -280,9 +290,7 @@ async def chat(request: ChatRequest, req: Request):
 
 @app.post("/tts")
 async def text_to_speech(request: TTSRequest):
-    """
-    Returns {"audio_base64": "..."} — matches frontend expectation.
-    """
+    """Returns base64 encoded audio — matches frontend expectation."""
     try:
         audio_bytes = await run_in_threadpool(generate_voice, request.text, request.lang)
         if audio_bytes:
@@ -306,12 +314,33 @@ async def scrape_status():
 @app.post("/scrape-now")
 async def scrape_now(background_tasks: BackgroundTasks):
     background_tasks.add_task(run_scrape_job)
-    return {"message": "Scrape job started"}
+    return {"message": "Scrape job started in background"}
 
 
 @app.get("/admin/visits")
 def get_visit_stats():
     return {"message": "Visit stats not configured in this version"}
+
+
+@app.get("/admin/groq-stats")
+def groq_stats():
+    """Check Groq key usage and cache stats."""
+    try:
+        from rag.groq_manager import get_stats
+        return get_stats()
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.post("/admin/clear-cache")
+def clear_groq_cache():
+    """Clear Groq response cache — useful after KB updates."""
+    try:
+        from rag.groq_manager import clear_cache
+        clear_cache()
+        return {"status": "Cache cleared ✅"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @app.post("/admin/rebuild-kb")
