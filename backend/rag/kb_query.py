@@ -9,6 +9,9 @@
 #   ✅ lang preference in all matching steps
 #   ✅ Strict lang routing: ga→kb_ga, ku→kb_ku, hi→kb_hi, en→kb_en
 #   ✅ Kumauni synonym expansion added
+#   ✅ Respectful language — आप instead of तू
+#   ✅ Question repeat fixed
+#   ✅ Proper fallback messages in all languages
 
 import os
 import re
@@ -55,6 +58,7 @@ _groq4 = _make_client("GROQ_API_KEY_4")
 
 GROQ_PRIMARY  = "llama-3.3-70b-versatile"
 GROQ_FALLBACK = "llama3-70b-8192"
+GROQ_LIGHT    = "llama3-8b-8192"
 
 GROQ_ATTEMPTS = [
     (_groq1, GROQ_PRIMARY,  "Key1/Primary"),
@@ -70,7 +74,7 @@ GROQ_ATTEMPTS = [
 _embed_model = None
 _qa_database = []
 
-EMBED_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 GBPIET_URL       = "https://gbpiet.ac.in"
 
 
@@ -143,15 +147,15 @@ IDENTITY_Q = {
 GREETING_RESPONSE = {
     "en": "Hello! I'm Diksha, the official AI assistant for GBPIET, Pauri Garhwal. Ask me about admissions, fees, hostel, placements, faculty, courses and more!",
     "hi": "नमस्ते! मैं दीक्षा हूँ — GBPIET की आधिकारिक AI सहायिका। आप मुझसे admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
-    "ga": "समन्या! मैं दीक्षा छुं — जीबीपीआईईटी की AI दगड़िया। कुछ भी पुछि ल्या।",
-    "ku": "नमस्कार! मैं दीक्षा छु — जीबीपीआईईटी की AI दगड़िया। कुछ भी पूछिया।",
+    "ga": "समन्या जी! मैं दीक्षा छुं — जीबीपीआईईटी की AI दगड़िया। आप कुछ भी पुछि सकदन।",
+    "ku": "नमस्कार जी! मैं दीक्षा छु — जीबीपीआईईटी की AI दगड़िया। आप कुछ भी पूछ सकदन।",
 }
 
 IDENTITY_RESPONSE = {
     "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal, Uttarakhand. I help with college information in English, Hindi, Garhwali and Kumauni. Visit: {GBPIET_URL}",
     "hi": f"मैं दीक्षा हूँ — GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot। वेबसाइट: {GBPIET_URL}",
-    "ga": f"मी दीक्षा छुं — तुमर AI दगड़िया। वेबसाइट: {GBPIET_URL}",
-    "ku": f"मी दीक्षा छु — तुमर AI साथी। वेबसाइट: {GBPIET_URL}",
+    "ga": f"मैं दीक्षा छुं — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छुं। आप मीसे admission, fees, hostel, placement बारे मा पुछि सकदन। वेबसाइट: {GBPIET_URL}",
+    "ku": f"मैं दीक्षा छु — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छु। आप मीसे admission, fees, hostel, placement बारे मा पूछ सकदन। वेबसाइट: {GBPIET_URL}",
 }
 
 
@@ -260,15 +264,10 @@ def is_hindi_text(text: str) -> bool:
 
 
 def detect_answer_lang(answer_text: str, item_lang: str = "") -> str:
-    """
-    Detect language of a DB answer.
-    Priority: item 'lang' tag → KU_MARKERS → GA_MARKERS → script ratio
-    """
     if item_lang in ("ga", "garhwali"):  return "ga"
     if item_lang in ("ku", "kumauni"):   return "ku"
     if item_lang in ("hi", "hindi"):     return "hi"
     if item_lang == "en":                return "en"
-    # marker-based detection only if no lang tag
     if any(m in answer_text for m in GA_MARKERS): return "ga"
     if any(m in answer_text for m in KU_MARKERS): return "ku"
     latin = sum(1 for c in answer_text if c.isascii() and c.isalpha())
@@ -330,7 +329,6 @@ HINDI_MAP = {
     'संपर्क': 'contact',           'फोन': 'phone',
     'रजिस्ट्रार': 'registrar',     'कुलसचिव': 'registrar',
     'कितने': 'how many',           'कौन से': 'which',
-    # Garhwali words
     'कु':       'who what of',   'कू':      'who',
     'कन':       'how',           'कनकै':    'how',
     'कख':       'where',         'कनै':     'where',
@@ -427,7 +425,6 @@ KUMAUNI_SYNONYM_MAP = {
 
 
 def ku_to_hi_en(text: str) -> str:
-    """Expand Kumauni words to Hindi/English for better search matching."""
     t = text.lower()
     for ku_word, translation in sorted(KUMAUNI_SYNONYM_MAP.items(), key=lambda x: -len(x[0])):
         if ku_word in t:
@@ -466,7 +463,7 @@ def fix_typos(text: str) -> str:
             fixed.append(w_clean if w_clean != w else w)
     result = " ".join(fixed)
     result = ga_ku_to_hi_en(result)
-    result = ku_to_hi_en(result)   # ← Kumauni expansion
+    result = ku_to_hi_en(result)
     return result
 
 
@@ -605,17 +602,14 @@ DIRECT_KEYWORD_MAP = {
     "faculty":     "faculty",    "hod":         "head of department",
     "about":       "about gbpiet","website":    "gbpiet website",
     "h0d": "head of department", "hods": "head of department",
-    # Hindi
     "रजिस्ट्रार":  "registrar",  "निदेशक":   "director",
     "डीन":          "dean",       "प्लेसमेंट": "placement",
     "हॉस्टल":       "hostel",     "फीस":       "fees",
     "प्रवेश":       "admission",  "संपर्क":    "contact",
     "पुस्तकालय":   "library",    "परिवहन":    "transport",
     "रैगिंग":       "ragging",    "संकाय":     "faculty",
-    # Garhwali/Kumauni
     "एडमिशन":       "admission",  "भर्ती":    "admission",
     "नौकरी":         "placement",  "सुविधा":   "facility",
-    # Kumauni specific
     "भर्ति":         "admission",  "सुबिद":    "facility",
     "ज्याणी":        "information","दाम":      "fees",
 }
@@ -694,7 +688,6 @@ STOP = {
     'और','या','को','ने','था','थी','थे','कि','जो','तो','भी',
     'मैं','हम','आप','वे','इस','उस','यह','वह','पर','बारे',
     'कैसे','कहाँ','कहां','तक',
-    # Garhwali stop words
     'कु','कू','कि','कन','कनकै','कख','कनै',
     'माँ','मा','बटि','च','छ','छन','एक',
     'अर','त','त्वै','भी','न',
@@ -702,7 +695,6 @@ STOP = {
     'मी','आम','तुम','तुमुं','वु','वे',
     'यैसैं','यें','वैसें','वैन','यु',
     'पर','बारे','तक','जु',
-    # Kumauni stop words
     'को','के','कन','कसि','कै','छौ','छन','छा',
     'लै','बटा','हैबर','यो','वो','भयो',
     'म्यूँ','त्यूँ','ज्यू','भल',
@@ -769,7 +761,6 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
         bm25_results = bm25_search(query=question, top_k=5)
         collections  = get_collection_for_query(question, lang)
 
-        # ── Force correct collection by lang ──────────────────────────
         if lang == "ga":
             if "kb_ga" in COLLECTIONS and "kb_ga" not in collections:
                 collections = ["kb_ga"] + [c for c in collections if c not in ("kb_hi", "kb_ku")]
@@ -856,58 +847,59 @@ def rag_search(question: str, lang: str = "en"):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# LLM PROMPT BUILDER — all 4 languages with feminine grammar
+# LLM PROMPT BUILDER — all 4 languages
 # ══════════════════════════════════════════════════════════════════════
 def build_prompt(question: str, context: str, lang: str, history: str = "") -> str:
 
     if lang == "hi":
-        return f"""Aap दीक्षा hain — GBPIET ki official AI chatbot.
+        return f"""आप दीक्षा हैं — GBPIET की official AI chatbot।
 RULES:
-- HAMESHA shuddh Hindi mein jawab dein.
-- Aap ek ladki hain — HAMESHA feminine forms use karein:
-  सकती हूँ (na ki सकता हूँ), करूँगी (na ki करूँगा),
-  जानती हूँ (na ki जानता हूँ), मिलती हूँ (na ki मिलता हूँ).
-- Sirf context use karein.
-- Relevant ho to website mention karein: {GBPIET_URL}
-- Context mein jawab nahi: "माफ़ करें, यह जानकारी नहीं मिली। {GBPIET_URL} देखें।"
+- HAMESHA shuddh Hindi mein jawab dein।
+- User ko हमेशा "आप" kahein — kabhi "तू" ya "तुम" nahi।
+- Feminine forms use karein: सकती हूँ, करूँगी, जानती हूँ।
+- Sawaal dobara mat likho — seedha jawab do।
+- Sirf context use karein।
+- Website: {GBPIET_URL}
+- Jawab nahi mila: "माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।"
 {history}
 Context:
 {context}
 
-Sawaal: {question}
-Jawab (Hindi mein, feminine):"""
+Jawab (Hindi mein, feminine, sawaal repeat mat karo):"""
 
     elif lang == "ga":
-        return f"""तू दीक्षा छुं — जीबीपीआईईटी, पौड़ी गढ़वाल कु official AI chatbot।
+        return f"""आप दीक्षा छन — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot।
 
 RULES (बहुत जरूरी):
-- हमेशा गढ़वाली मा जवाब दे — Hindi या English मा नि।
-- तू एक लड़की छुं — feminine forms use कर।
-- अपणु नाम हमेशा "दीक्षा" लिख — कभी "डिक्षा" या "Diksha" नि लिखण।
-- Sirf context use kar।
+- हमेशा गढ़वाली मा जवाब द्या — Hindi या English मा नि।
+- User कु हमेशा "आप" या "थैं" बुल्या — कभी "तू" या "तुम" नि।
+- आप एक लड़की छन — feminine forms use कर्या।
+- अपणु नाम हमेशा "दीक्षा" लिख्या।
+- Sawaal dobara mat likho — seedha jawab do।
+- Sirf context use kar्या।
 - Website: {GBPIET_URL}
-- Jawab नि मिलो: "माफ करा, यु जानकारी मीथे नि मिलि। {GBPIET_URL} देखो।"
+- Jawab नि मिलो: "माफ़ करया जी, मियूँ थै ईं का बारे मा पता नी च। जादा जानकारी का खातिर {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।"
 {history}
 Context: {context}
 
-Sawaal: {question}
-Jawab (गढ़वाली मा — MUST be Garhwali, NOT Hindi):"""
+Jawab (गढ़वाली मा — आप use करो, sawaal repeat mat karo):"""
 
     elif lang == "ku":
-        return f"""तू दीक्षा छु — जीबीपीआईईटी, पौड़ी गढ़वाल कि official AI chatbot।
+        return f"""आप दीक्षा छन — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot।
 
 RULES (बहुत जरूरी):
-- हमेशा कुमाउनी मा जवाब दे — Hindi या English मा नि।
-- तू एक छोरी छु — feminine forms use कर।
-- अपणु नाम हमेशा "दीक्षा" लिख — कभी "डिक्षा" या "Diksha" नि लिखण।
-- Sirf context use kar।
+- हमेशा कुमाउनी मा जवाब द्या — Hindi या English मा नि।
+- User कु हमेशा "आप" या "ज्यू" बुल्या — कभी "तू" या "तुम" नि।
+- आप एक छोरी छन — feminine forms use कर्या।
+- अपणु नाम हमेशा "दीक्षा" लिख्या।
+- Sawaal dobara mat likho — seedha jawab do।
+- Sirf context use kar्या।
 - Website: {GBPIET_URL}
-- Jawab नि मिलो: "माफ करिया, यु ज्याणी मीथे नि मिलि। {GBPIET_URL} देखो।"
+- Jawab नि मिलो: "माफ़ करिया जी, मीकें इ बारे में जानकारी नैं च। अधिक जानकारी खुनी {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।"
 {history}
 Context: {context}
 
-Sawaal: {question}
-Jawab (कुमाउनी मा — MUST be Kumauni, NOT Hindi):"""
+Jawab (कुमाउनी मा — आप/ज्यू use करो, sawaal repeat mat karo):"""
 
     else:
         return f"""You are दीक्षा (Diksha) — official AI assistant for GBPIET
@@ -916,6 +908,8 @@ Pauri Garhwal, Uttarakhand. Website: {GBPIET_URL}
 
 RULES:
 - Answer in ENGLISH ONLY.
+- Always address user respectfully.
+- NEVER repeat or rephrase the question — start directly with the answer.
 - Use ONLY the context below — do NOT hallucinate.
 - If not found: "I'm sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030."
 - Keep answers concise and helpful.
@@ -923,8 +917,7 @@ RULES:
 Context:
 {context}
 
-Question: {question}
-Answer (ENGLISH ONLY):"""
+Answer (ENGLISH ONLY — do not repeat the question):"""
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -933,25 +926,34 @@ Answer (ENGLISH ONLY):"""
 def llm_answer(question: str, context: str, lang: str, history: str = "") -> str:
     prompt = build_prompt(question, context, lang, history)
 
-    # ── System prompt — language-specific strict instruction ──────────
     if lang == "ga":
         system = (
             f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in Garhwali dialect. DO NOT respond in Hindi or English. "
+            "You MUST respond ONLY in Garhwali dialect. NEVER use Hindi or English. "
+            "NEVER repeat or echo the user question. Start answer directly. "
+            "ALWAYS address user as 'आप' or 'थैं' — NEVER use 'तू' or 'तुम'. "
             "You are female — use feminine Garhwali grammar. "
-            "Always spell your name as दीक्षा."
+            "Always spell your name as दीक्षा. "
+            "If answer not found say: माफ़ करया जी, मियूँ थै ईं का बारे मा पता नी च। "
+            f"जादा जानकारी का खातिर {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।"
         )
     elif lang == "ku":
         system = (
             f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in Kumauni dialect. DO NOT respond in Hindi or English. "
+            "You MUST respond ONLY in Kumauni dialect. NEVER use Hindi or English. "
+            "NEVER repeat or echo the user question. Start answer directly. "
+            "ALWAYS address user as 'आप' or 'ज्यू' — NEVER use 'तू' or 'तुम'. "
             "You are female — use feminine Kumauni grammar. "
-            "Always spell your name as दीक्षा."
+            "Always spell your name as दीक्षा. "
+            "If answer not found say: माफ़ करिया जी, मीकें इ बारे में जानकारी नैं च। "
+            f"अधिक जानकारी खुनी {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।"
         )
     elif lang == "hi":
         system = (
             f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
             "You MUST respond ONLY in Hindi. "
+            "NEVER repeat or echo the user question. Start answer directly. "
+            "Always address user as 'आप' — never use 'तू' or 'तुम'. "
             "You are female — always use feminine Hindi grammar: "
             "सकती हूँ (not सकता हूँ), करूँगी (not करूँगा). "
             "Always spell your name as दीक्षा."
@@ -959,7 +961,9 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
     else:
         system = (
             f"You are Diksha, official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in English. Be helpful, accurate and concise."
+            "You MUST respond ONLY in English. Be helpful, accurate and concise. "
+            "NEVER repeat or echo the user question. Start directly with the answer. "
+            "Always address user respectfully."
         )
 
     result = groq_call(
@@ -1032,12 +1036,12 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
         print("[RESULT] RAG + LLM")
         return llm_answer(question, ctx, lang, history)
 
-    # No match
+    # No match — respectful fallback in all languages
     print("[RESULT] No match")
     fb = {
         "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।",
-        "ga": f"माफ करा, यु जानकारी मीथे नि मिलि। {GBPIET_URL} देखो।",
-        "ku": f"माफ करिया! यु ज्याणी नैं मिलि। {GBPIET_URL} देखो।",
+        "ga": f"माफ़ करया जी, मियूँ थै ईं का बारे मा पता नी च। जादा जानकारी का खातिर {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
+        "ku": f"माफ़ करिया जी, मीकें इ बारे में जानकारी नैं च। अधिक जानकारी खुनी {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।",
         "en": f"I'm sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030.",
     }
     return fb.get(lang, fb["en"])
