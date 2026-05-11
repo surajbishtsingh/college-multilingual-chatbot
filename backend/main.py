@@ -114,7 +114,7 @@ app = FastAPI(title="Diksha - GBPIET Chatbot", version="2.0.0")
 # ── CORS — allow ALL origins, ALL networks ────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # every domain/IP allowed
+    allow_origins=["https://college-multilingual-chatbot-lzrp.vercel.app/"],        # every domain/IP allowed
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
