@@ -1,11 +1,10 @@
-# ingest_to_qdrant.py
+# build_kb.py
 # ─────────────────────────────────────────────────────────────
-# Run this ONCE locally to upload all JSON data to Qdrant Cloud
+# Run this to upload all JSON data to Qdrant Cloud
 #
 # Usage:
 #   cd backend
-#   pip install qdrant-client sentence-transformers python-dotenv
-#   python ingest_to_qdrant.py
+#   python build_kb.py
 # ─────────────────────────────────────────────────────────────
 
 import os
@@ -18,8 +17,7 @@ load_dotenv()
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
-    Distance, VectorParams, PointStruct, Filter,
-    FieldCondition, MatchValue,
+    Distance, VectorParams, PointStruct,
 )
 from sentence_transformers import SentenceTransformer
 
@@ -42,8 +40,8 @@ COLLECTION_MAP = {
     ("fees",        "hi"): "gbpiet_kb_hi",
     ("hostel",      "hi"): "gbpiet_kb_hi",
 }
-DEFAULT_EN = "gbpiet_kb_en"
-DEFAULT_HI = "gbpiet_kb_hi"
+DEFAULT_EN     = "gbpiet_kb_en"
+DEFAULT_HI     = "gbpiet_kb_hi"
 FAQ_COLLECTION = "gbpiet_faq"
 
 ALL_COLLECTIONS = [
@@ -56,109 +54,33 @@ ALL_COLLECTIONS = [
     "gbpiet_admissions",
 ]
 
-# build_kb.py — top imports section, add:
-import qdrant_setup
 
-# Replace the temp/swap logic with this cloud-compatible version:
-def build_knowledge_base(recreate: bool = True):
-    print("=" * 60)
-    print("Diksha KB Builder")
-    print(f"Target: {'Qdrant Cloud' if qdrant_setup.USE_CLOUD else 'Local Qdrant'}")
-    print("=" * 60)
-
-    data_folder = os.path.join(os.path.dirname(__file__), "data")
-
-    # Step 1: Load documents
-    print("\n[1/4] Loading JSON files...")
-    buckets = load_documents(data_folder)
-
-    # Step 2: Chunk
-    print("\n[2/4] Chunking documents...")
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=400, chunk_overlap=60,
-        separators=["\n\n", "\n", ". ", " "]
-    )
-    chunked = {}
-    for collection_suffix, docs in buckets.items():
-        if not docs:
-            continue
-        # Add prefix for cloud
-        prefix   = qdrant_setup.PREFIX
-        col_name = f"{prefix}{collection_suffix}"
-        chunks   = splitter.split_documents(docs)
-        chunked[col_name] = chunks
-        print(f"  {col_name}: {len(docs)} docs → {len(chunks)} chunks")
-
-    # Step 3: Embed
-    print("\n[3/4] Creating embeddings...")
-    embeddings = HuggingFaceEmbeddings(
-        model_name=EMBED_MODEL_NAME,
-        model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True}
-    )
-
-    all_texts = []
-    for chunks in chunked.values():
-        all_texts.extend([c.page_content for c in chunks])
-
-    print(f"  Embedding {len(all_texts)} chunks...")
-    all_vectors = embeddings.embed_documents(all_texts)
-    print(f"  Embedding dim: {len(all_vectors[0])}")
-
-    # Step 4: Upload to Qdrant (cloud or local)
-    print("\n[4/4] Uploading to Qdrant...")
-
-    # Reset client to ensure fresh connection
-    qdrant_setup._client = None
-    ensure_collections(recreate=recreate)
-    client = get_client()
-
-    vector_idx = 0
-    for col_name, chunks in chunked.items():
-        if not chunks:
-            continue
-
-        points = []
-        for chunk in chunks:
-            vec = all_vectors[vector_idx]
-            vector_idx += 1
-            points.append(PointStruct(
-                id=str(uuid.uuid4()),
-                vector=vec,
-                payload={
-                    **chunk.metadata,
-                    "text": chunk.page_content,
-                }
-            ))
-
-        # Upload in batches
-        batch_size = 100
-        for start in range(0, len(points), batch_size):
-            client.upsert(
-                collection_name=col_name,
-                points=points[start:start + batch_size]
-            )
-
-        print(f"  ✅ {col_name}: {len(points)} points")
-
-    print("\n" + "=" * 60)
-    print("✅ KB Build Complete!")
-    print("=" * 60)
-
-    # Print stats
-    for name in chunked:
-        try:
-            info = client.get_collection(name)
-            print(f"  {name}: {info.points_count} points")
-        except Exception:
-            pass
+# ── Fix: category field list ya string dono handle karo ───────
+def normalize_category(category) -> str:
+    """
+    category kabhi string hoti hai, kabhi list.
+    Dono cases handle karta hai.
+    """
+    if isinstance(category, list):
+        # List hai toh pehla element lo
+        return category[0].lower().strip() if category else "general"
+    if isinstance(category, str):
+        return category.lower().strip()
+    return "general"
 
 
 def get_collection(item: dict) -> str:
-    category = item.get("category", "").lower().strip()
-    lang     = item.get("lang", "en").lower().strip()
+    """Route item to correct Qdrant collection."""
+    # ✅ Fix — normalize_category use karo
+    category = normalize_category(item.get("category", "general"))
+    lang     = item.get("lang", "en")
 
-    # FAQ items go to FAQ collection
+    # lang bhi list ho sakti hai
+    if isinstance(lang, list):
+        lang = lang[0] if lang else "en"
+    lang = lang.lower().strip()
+
+    # FAQ items
     if category in ("faq", "general", ""):
         return FAQ_COLLECTION if lang == "en" else DEFAULT_HI
 
@@ -169,7 +91,7 @@ def get_collection(item: dict) -> str:
     return DEFAULT_EN if lang == "en" else DEFAULT_HI
 
 
-def load_all_json(data_folder: str) -> list[dict]:
+def load_all_json(data_folder: str) -> list:
     all_items = []
     files = sorted(glob.glob(os.path.join(data_folder, "*.json")))
 
@@ -202,19 +124,28 @@ def load_all_json(data_folder: str) -> list[dict]:
                 else:
                     questions = []
 
-                # Build text for embedding = question + answer
-                primary_q = questions[0] if questions else ""
+                primary_q      = questions[0] if questions else ""
                 text_for_embed = f"{primary_q}\n{answer}".strip()
 
+                # ✅ Fix — normalize karo yahan bhi
+                category = normalize_category(item.get("category", "general"))
+                lang     = item.get("lang", "en")
+                if isinstance(lang, list):
+                    lang = lang[0] if lang else "en"
+
+                tags = item.get("tags", [])
+                if isinstance(tags, str):
+                    tags = [tags]
+
                 all_items.append({
-                    "text":       text_for_embed,
-                    "question":   primary_q,
-                    "answer":     answer.strip(),
-                    "category":   item.get("category", "general"),
-                    "tags":       item.get("tags", []),
-                    "lang":       item.get("lang", "en"),
-                    "source":     filename,
-                    "item_id":    item.get("id", None),
+                    "text":     text_for_embed,
+                    "question": primary_q,
+                    "answer":   answer.strip(),
+                    "category": category,
+                    "tags":     tags,
+                    "lang":     lang,
+                    "source":   filename,
+                    "item_id":  item.get("id", None),
                 })
                 count += 1
 
@@ -244,19 +175,23 @@ def ensure_collections(client: QdrantClient):
             print(f"  📦 {name}: already exists ({count} points)")
 
 
-def embed_in_batches(model: SentenceTransformer, texts: list[str]) -> list:
+def embed_in_batches(model: SentenceTransformer, texts: list) -> list:
     all_vectors = []
     for i in range(0, len(texts), BATCH_SIZE):
-        batch = texts[i:i + BATCH_SIZE]
-        vectors = model.encode(batch, normalize_embeddings=True, show_progress_bar=False)
+        batch   = texts[i:i + BATCH_SIZE]
+        vectors = model.encode(
+            batch,
+            normalize_embeddings=True,
+            show_progress_bar=False,
+        )
         all_vectors.extend(vectors.tolist())
         print(f"  🔢 Embedded {min(i + BATCH_SIZE, len(texts))}/{len(texts)}")
     return all_vectors
 
 
-def upload_to_qdrant(client: QdrantClient, items: list[dict], vectors: list):
+def upload_to_qdrant(client: QdrantClient, items: list, vectors: list):
     # Group by collection
-    groups: dict[str, list] = {}
+    groups: dict = {}
     for item, vector in zip(items, vectors):
         col = get_collection(item)
         if col not in groups:
@@ -267,9 +202,8 @@ def upload_to_qdrant(client: QdrantClient, items: list[dict], vectors: list):
     for collection, pairs in groups.items():
         points = []
         for item, vector in pairs:
-            point_id = str(uuid.uuid4())
             points.append(PointStruct(
-                id=point_id,
+                id=str(uuid.uuid4()),
                 vector=vector,
                 payload={
                     "text":     item["text"],
@@ -288,7 +222,7 @@ def upload_to_qdrant(client: QdrantClient, items: list[dict], vectors: list):
             client.upsert(collection_name=collection, points=batch)
 
         count = client.get_collection(collection).points_count
-        print(f"  ✅ {collection}: {len(pairs)} items uploaded → {count} total points")
+        print(f"  ✅ {collection}: {len(pairs)} items → {count} total points")
 
 
 def main():
@@ -296,28 +230,27 @@ def main():
     print("  GBPIET Qdrant Ingestion Script")
     print("=" * 55)
 
-    # ── Validate env ──────────────────────────────────────
+    # Validate env
     if not QDRANT_URL or not QDRANT_API_KEY:
         print("❌ Missing QDRANT_URL or QDRANT_API_KEY in .env")
-        print("   Add them to backend/.env and retry.")
         return
 
     print(f"\n🔗 Connecting to Qdrant: {QDRANT_URL[:40]}...")
     client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=60)
     print("✅ Connected\n")
 
-    # ── Ensure collections exist ──────────────────────────
+    # Ensure collections exist
     print("📦 Checking collections...")
     ensure_collections(client)
 
-    # ── Load JSON data ────────────────────────────────────
+    # Load JSON data
     print(f"\n📂 Loading JSON from: {DATA_FOLDER}")
     items = load_all_json(DATA_FOLDER)
     if not items:
         print("❌ No data found. Check your data/ folder.")
         return
 
-    # ── Embed ─────────────────────────────────────────────
+    # Embed
     print(f"\n🤖 Loading embedding model: {EMBED_MODEL}")
     model = SentenceTransformer(EMBED_MODEL)
     print("✅ Model loaded\n")
@@ -327,21 +260,23 @@ def main():
     vectors = embed_in_batches(model, texts)
     print("✅ Embedding complete\n")
 
-    # ── Upload ────────────────────────────────────────────
+    # Upload
     print("⬆️  Uploading to Qdrant Cloud...")
     upload_to_qdrant(client, items, vectors)
 
-    # ── Final summary ─────────────────────────────────────
+    # Final summary
     print("\n" + "=" * 55)
     print("✅ INGESTION COMPLETE — Collection summary:")
     print("=" * 55)
     for name in ALL_COLLECTIONS:
-        count = client.get_collection(name).points_count
-        status = "✅" if count > 0 else "⚠️  empty"
-        print(f"  {status}  {name}: {count} points")
+        try:
+            count  = client.get_collection(name).points_count
+            status = "✅" if count > 0 else "⚠️  empty"
+            print(f"  {status}  {name}: {count} points")
+        except Exception:
+            print(f"  ❌  {name}: error")
     print("=" * 55)
-    print("\nYour Qdrant is now populated!")
-    print("Redeploy on Railway — vector search will now work.")
+    print("\n✅ Qdrant populated! Chatbot ready.")
 
 
 if __name__ == "__main__":
