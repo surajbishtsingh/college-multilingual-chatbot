@@ -80,6 +80,19 @@ SECTION_TO_LANG = {
     "english":  "en",
 }
 
+# ═══════════════════════════════════════════════
+# ALLOWED ORIGINS
+# ═══════════════════════════════════════════════
+
+ALLOWED_ORIGINS = [
+    "https://college-multilingual-chatbot-lzrp.vercel.app",  # Vercel frontend
+    "https://gbpiet.ac.in",                                   # College website
+    "https://www.gbpiet.ac.in",                               # College website www
+    "http://localhost:3000",                                   # Local dev React
+    "http://localhost:5173",                                   # Local dev Vite
+    "http://localhost:8000",                                   # Local backend
+]
+
 
 # ═══════════════════════════════════════════════
 # MODELS
@@ -111,11 +124,13 @@ class ChatResponse(BaseModel):
 
 app = FastAPI(title="Diksha - GBPIET Chatbot", version="2.0.0")
 
-# ── CORS — allow ALL origins, ALL networks ────────────────────────────
+# ── CORS — fixed for mobile + all networks ───────────────────────────
+# NOTE: allow_credentials=False ZAROORI hai jab allow_origins=["*"] ho
+# Warna mobile browsers block kar dete hain
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],        # every domain/IP allowed
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,   # ✅ False — mobile browsers ke liye zaroori
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
@@ -225,6 +240,25 @@ async def shutdown_event():
 # ═══════════════════════════════════════════════
 # ROUTES
 # ═══════════════════════════════════════════════
+
+# ── OPTIONS preflight — mobile browsers ke liye ZAROORI ─────────────
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str, request: Request):
+    """
+    Mobile browsers pehle OPTIONS request bhejte hain (preflight).
+    Yeh route usse handle karta hai — iske bina mobile pe kaam nahi karta.
+    """
+    origin = request.headers.get("origin", "")
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin":  origin if origin in ALLOWED_ORIGINS else ALLOWED_ORIGINS[0],
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Max-Age":       "3600",
+        }
+    )
+
 
 @app.get("/")
 def home():
