@@ -63,7 +63,7 @@ body {
   border-radius: 50%;
   border: 3px solid #C8A951;
   overflow: hidden;
-  background: #003580;
+  background: transparent;
   box-shadow: 0 6px 28px rgba(0,53,128,0.45);
   transition: transform 0.22s, box-shadow 0.22s;
 }
