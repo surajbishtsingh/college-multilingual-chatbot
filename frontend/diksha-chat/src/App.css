@@ -563,7 +563,7 @@ body {
   border-radius: 50%;
   border: 3px solid #C8A951;
   overflow: hidden;
-  background: #003580;
+  background: transparent;
   flex-shrink: 0;
   box-shadow: 0 4px 16px rgba(0,53,128,0.35);
 }
