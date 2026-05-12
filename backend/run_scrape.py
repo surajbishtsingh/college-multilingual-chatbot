@@ -1,4 +1,4 @@
-# backend/run_scrape.py
+# backend/run_scrape.py — Railway compatible (no Chrome needed)
 import sys
 import os
 
@@ -14,39 +14,36 @@ load_dotenv()
 import time
 import uuid
 import hashlib
-from urllib.parse import urlparse
+import requests
+import re
+from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 
 print("\n" + "=" * 55)
-print("  Diksha Website Scraper — FIXED VERSION")
+print("  Diksha Website Scraper — Railway Edition")
 print("=" * 55)
 
 # CONFIG
 BASE_URL  = os.getenv("COLLEGE_WEBSITE_URL", "https://gbpiet.ac.in")
 MAX_PAGES = 50
 
-# ✅ Skip these URL patterns — images, wp-content, tenders, sitemaps
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9,hi;q=0.8",
+}
+
 SKIP_PATTERNS = [
-    "/wp-content/",       # images, uploads
-    "/wp-admin/",
-    "/wp-includes/",
-    "/wp-login",
-    "sitemap",
-    ".jpeg", ".jpg", ".png", ".gif", ".svg", ".webp",
+    "/wp-content/", "/wp-admin/", "/wp-includes/", "/wp-login",
+    "sitemap", ".jpeg", ".jpg", ".png", ".gif", ".svg", ".webp",
     ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".zip",
-    ".css", ".js", ".xml",
-    "javascript:", "mailto:", "tel:",
-    "/feed/", "/tag/", "/author/",
-    "/tender",            # tender notices — not useful for chatbot
-    "/revised-order",     # procurement notices
-    "/provisional-result",# result notices (change often)
-    "?share=", "?replytocom",
-    "#",
+    ".css", ".js", ".xml", "javascript:", "mailto:", "tel:",
+    "/feed/", "/tag/", "/author/", "/tender", "/revised-order",
+    "/provisional-result", "?share=", "?replytocom", "#",
 ]
 
-# ✅ Priority pages — most important content for students
 PRIORITY_PAGES = [
-    "",                                           # home page
+    "",
     "/admission",
     "/prospective-students/courses-offered",
     "/academic-programmes/undergraduate",
@@ -73,6 +70,7 @@ PRIORITY_PAGES = [
     "/administration/governing-council",
     "/administration/board-of-governors",
     "/administration/office-of-the-registrar",
+    "/administration/deans-associate-deans",
     "/facilities",
     "/facilities/computer-centre",
     "/facilities/central-workshop",
@@ -82,7 +80,6 @@ PRIORITY_PAGES = [
     "/transport-service",
     "/student-life",
     "/student-life/student-activity-cell",
-    "/student-life/flim-and-music",
     "/academic-calendar",
     "/academic-information",
     "/rules-and-regulations",
@@ -93,24 +90,22 @@ PRIORITY_PAGES = [
     "/mous",
     "/rti-gbpiet",
     "/guidelines-for-anti-ragging-undertaken",
-    "/key-documents/minutes-of-board-of-governors",
 ]
 
 
 def should_skip(url: str) -> bool:
-    """Return True if URL should be skipped."""
     url_lower = url.lower()
     for pattern in SKIP_PATTERNS:
         if pattern in url_lower:
             return True
     return False
 
+
 def detect_category(url: str) -> str:
-    """Categorize page based on URL path."""
     url_lower = url.lower()
     if any(x in url_lower for x in ["/admission", "/courses", "/undergraduate", "/postgraduate", "/doctoral"]):
         return "admissions"
-    elif any(x in url_lower for x in ["/fee", "/fees"]):
+    elif any(x in url_lower for x in ["/fee"]):
         return "fees"
     elif any(x in url_lower for x in ["/placement", "/training", "/recruitment", "/campus-drives"]):
         return "placement"
@@ -118,27 +113,56 @@ def detect_category(url: str) -> str:
         return "departments"
     elif any(x in url_lower for x in ["/facility", "/facilities", "/health", "/sports", "/transport", "/bank"]):
         return "facilities"
-    elif any(x in url_lower for x in ["/about", "/vision", "/mission", "/director", "/history"]):
+    elif any(x in url_lower for x in ["/about", "/vision", "/mission", "/director"]):
         return "about"
-    elif any(x in url_lower for x in ["/administration", "/governing", "/board", "/registrar"]):
+    elif any(x in url_lower for x in ["/administration", "/governing", "/board", "/registrar", "/deans"]):
         return "administration"
-    elif any(x in url_lower for x in ["/student", "/activity", "/club"]):
+    elif any(x in url_lower for x in ["/student", "/activity"]):
         return "student_life"
-    elif any(x in url_lower for x in ["/academic", "/calendar", "/result", "/syllabus", "/rules"]):
+    elif any(x in url_lower for x in ["/academic", "/calendar", "/result", "/rules"]):
         return "academics"
-    elif any(x in url_lower for x in ["/contact", "/reach", "/location"]):
+    elif any(x in url_lower for x in ["/contact", "/reach"]):
         return "contact"
     else:
         return "general"
 
 
-def is_same_domain(url: str) -> bool:
-    base_domain = urlparse(BASE_URL).netloc
-    parsed      = urlparse(url)
-    return not parsed.netloc or parsed.netloc == base_domain
+def fetch_page(url: str) -> tuple[str, str]:
+    """Fetch page using requests — no Chrome needed."""
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=15)
+        if r.status_code != 200:
+            print(f"  [Fetch] HTTP {r.status_code} for {url}")
+            return "", ""
+
+        html = r.text
+        soup = BeautifulSoup(html, "html.parser")
+
+        # Remove useless tags
+        for tag in ["script", "style", "noscript", "iframe", "svg", "head", "nav", "footer"]:
+            for el in soup.find_all(tag):
+                el.decompose()
+
+        body = soup.find("body")
+        if not body:
+            return html, ""
+
+        # Clean text
+        raw = body.get_text(separator="\n", strip=True)
+        lines = [l.strip() for l in raw.split("\n") if len(l.strip()) > 5]
+        text = "\n".join(lines)
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        text = re.sub(r' {2,}', ' ', text)
+
+        print(f"  [Fetch] {len(html)} chars HTML, {len(text)} chars text from {url}")
+        return html, text.strip()
+
+    except Exception as e:
+        print(f"  [Fetch] Error: {e}")
+        return "", ""
 
 
-# ── Setup ───────────────────────────────────────────────────────────────
+# ── Setup ────────────────────────────────────────────────────────────
 print("\n[Setup] Loading embeddings model...")
 from rag.embeddings import get_embed_model
 embed_model = get_embed_model()
@@ -164,7 +188,7 @@ else:
     info = client.get_collection(COLLECTION)
     print(f"  [Qdrant] Collection exists with {info.points_count} points")
 
-# ── Get already-indexed hashes (to skip duplicates) ────────────────────
+# ── Get existing hashes ───────────────────────────────────────────────
 print("[Setup] Loading existing content hashes...")
 existing_hashes = set()
 try:
@@ -187,109 +211,13 @@ try:
 except Exception:
     pass
 
-# ── Start Chrome/Selenium ───────────────────────────────────────────────
-print("[Setup] Starting Chrome driver...")
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
-
-options = Options()
-options.add_argument("--headless=new")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--disable-gpu")
-options.add_argument("--window-size=1920,1080")
-options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0")
-options.add_argument("--disable-blink-features=AutomationControlled")
-# Block images and fonts — faster loading
-prefs = {
-    "profile.managed_default_content_settings.images": 2,
-    "profile.managed_default_content_settings.fonts":  2,
-}
-options.add_experimental_option("prefs", prefs)
-options.add_experimental_option("excludeSwitches", ["enable-automation"])
-
-service = Service(ChromeDriverManager().install())
-driver  = webdriver.Chrome(service=service, options=options)
-driver.set_page_load_timeout(30)
-
-
-def fetch_page(url: str) -> tuple[str, str]:
-    """
-    Returns (html, body_text) tuple.
-    body_text is the rendered text from Selenium directly.
-    """
-    try:
-        driver.get(url)
-
-        # Wait for React to render
-        import time
-        time.sleep(4)
-
-        # ✅ Get both the HTML and the already-rendered text
-        html      = driver.page_source
-        body_text = driver.find_element(By.TAG_NAME, "body").text
-
-        print(f"  [Fetch] Got {len(html)} chars HTML, "
-              f"{len(body_text)} chars text from {url}")
-
-        return html, body_text
-
-    except Exception as e:
-        print(f"  [Fetch] Error: {e}")
-        return "", ""
-
-def parse_html(html: str, url: str) -> str:
-    """
-    Extract clean text from HTML.
-    Uses Selenium's body.text directly — most reliable for JS sites.
-    """
-    try:
-        soup = BeautifulSoup(html, "html.parser")
-
-        # ── Only remove clearly useless tags ─────────────────────
-        # DO NOT remove by class — too aggressive for React sites
-        for tag in ["script", "style", "noscript",
-                    "iframe", "svg", "canvas", "head"]:
-            for el in soup.find_all(tag):
-                el.decompose()
-
-        # ── Get all text from body ────────────────────────────────
-        body = soup.find("body")
-        if not body:
-            return ""
-
-        # Get raw text
-        raw = body.get_text(separator="\n", strip=True)
-
-        # ── Clean up ──────────────────────────────────────────────
-        import re
-        lines = []
-        for line in raw.split("\n"):
-            line = line.strip()
-            # Skip very short lines (menu items, single words)
-            if len(line) > 5:
-                lines.append(line)
-
-        text = "\n".join(lines)
-        text = re.sub(r'\n{3,}', '\n\n', text)
-        text = re.sub(r' {2,}', ' ', text)
-
-        return text.strip()
-
-    except Exception as e:
-        print(f"  [Parse] Error: {e}")
-        return ""
-
-# ══════════════════════════════════════════════════════════════════════
-print(f"\n[1/4] Crawling + Parsing (max {MAX_PAGES} pages)...")
+# ── Crawl ─────────────────────────────────────────────────────────────
+print(f"\n[1/4] Crawling (max {MAX_PAGES} pages)...")
 print("-" * 55)
 
-visited      = set()
-all_chunks   = []
-pages_done   = 0
+visited    = set()
+all_chunks = []
+pages_done = 0
 
 for path in PRIORITY_PAGES:
     if pages_done >= MAX_PAGES:
@@ -297,9 +225,7 @@ for path in PRIORITY_PAGES:
 
     url = BASE_URL.rstrip("/") + path
 
-    # ✅ Skip if matches any bad pattern
     if should_skip(url):
-        print(f"\n[SKIP] {url}")
         continue
 
     if url in visited:
@@ -309,47 +235,30 @@ for path in PRIORITY_PAGES:
     pages_done += 1
     print(f"\n[{pages_done}/{MAX_PAGES}] {url}")
 
-    # Fetch
-    # Fetch
-    result = fetch_page(url)
-    if not result or not result[0]:
-        print(f"  [Skip] No content returned")
-        continue
-
-    html, body_text = result
-
-# Use body_text directly if it has content (already rendered by Selenium)
-    if len(body_text) > 100:
-        text = body_text
-    else:
-        text = parse_html(html, url)
-    print(f"  [Parse] Extracted {len(text)} chars of clean text")
+    html, text = fetch_page(url)
 
     if len(text) < 100:
-        print(f"  [Skip] Too short after parsing: {len(text)} chars")
+        print(f"  [Skip] Too short: {len(text)} chars")
         continue
 
     print(f"  [OK] {len(text)} chars extracted")
 
-    # Get page title
-    # Get page title  
+    # Title
     try:
-        soup  = BeautifulSoup(html, "html.parser")   # ← html is now a string ✅
+        soup  = BeautifulSoup(html, "html.parser")
         title = ""
         if soup.title:
-            title = soup.title.get_text(strip=True)
-            title = title.split("|")[0].strip()
+            title = soup.title.get_text(strip=True).split("|")[0].strip()
         if not title and soup.find("h1"):
             title = soup.find("h1").get_text(strip=True)
         if not title:
-            title = url.split("/")[-1].replace("-", " ").title()
+            title = path.strip("/").replace("-", " ").title() or "GBPIET"
     except Exception:
         title = "GBPIET Page"
 
-    # Content hash for dedup
+    # Hash + chunk
     content_hash = hashlib.md5(text.encode("utf-8")).hexdigest()
 
-    # Chunk the text
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
@@ -366,8 +275,6 @@ for path in PRIORITY_PAGES:
             continue
 
         chunk_hash = content_hash + f"_{i}"
-
-        # Skip if already indexed
         if chunk_hash in existing_hashes:
             continue
 
@@ -382,25 +289,20 @@ for path in PRIORITY_PAGES:
         })
         chunk_count += 1
 
-    print(f"  [Chunk] {chunk_count} new chunks created")
-    time.sleep(1)
+    print(f"  [Chunk] {chunk_count} new chunks")
+    time.sleep(0.5)
 
-# Close browser
-driver.quit()
-print("\n[Crawler] Chrome closed")
-
-# ══════════════════════════════════════════════════════════════════════
+# ── Summary ───────────────────────────────────────────────────────────
 print(f"\n[2/4] Summary:")
-print(f"  Pages crawled:  {pages_done}")
-print(f"  Total chunks:   {len(all_chunks)}")
+print(f"  Pages crawled : {pages_done}")
+print(f"  Total chunks  : {len(all_chunks)}")
 
-# ══════════════════════════════════════════════════════════════════════
+# ── Index ─────────────────────────────────────────────────────────────
 print(f"\n[3/4] Indexing into Qdrant...")
 
 if not all_chunks:
     print("  Nothing new to index")
 else:
-    # Embed in small batches
     texts       = [c["text"] for c in all_chunks]
     all_vectors = []
     batch_size  = 16
@@ -409,8 +311,8 @@ else:
         batch   = texts[i:i + batch_size]
         vectors = embed_model.embed_documents(batch)
         all_vectors.extend(vectors)
+        print(f"  [Embed] {min(i+batch_size, len(texts))}/{len(texts)} done")
 
-    # Build Qdrant points
     points = [
         PointStruct(
             id=str(uuid.uuid4()),
@@ -428,20 +330,19 @@ else:
         for i in range(len(all_chunks))
     ]
 
-    # Upsert in batches
-    upsert_batch = 50
-    total_done   = 0
-    for start in range(0, len(points), upsert_batch):
-        batch = points[start:start + upsert_batch]
+    total_done = 0
+    for start in range(0, len(points), 50):
+        batch = points[start:start + 50]
         client.upsert(collection_name=COLLECTION, points=batch)
         total_done += len(batch)
+        print(f"  [Qdrant] Upserted {total_done}/{len(points)}")
 
-    print(f"  [Qdrant] Indexed {total_done} new chunks")
+    print(f"  [Qdrant] Done — {total_done} chunks indexed")
 
-# ══════════════════════════════════════════════════════════════════════
+# ── Final count ───────────────────────────────────────────────────────
 final_info = client.get_collection(COLLECTION)
 print(f"\n[4/4] Final Qdrant count: {final_info.points_count} points")
 
 print("\n" + "=" * 55)
-print(f"✅ Done! {len(all_chunks)} new chunks indexed from {pages_done} pages")
+print(f"Done! {len(all_chunks)} new chunks from {pages_done} pages")
 print("=" * 55)
