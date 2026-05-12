@@ -192,7 +192,7 @@ GREETINGS = {
 }
 
 IDENTITY_Q = {
-    "who are you", "what are you", "who r u", "tum kaun ho",
+    "who are you", "what are you", "who r u", "tum kaun ho","kon ho",
     "aap kaun hain", "aap kaun ho", "kaun ho tum", "who made you",
     "who created you", "who made diksha", "diksha kaun hai",
     "को च", "कु च", "कू च", "को छ", "कु छ", "को cha", "ko cha",
@@ -204,7 +204,7 @@ IDENTITY_Q = {
 GREETING_RESPONSE = {
     "en": f"Hello! I'm Diksha, the official AI assistant for GBPIET, Pauri Garhwal. Ask me about admissions, fees, hostel, placements, faculty, courses and more!",
     "hi": f"नमस्ते! मैं दीक्षा हूँ — GBPIET की आधिकारिक AI सहायिका। आप मुझसे admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
-    "ga": f"समन्या जी! मैं दीक्षा छुं — जीबीपीआईईटी की AI दगड़िया। कुछ भी पुछि सकदन।",
+    "ga": f"समन्या जी! मैं दीक्षा छुं — जीबीपीआईईटी की AI दगड़िया। कुछ भी पुछि सकदा।",
     "ku": f"नमस्कार जी! मैं दीक्षा छु — जीबीपीआईईटी की AI दगड़िया। कुछ भी पूछ सकदन।",
 }
 
@@ -220,7 +220,7 @@ OUT_OF_SCOPE_RESPONSE = {
     "en": "Sorry, this question is out of my syllabus! I can only answer questions related to GBPIET — admissions, fees, hostel, placements, faculty, courses and more.",
     "hi": "माफ़ करें, यह सवाल मेरे syllabus से बाहर है! मैं केवल GBPIET से जुड़े सवालों का जवाब दे सकती हूँ — admission, fees, hostel, placement आदि।",
     "ga": "माफ करा, यु सवाल मेरे syllabus बटि बाहर छ! मी सिर्फ GBPIET बारे माँ जानकारी दे सकदुं।",
-    "ku": "माफ करिया, यु सवाल मेरे syllabus बटा बाहर छ! मी सिर्फ GBPIET बारे मा ज्याणी दे सकदु।",
+    "ku": "माफ करिया, यु सवाल मेरे syllabus बटा भ्यार छ! मी सिर्फ GBPIET बारे मा ज्याणी दे सकदु।",
 }
 
 
@@ -249,17 +249,19 @@ def is_out_of_scope(question: str) -> bool:
         return _scope_cache[q]
 
     system = (
-        "You are a strict classifier for a college chatbot. "
-        "Your job: decide if a question is related to a college/university "
-        "(admissions, fees, hostel, courses, faculty, placements, exams, results, "
-        "scholarships, transport, library, sports, campus, departments, wardens, "
-        "deans, directors, registrar, anti-ragging, etc.). "
-        "Answer with ONLY one word: YES (college-related) or NO (not college-related). "
-        "Examples of YES: 'fees', 'hod of cse', 'admission process', 'hostel warden', "
-        "'placement record', 'GBPIET', 'pauri', 'director kaun hai'. "
-        "Examples of NO: 'salman khan', 'taj mahal', 'ipl', 'weather today', "
-        "'modi', 'recipe', 'srinagar', 'bitcoin', 'cricket match'."
-    )
+    "You are a strict classifier for a college chatbot. "
+    "Your job: decide if a question is related to GBPIET college/university. "
+    "Answer with ONLY one word: YES (college-related) or NO (not college-related). "
+    "YES examples: fees, hod, admission, hostel warden, placement, GBPIET, "
+    "pauri, director, faculty, courses, library, transport, ragging, "
+    "result, exam, scholarship, department, dean, registrar, chairman, "
+    "how to reach, contact, sports, canteen, bus, mess, mca, btech, mtech, "
+    "where is gbpiet, ram mandir gbpiet, college location, campus. "
+    "NO examples: salman khan, taj mahal, ipl score, weather today, "
+    "modi, cooking recipe, bitcoin price, cricket match, bollywood, "
+    "ram mandir ayodhya, politics, news today, history of india, "
+    "other city location, movie review, stock market."
+)
 
     user_msg = f"Question: {question}\nIs this college-related? Answer YES or NO only."
 
@@ -484,12 +486,12 @@ KUMAUNI_SYNONYM_MAP = {
     'कते': 'kahan where',   'कसि': 'kaise how',
     'कतु': 'kitna',         'कै': 'kitne',
     'ज्याणी': 'jankari',   'भर्ति': 'admission',
-    'चेलो': 'ladka boy',   'चेली': 'ladki girl',
+    'चेलो': 'ladka','boy',   'चेली': 'ladki','girl',
     'दाम': 'fees',          'टक': 'paisa money',
     'रैण-बौण': 'hostel',   'खाण-पीण': 'mess food',
     'सुबिद': 'facility',   'नौकरी': 'job placement',
     'कमाइ': 'salary',       'पगार': 'salary',
-    'बटा': 'se from',       'हैबर': 'se from',
+    'बटा': 'se','from',       'हैबर': 'se from',
 }
 
 def ku_to_hi_en(text: str) -> str:
