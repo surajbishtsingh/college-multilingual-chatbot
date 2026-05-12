@@ -746,7 +746,7 @@ export default function App() {
               }}
             />
           </div>
-          <div className="fab-label">ASK DIKSHA</div>
+          <div className="fab-label">WELCOME GBPIET</div>
           <div className="fab-online-dot"/>
         </div>
       )}
