@@ -789,7 +789,6 @@ export default function App() {
             <div className="popup-diksha-row">
               <div style={{
                 width: 72, height: 72, borderRadius: '50%',
-                border: '3px solid #C8A951', overflow: 'hidden',
                 background: 'transparent', flexShrink: 0,
                 boxShadow: '0 4px 16px rgba(0,53,128,0.35)'
               }}>
