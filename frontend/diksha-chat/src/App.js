@@ -790,7 +790,7 @@ export default function App() {
               <div style={{
                 width: 72, height: 72, borderRadius: '50%',
                 border: '3px solid #C8A951', overflow: 'hidden',
-                background: '#003580', flexShrink: 0,
+                background: 'transparent', flexShrink: 0,
                 boxShadow: '0 4px 16px rgba(0,53,128,0.35)'
               }}>
                 <img
