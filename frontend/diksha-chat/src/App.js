@@ -787,20 +787,24 @@ export default function App() {
             </div>
 
             <div className="popup-diksha-row">
-              <div style={{
-                width: 72, height: 72, borderRadius: '50%',
-                background: 'transparent', flexShrink: 0,
-                boxShadow: '0 4px 16px rgba(0,53,128,0.35)'
-              }}>
-                <img
-                  src={avatarImg}
-                  alt="Diksha"
-                  style={{
-                    width: '100%', height: '100%',
-                    objectFit: 'cover', objectPosition: 'center 5%',
-                    display: 'block', imageRendering: '-webkit-optimize-contrast'
-                  }}
-                />
+             <div style={{
+  width:72, height:72,
+  borderRadius:'0',
+  border:'none',
+  overflow:'visible',
+  background:'none',
+  flexShrink:0,
+  boxShadow:'none'
+}}>
+              <img src={avatarImg} alt="Diksha" style={{
+  width: '100%',
+  height: '100%',
+  objectFit: 'contain',
+  objectPosition: 'center',
+  display: 'block',
+  background: 'none',
+  imageRendering: '-webkit-optimize-contrast'
+}}/>
               </div>
               <div className="popup-intro-text">
                 <p className="popup-greeting">{getTimeGreeting()}!</p>
