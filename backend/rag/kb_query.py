@@ -486,12 +486,12 @@ KUMAUNI_SYNONYM_MAP = {
     'कते': 'kahan where',   'कसि': 'kaise how',
     'कतु': 'kitna',         'कै': 'kitne',
     'ज्याणी': 'jankari',   'भर्ति': 'admission',
-    'चेलो': 'ladka','boy',   'चेली': 'ladki','girl',
+    'चेलो': 'ladka boy',   'चेली': 'ladki girl',
     'दाम': 'fees',          'टक': 'paisa money',
     'रैण-बौण': 'hostel',   'खाण-पीण': 'mess food',
     'सुबिद': 'facility',   'नौकरी': 'job placement',
     'कमाइ': 'salary',       'पगार': 'salary',
-    'बटा': 'se','from',       'हैबर': 'se from',
+    'बटा': 'from',       'हैबर': 'se from',
 }
 
 def ku_to_hi_en(text: str) -> str:
