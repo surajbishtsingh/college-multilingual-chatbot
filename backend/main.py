@@ -195,7 +195,28 @@ async def startup_event():
     except Exception as e:
         print(f"[Startup] ⚠️ Scheduler: {e}")
     sys.stdout.flush()
-
+# 6. Auto-scrape if Qdrant website collection is empty
+    print("[Startup] Step 6: Checking Qdrant data...")
+    try:
+        from qdrant_setup import get_client as _get_qdrant
+        _qc = _get_qdrant()
+        _info = _qc.get_collection("website")
+        if _info.points_count < 100:
+            print(f"[Startup] ⚠️ Qdrant website has only {_info.points_count} points — auto-scraping...")
+            import threading
+            def _auto_scrape():
+                try:
+                    run_scrape_job()
+                    print("[Startup] ✅ Auto-scrape complete")
+                except Exception as e:
+                    print(f"[Startup] ❌ Auto-scrape failed: {e}")
+            t = threading.Thread(target=_auto_scrape, daemon=True)
+            t.start()
+        else:
+            print(f"[Startup] ✅ Qdrant has {_info.points_count} points — no scrape needed")
+    except Exception as e:
+        print(f"[Startup] ⚠️ Auto-scrape check: {e}")
+    sys.stdout.flush()
     # ── API Keys & Environment Summary ────────────────────────────────
     print("-" * 60)
     print("[Startup] Environment:")
