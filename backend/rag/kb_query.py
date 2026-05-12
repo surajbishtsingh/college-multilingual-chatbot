@@ -1,17 +1,19 @@
 # rag/kb_query.py — Complete RAG pipeline
 # Fixes:
 #   ✅ 4 Groq keys (8-attempt fallback)
-#   ✅ Garhwali answers returned correctly (GA_MARKERS detection)
-#   ✅ Kumauni answers returned correctly (KU_MARKERS detection)
+#   ✅ Garhwali answers ONLY in Garhwali
+#   ✅ Kumauni answers ONLY in Kumauni
+#   ✅ Hindi answers ONLY in Hindi
+#   ✅ English answers ONLY in English
 #   ✅ Emoji stripped before TTS / response
 #   ✅ Feminine grammar enforced
 #   ✅ दीक्षा spelling fixed
 #   ✅ lang preference in all matching steps
 #   ✅ Strict lang routing: ga→kb_ga, ku→kb_ku, hi→kb_hi, en→kb_en
 #   ✅ Kumauni synonym expansion added
-#   ✅ Respectful language — आप instead of तू
-#   ✅ Question repeat fixed
-#   ✅ Proper fallback messages in all languages
+#   ✅ "Respected" removed — natural tone only
+#   ✅ Out-of-scope questions rejected (non-GBPIET queries)
+#   ✅ Question NOT repeated in answer
 
 import os
 import re
@@ -19,7 +21,6 @@ import json
 import glob
 import asyncio
 import unicodedata
-import concurrent.futures
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from groq import Groq
@@ -58,7 +59,6 @@ _groq4 = _make_client("GROQ_API_KEY_4")
 
 GROQ_PRIMARY  = "llama-3.3-70b-versatile"
 GROQ_FALLBACK = "llama3-70b-8192"
-GROQ_LIGHT    = "llama3-8b-8192"
 
 GROQ_ATTEMPTS = [
     (_groq1, GROQ_PRIMARY,  "Key1/Primary"),
@@ -71,15 +71,61 @@ GROQ_ATTEMPTS = [
     (_groq4, GROQ_FALLBACK, "Key4/Fallback"),
 ]
 
-_embed_model = None
-_qa_database = []
+_embed_model  = None
+_qa_database  = []
 
 EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 GBPIET_URL       = "https://gbpiet.ac.in"
 
 
 # ══════════════════════════════════════════════════════════════════════
-# EMOJI STRIPPER
+# OUT-OF-SCOPE DETECTOR
+# ══════════════════════════════════════════════════════════════════════
+OUT_OF_SCOPE_KEYWORDS = {
+    "ram mandir", "mandir", "temple", "mosque", "church", "masjid",
+    "gurudwara", "dargah", "math", "ashram",
+    "weather", "mausam", "barish", "rain", "temperature",
+    "modi", "rahul gandhi", "election", "chunav", "vote",
+    "bjp", "congress", "party", "cm", "prime minister",
+    "movie", "film", "song", "gana", "actor", "actress",
+    "cricket", "ipl", "match",
+    "restaurant", "hotel bahar", "dhaba", "market", "bazaar",
+    "hospital bahar", "dawai", "medicine",
+}
+
+GBPIET_SCOPE_KEYWORDS = {
+    "gbpiet", "college", "admission", "fee", "fees", "hostel",
+    "placement", "faculty", "hod", "dean", "director", "registrar",
+    "course", "branch", "department", "exam", "result", "scholarship",
+    "library", "transport", "sports", "ragging", "warden", "mess",
+    "mca", "cse", "ece", "mechanical", "civil", "electrical",
+    "biotechnology", "applied", "pauri", "garhwal",
+    "प्रवेश", "फीस", "हॉस्टल", "प्लेसमेंट", "संकाय", "परीक्षा",
+    "छात्रवृत्ति", "पुस्तकालय", "परिवहन", "निदेशक", "रजिस्ट्रार",
+    "एडमिशन", "भर्ती", "दाम", "सुविधा", "नौकरी", "भर्ति",
+}
+
+def is_out_of_scope(question: str) -> bool:
+    q = question.lower().strip()
+    for kw in GBPIET_SCOPE_KEYWORDS:
+        if kw in q:
+            return False
+    for kw in OUT_OF_SCOPE_KEYWORDS:
+        if kw in q:
+            print(f"[SCOPE] Out of scope: '{q}' matched '{kw}'")
+            return True
+    return False
+
+OUT_OF_SCOPE_RESPONSE = {
+    "en": "I can only help with information about GBPIET college — admissions, fees, hostel, placements, faculty and more. Please ask me something related to GBPIET.",
+    "hi": "मैं केवल GBPIET कॉलेज से संबंधित जानकारी दे सकती हूँ — प्रवेश, फीस, हॉस्टल, प्लेसमेंट आदि। कृपया GBPIET से जुड़ा कोई सवाल पूछें।",
+    "ga": "मैं केवल जीबीपीआईईटी कॉलेज का जानकारी द्यूँ। कृपया जीबीपीआईईटी से जुड़ा सवाल पुछ्या।",
+    "ku": "मैं केवल जीबीपीआईईटी कॉलेज की जानकारी द्यूँ। कृपया जीबीपीआईईटी से जुड़ा सवाल पूछिया।",
+}
+
+
+# ══════════════════════════════════════════════════════════════════════
+# EMOJI STRIPPER + CLEAN RESPONSE
 # ══════════════════════════════════════════════════════════════════════
 _EMOJI_PATTERN = re.compile(
     "["
@@ -98,8 +144,15 @@ _EMOJI_PATTERN = re.compile(
 )
 
 def clean_response(text: str) -> str:
-    """Strip emojis and clean up extra whitespace from any response."""
+    """Strip emojis, remove salutations like 'Respected', clean whitespace."""
     text = _EMOJI_PATTERN.sub("", text)
+    # Remove salutation prefixes
+    text = re.sub(
+        r'^(Respected\s+\w+[\s,]*|Dear\s+\w+[\s,]*|प्रिय\s+\w+[\s,]*)',
+        '', text, flags=re.IGNORECASE
+    ).strip()
+    if text:
+        text = text[0].upper() + text[1:]
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
@@ -109,19 +162,18 @@ def clean_response(text: str) -> str:
 # ══════════════════════════════════════════════════════════════════════
 GA_MARKERS = [
     'छन', 'छ।', 'हूँद', 'कुण', 'मिलद', 'पैलू', 'अर',
-    'कनकै', 'कख',    'बटि',    'त्वै',   'छौ',    'छी',
+    'कनकै', 'कख', 'बटि', 'त्वै', 'छौ', 'छी',
     'छ्यायी', 'थ्यायी', 'तुमुं', 'यैसैं', 'वैसें',
-    'माँ',    'मी',   'जु',    'यु',    'वु',
+    'माँ', 'मी', 'जु', 'यु', 'वु',
 ]
-
 
 # ══════════════════════════════════════════════════════════════════════
 # KUMAUNI MARKERS
 # ══════════════════════════════════════════════════════════════════════
 KU_MARKERS = [
     'छौ', 'छन', 'छौँ', 'छा', 'लै', 'बटा', 'हैबर', 'कन',
-    'कसि', 'कै', 'म्यूँ', 'त्यूँ', 'यो', 'वो', 'को', 'के',
-    'भयो', 'ज्यू', 'भल', 'नानी', 'ठुली', 'हिटा', 'तल्लि', 'मल्लि'
+    'कसि', 'कै', 'म्यूँ', 'त्यूँ', 'यो', 'वो', 'भयो',
+    'ज्यू', 'भल', 'नानी', 'ठुली', 'हिटा', 'तल्लि', 'मल्लि',
 ]
 
 
@@ -139,9 +191,8 @@ IDENTITY_Q = {
     "who created you","who made diksha","diksha kaun hai",
     "को च","कु च","कू च","को छ","कु छ","को cha","ko cha",
     "तू को छ","तू कु छ","तू को च",
-    # Kumauni identity queries
-    "को छै", "के छै", "तू को छै", "तुम को छौ", "तुमार नाम के छ",
-    "ko chai", "tumar naam ke cha", "tu ko chai",
+    "को छै","के छै","तू को छै","तुम को छौ","तुमार नाम के छ",
+    "ko chai","tumar naam ke cha","tu ko chai",
 }
 
 GREETING_RESPONSE = {
@@ -154,8 +205,8 @@ GREETING_RESPONSE = {
 IDENTITY_RESPONSE = {
     "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal, Uttarakhand. I help with college information in English, Hindi, Garhwali and Kumauni. Visit: {GBPIET_URL}",
     "hi": f"मैं दीक्षा हूँ — GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot। वेबसाइट: {GBPIET_URL}",
-    "ga": f"मैं दीक्षा छुं — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छुं। आप मीसे admission, fees, hostel, placement बारे मा पुछि सकदन। वेबसाइट: {GBPIET_URL}",
-    "ku": f"मैं दीक्षा छु — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छु। आप मीसे admission, fees, hostel, placement बारे मा पूछ सकदन। वेबसाइट: {GBPIET_URL}",
+    "ga": f"मैं दीक्षा छुं — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot। आप मीसे admission, fees, hostel बारे मा पुछि सकदन। वेबसाइट: {GBPIET_URL}",
+    "ku": f"मैं दीक्षा छु — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot। आप मीसे admission, fees, hostel बारे मा पूछ सकदन। वेबसाइट: {GBPIET_URL}",
 }
 
 
@@ -209,7 +260,7 @@ def get_qdrant():
 
 
 # ══════════════════════════════════════════════════════════════════════
-# QA DATABASE — stores item-level lang tag
+# QA DATABASE
 # ══════════════════════════════════════════════════════════════════════
 def load_qa_database():
     global _qa_database
@@ -329,21 +380,21 @@ HINDI_MAP = {
     'संपर्क': 'contact',           'फोन': 'phone',
     'रजिस्ट्रार': 'registrar',     'कुलसचिव': 'registrar',
     'कितने': 'how many',           'कौन से': 'which',
-    'कु':       'who what of',   'कू':      'who',
-    'कन':       'how',           'कनकै':    'how',
-    'कख':       'where',         'कनै':     'where',
-    'बटि':      'from',          'कुण':     'to for',
-    'अर':       'and',           'त्वै':    'then',
-    'माँ':      'in',            'मा':      'in',
+    'कु': 'who what of', 'कू': 'who',
+    'कन': 'how',         'कनकै': 'how',
+    'कख': 'where',       'कनै': 'where',
+    'बटि': 'from',       'कुण': 'to for',
+    'अर': 'and',         'त्वै': 'then',
+    'माँ': 'in',         'मा': 'in',
     'बारे माँ': 'about',
-    'मी':       'i me',          'आम':      'we us',
-    'तुमुं':    'you',           'जु':      'who which',
-    'यु':       'this',          'वु':      'that they',
-    'यैसैं':    'this',          'वैसें':   'that',
-    'वैन':      'that',
-    'च':        'is',            'छ':       'is',
-    'छन':       'are is',        'छौ':      'was',
-    'थौ':       'was',           'छी':      'was',
+    'मी': 'i me',        'आम': 'we us',
+    'तुमुं': 'you',      'जु': 'who which',
+    'यु': 'this',        'वु': 'that they',
+    'यैसैं': 'this',     'वैसें': 'that',
+    'वैन': 'that',
+    'च': 'is',           'छ': 'is',
+    'छन': 'are is',      'छौ': 'was',
+    'थौ': 'was',         'छी': 'was',
 }
 
 
@@ -358,31 +409,32 @@ def hi_to_en(text: str) -> str:
 # GARHWALI SYNONYM MAP
 # ══════════════════════════════════════════════════════════════════════
 GARHWALI_SYNONYM_MAP = {
-    'खुणि': 'ke liye for', 'वास्ति': 'ke liye', 'कन लिजि': 'ke liye',
-    'छन्': 'hain are', 'अछ': 'hai is', 'रोणु': 'rahna', 'रैणु': 'rehna',
-    'कूण': 'kaun who', 'कोण': 'kaun who',
-    'कखे': 'kahan where', 'कख': 'kahan where', 'किख': 'kahan where',
-    'कसे': 'kaise how', 'कसि': 'kaise how', 'कनूँ': 'kaise how',
-    'कति': 'kitna how much', 'कितणु': 'kitna', 'कतणु': 'kitna how many',
-    'जानकारी': 'jankari information', 'विवरण': 'details information',
-    'एडमिशन': 'admission', 'दाखिला': 'admission', 'भर्ती': 'admission',
+    'खुणि': 'ke liye for',    'वास्ति': 'ke liye',   'कन लिजि': 'ke liye',
+    'छन्': 'hain are',        'अछ': 'hai is',         'रोणु': 'rahna',
+    'रैणु': 'rehna',           'कूण': 'kaun who',      'कोण': 'kaun who',
+    'कखे': 'kahan where',     'कख': 'kahan where',    'किख': 'kahan where',
+    'कसे': 'kaise how',       'कसि': 'kaise how',     'कनूँ': 'kaise how',
+    'कति': 'kitna how much',  'कितणु': 'kitna',       'कतणु': 'kitna how many',
+    'जानकारी': 'jankari information',
+    'एडमिशन': 'admission',    'दाखिला': 'admission',  'भर्ती': 'admission',
     'नाम लिखाणु': 'admission',
-    'पैलि': 'pehla first', 'पहिलो': 'pehla first',
-    'नौना': 'ladka boy', 'छोरा': 'ladka boy',
-    'नौन्यिँ': 'ladki girl', 'छोरी': 'ladki girl',
-    'दाम': 'fees', 'रकम': 'fees amount', 'मूल्य': 'fees', 'पैसा': 'fees money',
-    'आवास': 'hostel', 'रैणु-सैणु': 'hostel accommodation', 'निवास': 'hostel',
-    'मेस': 'mess', 'भोजनालय': 'mess canteen',
-    'सुविधा': 'facility', 'साधन': 'facility', 'इंतजाम': 'facility arrangement',
-    'आवेदन': 'application form', 'दरखास्त दया': 'apply', 'अर्जी दया': 'apply',
+    'पैलि': 'pehla first',    'पहिलो': 'pehla first',
+    'नौना': 'ladka boy',      'छोरा': 'ladka boy',
+    'नौन्यिँ': 'ladki girl',  'छोरी': 'ladki girl',
+    'दाम': 'fees',            'रकम': 'fees amount',   'मूल्य': 'fees',
+    'पैसा': 'fees money',
+    'आवास': 'hostel',         'रैणु-सैणु': 'hostel accommodation',
+    'निवास': 'hostel',        'मेस': 'mess',          'भोजनालय': 'mess canteen',
+    'सुविधा': 'facility',     'साधन': 'facility',     'इंतजाम': 'facility arrangement',
+    'आवेदन': 'application form',
     'योग्यता': 'eligibility', 'काबिलियत': 'eligibility', 'लायकी': 'eligibility',
-    'परीक्षा': 'exam', 'इम्तिहान': 'exam', 'जाँच': 'exam test',
-    'विभाग': 'department', 'खंड': 'department',
-    'नौकरी': 'job placement', 'रोजगार': 'job', 'तैनाती': 'placement',
-    'तनख्वाह': 'salary', 'कमाई': 'salary earnings', 'पगार': 'salary',
-    'मी': 'main I', 'मेरो': 'mera my',
-    'बताणु': 'batao tell', 'दसणु': 'batao tell', 'कहणु': 'kehna say',
-    'अर': 'aur and', 'बटे': 'se from', 'सैं': 'se from',
+    'परीक्षा': 'exam',        'इम्तिहान': 'exam',
+    'विभाग': 'department',    'खंड': 'department',
+    'नौकरी': 'job placement', 'रोजगार': 'job',        'तैनाती': 'placement',
+    'तनख्वाह': 'salary',      'कमाई': 'salary earnings', 'पगार': 'salary',
+    'मी': 'main I',           'मेरो': 'mera my',
+    'बताणु': 'batao tell',    'दसणु': 'batao tell',
+    'अर': 'aur and',          'बटे': 'se from',       'सैं': 'se from',
 }
 
 
@@ -398,29 +450,28 @@ def ga_ku_to_hi_en(text: str) -> str:
 # KUMAUNI SYNONYM MAP
 # ══════════════════════════════════════════════════════════════════════
 KUMAUNI_SYNONYM_MAP = {
-    'लिजी': 'ke liye for', 'काज': 'ke liye for', 'वास्ते': 'ke liye',
-    'छन': 'hain are', 'छ': 'hai is', 'छौ': 'ho are',
-    'रैण': 'rehna live', 'बौण': 'baithna sit',
-    'को': 'kaun who', 'के': 'kya what',
-    'कहाँ': 'kahan where', 'कते': 'kahan where', 'कहाँबटा': 'kahan se',
-    'कसि': 'kaise how', 'कन': 'kaise how',
-    'कतु': 'kitna how much', 'कै': 'kitne how many',
-    'ज्याणी': 'jankari information', 'बात': 'baat details',
-    'भर्ति': 'admission', 'नाम लिखाण': 'admission',
-    'पैलि': 'pehla first', 'पैली': 'pahle before',
-    'चेलो': 'ladka boy', 'नान': 'bachcha kid', 'चेली': 'ladki girl',
-    'दाम': 'fees price', 'टक': 'paisa money',
+    'लिजी': 'ke liye for',    'काज': 'ke liye for',   'वास्ते': 'ke liye',
+    'छन': 'hain are',         'छ': 'hai is',           'छौ': 'ho are',
+    'रैण': 'rehna live',      'बौण': 'baithna sit',
+    'को': 'kaun who',         'के': 'kya what',
+    'कहाँ': 'kahan where',    'कते': 'kahan where',    'कहाँबटा': 'kahan se',
+    'कसि': 'kaise how',       'कन': 'kaise how',
+    'कतु': 'kitna how much',  'कै': 'kitne how many',
+    'ज्याणी': 'jankari information',
+    'भर्ति': 'admission',     'नाम लिखाण': 'admission',
+    'पैलि': 'pehla first',    'पैली': 'pahle before',
+    'चेलो': 'ladka boy',      'नान': 'bachcha kid',    'चेली': 'ladki girl',
+    'दाम': 'fees price',      'टक': 'paisa money',
     'रैण-बौण': 'hostel stay', 'कमरा': 'room hostel',
-    'खाण-पीण': 'mess food', 'भोजन': 'food',
-    'सुबिद': 'facility convenience', 'इंतजाम': 'arrangement',
-    'फारम': 'form application', 'अर्जी': 'apply',
-    'लायक': 'eligibility', 'पास': 'exam pass',
-    'पड़ै': 'padhai study', 'इम्तिहान': 'exam',
-    'काज': 'job work', 'नौकरी': 'job placement',
-    'कमाइ': 'salary income', 'पगार': 'salary',
-    'मैं': 'main I', 'म्यूँ': 'mera my', 'तुमार': 'tumhara your',
-    'बुलण': 'bolna speak', 'बताण': 'batao tell', 'कौण': 'kehna say',
-    'और': 'aur and', 'बटा': 'se from', 'हैबर': 'se from/after',
+    'खाण-पीण': 'mess food',   'भोजन': 'food',
+    'सुबिद': 'facility convenience',
+    'फारम': 'form application',
+    'लायक': 'eligibility',    'पास': 'exam pass',
+    'पड़ै': 'padhai study',    'इम्तिहान': 'exam',
+    'नौकरी': 'job placement', 'कमाइ': 'salary income', 'पगार': 'salary',
+    'मैं': 'main I',          'म्यूँ': 'mera my',      'तुमार': 'tumhara your',
+    'बुलण': 'bolna speak',    'बताण': 'batao tell',
+    'और': 'aur and',          'बटा': 'se from',        'हैबर': 'se from/after',
 }
 
 
@@ -436,16 +487,14 @@ def ku_to_hi_en(text: str) -> str:
 # TYPO MAP
 # ══════════════════════════════════════════════════════════════════════
 TYPO_MAP = {
-    "h0d": "hod", "f33s": "fees", "adm1ssion": "admission",
-    "mechenical": "mechanical", "mechnical": "mechanical",
-    "mechincal": "mechanical",  "mechanicle": "mechanical",
-    "mechinical": "mechanical", "electical": "electrical",
-    "electrcal": "electrical",  "biotechonlogy": "biotechnology",
-    "bitoech": "biotechnology", "admision": "admission",
-    "admisson": "admission",    "palcement": "placement",
-    "hostle": "hostel",         "dircetor": "director",
-    "registar": "registrar",    "collage": "college",
-    "colege": "college",        "faculity": "faculty",
+    "h0d": "hod",               "f33s": "fees",          "adm1ssion": "admission",
+    "mechenical": "mechanical", "mechnical": "mechanical","mechincal": "mechanical",
+    "mechanicle": "mechanical", "mechinical": "mechanical",
+    "electical": "electrical",  "electrcal": "electrical",
+    "biotechonlogy": "biotechnology", "bitoech": "biotechnology",
+    "admision": "admission",    "admisson": "admission",  "palcement": "placement",
+    "hostle": "hostel",         "dircetor": "director",   "registar": "registrar",
+    "collage": "college",       "colege": "college",      "faculity": "faculty",
     "placment": "placement",    "semster": "semester",
 }
 
@@ -471,71 +520,46 @@ def fix_typos(text: str) -> str:
 # SPECIFIC ROLE MAP
 # ══════════════════════════════════════════════════════════════════════
 SPECIFIC_ROLE_MAP = {
-    "dean academic affairs":  "dean academic",
-    "dean of academic":       "dean academic",
-    "dean academics":         "dean academic",
-    "dean academic":          "dean academic",
-    "dean accadmic":          "dean academic",
-    "dean acadmic":           "dean academic",
-    "dean student welfare":   "dean student welfare",
-    "dean of student":        "dean student welfare",
-    "dean student":           "dean student welfare",
-    "dean welfare":           "dean student welfare",
-    "dean research":          "dean research",
-    "dean planning":          "dean planning",
-    "dean faculty welfare":   "dean faculty welfare",
-    "dean faculty":           "dean faculty welfare",
-    "hod of cse":             "hod cse",   "hod cse": "hod cse",
-    "hod of ece":             "hod ece",   "hod ece": "hod ece",
-    "hod of me":              "hod mechanical",
-    "hod me":                 "hod mechanical",
-    "hod of mechanical":      "hod mechanical",
-    "hod mechanical":         "hod mechanical",
-    "hod of civil":           "hod civil", "hod civil": "hod civil",
-    "hod of ee":              "hod electrical",
-    "hod ee":                 "hod electrical",
-    "hod of electrical":      "hod electrical",
-    "hod electrical":         "hod electrical",
-    "hod of mca":             "hod mca",   "hod mca": "hod mca",
-    "hod of csa":             "hod mca",   "hod csa": "hod mca",
-    "hod of biotech":         "hod biotechnology",
-    "hod biotech":            "hod biotechnology",
-    "hod of biotechnology":   "hod biotechnology",
-    "hod biotechnology":      "hod biotechnology",
-    "hod of applied":         "hod applied sciences",
-    "hod applied":            "hod applied sciences",
-    "warden of kailash":      "warden kailash",
-    "warden kailash":         "warden kailash",
-    "warden of trishul":      "warden trishul",
-    "warden trishul":         "warden trishul",
-    "warden of neelkanth":    "warden neelkanth",
-    "warden neelkanth":       "warden neelkanth",
-    "warden of vh":           "warden viswerwarya",
-    "warden vh":              "warden viswerwarya",
-    "warden of viswerwarya":  "warden viswerwarya",
-    "warden viswerwarya":     "warden viswerwarya",
-    "warden of raman":        "warden raman",
-    "warden raman":           "warden raman",
-    "warden of bhagirathi":   "warden bhagirathi",
-    "warden bhagirathi":      "warden bhagirathi",
-    "warden of rudra":        "warden rudra",
-    "warden rudra":           "warden rudra",
-    "warden of badri":        "warden badri",
-    "warden badri":           "warden badri",
-    "warden of kedar":        "warden kedar",
-    "warden kedar":           "warden kedar",
-    "warden of alaknanda":    "warden alaknanda",
-    "warden alaknanda":       "warden alaknanda",
-    "warden of shivalik":     "warden shivalik",
-    "warden shivalik":        "warden shivalik",
-    "priti dimri":            "hod mca",
-    "prof priti dimri":       "hod mca",
+    "dean academic affairs": "dean academic", "dean of academic": "dean academic",
+    "dean academics": "dean academic",        "dean academic": "dean academic",
+    "dean accadmic": "dean academic",         "dean acadmic": "dean academic",
+    "dean student welfare": "dean student welfare",
+    "dean of student": "dean student welfare",
+    "dean student": "dean student welfare",   "dean welfare": "dean student welfare",
+    "dean research": "dean research",         "dean planning": "dean planning",
+    "dean faculty welfare": "dean faculty welfare",
+    "dean faculty": "dean faculty welfare",
+    "hod of cse": "hod cse",   "hod cse": "hod cse",
+    "hod of ece": "hod ece",   "hod ece": "hod ece",
+    "hod of me": "hod mechanical",     "hod me": "hod mechanical",
+    "hod of mechanical": "hod mechanical", "hod mechanical": "hod mechanical",
+    "hod of civil": "hod civil",       "hod civil": "hod civil",
+    "hod of ee": "hod electrical",     "hod ee": "hod electrical",
+    "hod of electrical": "hod electrical", "hod electrical": "hod electrical",
+    "hod of mca": "hod mca",           "hod mca": "hod mca",
+    "hod of csa": "hod mca",           "hod csa": "hod mca",
+    "hod of biotech": "hod biotechnology", "hod biotech": "hod biotechnology",
+    "hod of biotechnology": "hod biotechnology", "hod biotechnology": "hod biotechnology",
+    "hod of applied": "hod applied sciences", "hod applied": "hod applied sciences",
+    "warden of kailash": "warden kailash",   "warden kailash": "warden kailash",
+    "warden of trishul": "warden trishul",   "warden trishul": "warden trishul",
+    "warden of neelkanth": "warden neelkanth", "warden neelkanth": "warden neelkanth",
+    "warden of vh": "warden viswerwarya",    "warden vh": "warden viswerwarya",
+    "warden of viswerwarya": "warden viswerwarya", "warden viswerwarya": "warden viswerwarya",
+    "warden of raman": "warden raman",       "warden raman": "warden raman",
+    "warden of bhagirathi": "warden bhagirathi", "warden bhagirathi": "warden bhagirathi",
+    "warden of rudra": "warden rudra",       "warden rudra": "warden rudra",
+    "warden of badri": "warden badri",       "warden badri": "warden badri",
+    "warden of kedar": "warden kedar",       "warden kedar": "warden kedar",
+    "warden of alaknanda": "warden alaknanda", "warden alaknanda": "warden alaknanda",
+    "warden of shivalik": "warden shivalik", "warden shivalik": "warden shivalik",
+    "priti dimri": "hod mca",               "prof priti dimri": "hod mca",
 }
 
 ROLE_BLACKLIST = [
-    "list all", "all hod", "all department", "all heads",
-    "departments at gbpiet", "list of hod", "all hods",
-    "सभी विभाग", "सभी hod",
+    "list all","all hod","all department","all heads",
+    "departments at gbpiet","list of hod","all hods",
+    "सभी विभाग","सभी hod",
 ]
 
 
@@ -561,10 +585,10 @@ def specific_role_answer(question: str, preferred_lang: str = "en"):
         if any(p in q_lower for p in ROLE_BLACKLIST):
             continue
         score = 0
-        if all(w in q_lower for w in topic_words):                                              score += 3
-        elif mapped.lower() in q_lower:                                                          score += 2
-        elif len(topic_words) >= 2 and sum(1 for w in topic_words if w in q_lower) >= 2:        score += 1
-        if any(w in a_lower for w in topic_words):                                               score += 1
+        if all(w in q_lower for w in topic_words):                                          score += 3
+        elif mapped.lower() in q_lower:                                                      score += 2
+        elif len(topic_words) >= 2 and sum(1 for w in topic_words if w in q_lower) >= 2:    score += 1
+        if any(w in a_lower for w in topic_words):                                           score += 1
         if score >= 2:
             candidates.append({
                 "answer": item["answer"],
@@ -588,30 +612,30 @@ def specific_role_answer(question: str, preferred_lang: str = "en"):
 # DIRECT KEYWORD MAP
 # ══════════════════════════════════════════════════════════════════════
 DIRECT_KEYWORD_MAP = {
-    "registrar":   "registrar",  "director":    "director",
-    "dean":        "dean",       "chairman":    "chairman",
-    "warden":      "warden",     "placement":   "placement",
-    "placements":  "placement",  "hostel":      "hostel",
-    "hostels":     "hostel",     "fees":        "fees",
-    "fee":         "fees",       "admission":   "admission",
-    "admissions":  "admission",  "contact":     "contact",
-    "courses":     "courses",    "course":      "courses",
-    "library":     "library",    "transport":   "transport",
-    "scholarship": "scholarship","result":      "result",
-    "ragging":     "ragging",    "sports":      "sports",
-    "faculty":     "faculty",    "hod":         "head of department",
-    "about":       "about gbpiet","website":    "gbpiet website",
+    "registrar": "registrar",    "director": "director",
+    "dean": "dean",              "chairman": "chairman",
+    "warden": "warden",          "placement": "placement",
+    "placements": "placement",   "hostel": "hostel",
+    "hostels": "hostel",         "fees": "fees",
+    "fee": "fees",               "admission": "admission",
+    "admissions": "admission",   "contact": "contact",
+    "courses": "courses",        "course": "courses",
+    "library": "library",        "transport": "transport",
+    "scholarship": "scholarship","result": "result",
+    "ragging": "ragging",        "sports": "sports",
+    "faculty": "faculty",        "hod": "head of department",
+    "about": "about gbpiet",     "website": "gbpiet website",
     "h0d": "head of department", "hods": "head of department",
-    "रजिस्ट्रार":  "registrar",  "निदेशक":   "director",
-    "डीन":          "dean",       "प्लेसमेंट": "placement",
-    "हॉस्टल":       "hostel",     "फीस":       "fees",
-    "प्रवेश":       "admission",  "संपर्क":    "contact",
-    "पुस्तकालय":   "library",    "परिवहन":    "transport",
-    "रैगिंग":       "ragging",    "संकाय":     "faculty",
-    "एडमिशन":       "admission",  "भर्ती":    "admission",
-    "नौकरी":         "placement",  "सुविधा":   "facility",
-    "भर्ति":         "admission",  "सुबिद":    "facility",
-    "ज्याणी":        "information","दाम":      "fees",
+    "रजिस्ट्रार": "registrar",  "निदेशक": "director",
+    "डीन": "dean",               "प्लेसमेंट": "placement",
+    "हॉस्टल": "hostel",          "फीस": "fees",
+    "प्रवेश": "admission",       "संपर्क": "contact",
+    "पुस्तकालय": "library",      "परिवहन": "transport",
+    "रैगिंग": "ragging",         "संकाय": "faculty",
+    "एडमिशन": "admission",       "भर्ती": "admission",
+    "नौकरी": "placement",        "सुविधा": "facility",
+    "भर्ति": "admission",        "सुबिद": "facility",
+    "ज्याणी": "information",     "दाम": "fees",
 }
 
 
@@ -847,77 +871,78 @@ def rag_search(question: str, lang: str = "en"):
 
 
 # ══════════════════════════════════════════════════════════════════════
-# LLM PROMPT BUILDER — all 4 languages
+# LLM PROMPT BUILDER
 # ══════════════════════════════════════════════════════════════════════
 def build_prompt(question: str, context: str, lang: str, history: str = "") -> str:
 
     if lang == "hi":
         return f"""आप दीक्षा हैं — GBPIET की official AI chatbot।
+
 RULES:
-- HAMESHA shuddh Hindi mein jawab dein।
-- User ko हमेशा "आप" kahein — kabhi "तू" ya "तुम" nahi।
-- Feminine forms use karein: सकती हूँ, करूँगी, जानती हूँ।
-- Sawaal dobara mat likho — seedha jawab do।
-- Sirf context use karein।
+- केवल Hindi में जवाब दें।
+- User को "आप" कहें — कभी "तू" या "तुम" नहीं।
+- Feminine forms: सकती हूँ, करूँगी, जानती हूँ।
+- जवाब सीधे शुरू करें — सवाल दोबारा मत लिखें।
+- "Respected" या "Dear" मत लिखें।
+- केवल नीचे दिए context का उपयोग करें।
 - Website: {GBPIET_URL}
-- Jawab nahi mila: "माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।"
+- जवाब न मिले: "माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें।"
 {history}
 Context:
 {context}
 
-Jawab (Hindi mein, feminine, sawaal repeat mat karo):"""
+Jawab (Hindi mein, bina sawaal repeat kiye):"""
 
     elif lang == "ga":
         return f"""आप दीक्षा छन — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot।
 
-RULES (बहुत जरूरी):
-- हमेशा गढ़वाली मा जवाब द्या — Hindi या English मा नि।
-- User कु हमेशा "आप" या "थैं" बुल्या — कभी "तू" या "तुम" नि।
-- आप एक लड़की छन — feminine forms use कर्या।
-- अपणु नाम हमेशा "दीक्षा" लिख्या।
-- Sawaal dobara mat likho — seedha jawab do।
-- Sirf context use kar्या।
+RULES:
+- केवल गढ़वाली में जवाब द्या।
+- User कु "आप" या "थैं" बुल्या।
+- Feminine forms use कर्या।
+- जवाब सीधे शुरू कर्या — सवाल दोबारा मत लिख्या।
+- "Respected" या "Dear" मत लिख्या।
+- Context का ही उपयोग कर्या।
 - Website: {GBPIET_URL}
-- Jawab नि मिलो: "माफ़ करया जी, मियूँ थै ईं का बारे मा पता नी च। जादा जानकारी का खातिर {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।"
+- Jawab नि मिलो: "माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा।"
 {history}
 Context: {context}
 
-Jawab (गढ़वाली मा — आप use करो, sawaal repeat mat karo):"""
+Jawab (केवल गढ़वाली में):"""
 
     elif lang == "ku":
         return f"""आप दीक्षा छन — जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot।
 
-RULES (बहुत जरूरी):
-- हमेशा कुमाउनी मा जवाब द्या — Hindi या English मा नि।
-- User कु हमेशा "आप" या "ज्यू" बुल्या — कभी "तू" या "तुम" नि।
-- आप एक छोरी छन — feminine forms use कर्या।
-- अपणु नाम हमेशा "दीक्षा" लिख्या।
-- Sawaal dobara mat likho — seedha jawab do।
-- Sirf context use kar्या।
+RULES:
+- केवल कुमाउनी में जवाब द्या।
+- User कु "आप" या "ज्यू" बुल्या।
+- Feminine forms use कर्या।
+- जवाब सीधे शुरू कर्या — सवाल दोबारा मत लिख्या।
+- "Respected" या "Dear" मत लिख्या।
+- Context का ही उपयोग कर्या।
 - Website: {GBPIET_URL}
-- Jawab नि मिलो: "माफ़ करिया जी, मीकें इ बारे में जानकारी नैं च। अधिक जानकारी खुनी {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।"
+- Jawab नि मिलो: "माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया।"
 {history}
 Context: {context}
 
-Jawab (कुमाउनी मा — आप/ज्यू use करो, sawaal repeat mat karo):"""
+Jawab (केवल कुमाउनी में):"""
 
     else:
-        return f"""You are दीक्षा (Diksha) — official AI assistant for GBPIET
+        return f"""You are Diksha — official AI assistant for GBPIET
 (Govind Ballabh Pant Institute of Engineering and Technology),
 Pauri Garhwal, Uttarakhand. Website: {GBPIET_URL}
 
 RULES:
 - Answer in ENGLISH ONLY.
-- Always address user respectfully.
-- NEVER repeat or rephrase the question — start directly with the answer.
-- Use ONLY the context below — do NOT hallucinate.
-- If not found: "I'm sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030."
-- Keep answers concise and helpful.
+- DO NOT start with "Respected", "Dear", or any salutation.
+- NEVER repeat the question — start directly with the answer.
+- Use ONLY the context below.
+- If not in context: "Sorry, I couldn't find that. Please visit {GBPIET_URL} or call 01368-228030."
 {history}
 Context:
 {context}
 
-Answer (ENGLISH ONLY — do not repeat the question):"""
+Answer (English, no salutation, no question repeat):"""
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -929,41 +954,39 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
     if lang == "ga":
         system = (
             f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in Garhwali dialect. NEVER use Hindi or English. "
-            "NEVER repeat or echo the user question. Start answer directly. "
-            "ALWAYS address user as 'आप' or 'थैं' — NEVER use 'तू' or 'तुम'. "
-            "You are female — use feminine Garhwali grammar. "
-            "Always spell your name as दीक्षा. "
-            "If answer not found say: माफ़ करया जी, मियूँ थै ईं का बारे मा पता नी च। "
-            f"जादा जानकारी का खातिर {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।"
+            "STRICT: Respond ONLY in Garhwali — NEVER Hindi or English. "
+            "NEVER start with 'Respected' or 'Dear'. "
+            "NEVER repeat the question. Start answer directly. "
+            "Address user as 'आप'/'थैं' only. "
+            "Use feminine grammar. Name: दीक्षा always. "
+            f"No answer found: माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा।"
         )
     elif lang == "ku":
         system = (
             f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in Kumauni dialect. NEVER use Hindi or English. "
-            "NEVER repeat or echo the user question. Start answer directly. "
-            "ALWAYS address user as 'आप' or 'ज्यू' — NEVER use 'तू' or 'तुम'. "
-            "You are female — use feminine Kumauni grammar. "
-            "Always spell your name as दीक्षा. "
-            "If answer not found say: माफ़ करिया जी, मीकें इ बारे में जानकारी नैं च। "
-            f"अधिक जानकारी खुनी {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।"
+            "STRICT: Respond ONLY in Kumauni — NEVER Hindi or English. "
+            "NEVER start with 'Respected' or 'Dear'. "
+            "NEVER repeat the question. Start answer directly. "
+            "Address user as 'आप'/'ज्यू' only. "
+            "Use feminine grammar. Name: दीक्षा always. "
+            f"No answer found: माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया।"
         )
     elif lang == "hi":
         system = (
             f"You are दीक्षा (Diksha), official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in Hindi. "
-            "NEVER repeat or echo the user question. Start answer directly. "
-            "Always address user as 'आप' — never use 'तू' or 'तुम'. "
-            "You are female — always use feminine Hindi grammar: "
-            "सकती हूँ (not सकता हूँ), करूँगी (not करूँगा). "
-            "Always spell your name as दीक्षा."
+            "STRICT: Respond ONLY in Hindi. "
+            "NEVER start with 'Respected' or 'Dear'. "
+            "NEVER repeat the question. Start answer directly. "
+            "Address user as 'आप' only. "
+            "Feminine grammar: सकती हूँ, करूँगी. Name: दीक्षा always."
         )
     else:
         system = (
             f"You are Diksha, official female AI assistant for GBPIET ({GBPIET_URL}). "
-            "You MUST respond ONLY in English. Be helpful, accurate and concise. "
-            "NEVER repeat or echo the user question. Start directly with the answer. "
-            "Always address user respectfully."
+            "STRICT: Respond ONLY in English. "
+            "NEVER start with 'Respected' or 'Dear'. "
+            "NEVER repeat the question. Start answer directly. "
+            "Be helpful, accurate and concise."
         )
 
     result = groq_call(
@@ -981,7 +1004,7 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
         if lines:
             return clean_response(lines[0]) + f"\n\nFor more info: {GBPIET_URL}"
 
-    return f"I'm sorry, I couldn't generate a response. Please visit {GBPIET_URL} or call 01368-228030."
+    return f"Sorry, I couldn't generate a response. Please visit {GBPIET_URL} or call 01368-228030."
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -999,6 +1022,11 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     if question.lower().strip() in IDENTITY_Q:
         print("[RESULT] Identity")
         return clean_response(IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"]))
+
+    # ── Out of scope ───────────────────────────────────────────────────
+    if is_out_of_scope(question):
+        print("[RESULT] Out of scope")
+        return OUT_OF_SCOPE_RESPONSE.get(lang, OUT_OF_SCOPE_RESPONSE["en"])
 
     print(f"\n{'='*55}\n[Q/{lang}] {question}\n{'='*55}")
 
@@ -1036,12 +1064,12 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
         print("[RESULT] RAG + LLM")
         return llm_answer(question, ctx, lang, history)
 
-    # No match — respectful fallback in all languages
+    # No match
     print("[RESULT] No match")
     fb = {
         "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।",
-        "ga": f"माफ़ करया जी, मियूँ थै ईं का बारे मा पता नी च। जादा जानकारी का खातिर {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
-        "ku": f"माफ़ करिया जी, मीकें इ बारे में जानकारी नैं च। अधिक जानकारी खुनी {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।",
-        "en": f"I'm sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030.",
+        "ga": f"माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
+        "ku": f"माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।",
+        "en": f"Sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030.",
     }
     return fb.get(lang, fb["en"])
