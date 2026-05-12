@@ -9,7 +9,7 @@ _embed_model = None
 
 # Lightweight multilingual model — supports Hindi + English (and 50+ languages)
 # 6 layers, ~120MB, fast on CPU — lightest option with strong Hindi/English quality
-EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L6-v2"
+EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 
 def get_embed_model() -> HuggingFaceEmbeddings:
