@@ -52,25 +52,29 @@ body {
   position: absolute;
   top: -8px; left: -8px; right: -8px; bottom: 18px;
   border-radius: 50%;
-  border: 2.5px solid rgba(200,169,81,0.55);
+  /*border: 2.5px solid rgba(200,169,81,0.55);
   animation: fabPulse 2.2s ease-out infinite;
-  pointer-events: none;
+  pointer-events: none;*/
+  display: none;
 }
 
 .fab-circle {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  border: 3px solid #C8A951;
+  /*border: 3px solid #C8A951;*/
+   border: none;
   overflow: hidden;
   background: transparent;
-  box-shadow: 0 6px 28px rgba(0,53,128,0.45);
-  transition: transform 0.22s, box-shadow 0.22s;
+  /*box-shadow: 0 6px 28px rgba(0,53,128,0.45);*/
+  box-shadow: none;
+  transition: transform 0.22s /*, box-shadow 0.22s*/ ;
 }
 
 .floating-fab:hover .fab-circle {
   transform: scale(1.08);
-  box-shadow: 0 10px 36px rgba(0,53,128,0.55);
+  /*box-shadow: 0 10px 36px rgba(0,53,128,0.55);*/
+    box-shadow: none;
 }
 
 .fab-label {
