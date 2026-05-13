@@ -247,10 +247,16 @@ def is_out_of_scope(question: str) -> bool:
     q = question.strip().lower()
 
     # Always allow very short replies (conversational follow-ups)
-    if len(q.split()) <= 3:
+    if len(q.split()) <= 4:
         return False
 
     if q in GREETINGS or q in IDENTITY_Q:
+        return False
+
+    # User introducing themselves → never out of scope
+    _intro_words = {"i am", "i'm", "my name", "mera naam", "main hoon", "naam hai"}
+    if any(iw in q for iw in _intro_words):
+        print(f"[SCOPE] User intro detected → IN SCOPE")
         return False
 
     # If matches any role/person in SPECIFIC_ROLE_MAP → always in scope
@@ -262,10 +268,13 @@ def is_out_of_scope(question: str) -> bool:
 
     # If contains known faculty/staff name keywords → in scope
     STAFF_KEYWORDS = {
-        "priti", "dimri", "rawat", "nautiyal", "negi", "bisht",
-        "professor", "prof", "dr ", "doctor", "faculty", "teacher",
-        "principal", "vice chancellor",
+        "priti", "dimri", "rawat", "nautiyal", "negi", "bisht", "kunwar",
+        "narayan", "siddharth", "ghansela", "professor", "prof", "dr",
+        "doctor", "faculty", "teacher", "assistant professor",
+        "associate professor", "hod", "dean", "warden", "registrar",
+        "director", "chairman",
     }
+    q_words = set(q.lower().split())
     for kw in STAFF_KEYWORDS:
         if kw in q:
             print(f"[SCOPE] Staff keyword '{kw}' → IN SCOPE")
@@ -580,6 +589,8 @@ SPECIFIC_ROLE_MAP = {
     "warden of alaknanda": "warden alaknanda", "warden alaknanda": "warden alaknanda",
     "warden of shivalik": "warden shivalik", "warden shivalik": "warden shivalik",
     "priti dimri": "hod mca",               "prof priti dimri": "hod mca",
+    "kunwar deep narayan": "faculty mca",   "kunwar narayan": "faculty mca",
+    "siddharth ghansela": "faculty mca",    "dr siddharth": "faculty mca",
 }
 
 ROLE_BLACKLIST = [
@@ -1077,7 +1088,22 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
         print("[RESULT] Identity")
         return clean_response(IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"]))
 
-    # ── Out-of-scope check ────────────────────────────────────────────
+    # ── User introducing themselves ───────────────────────────────────
+    _intro_words = {"i am", "my name is", "mera naam", "naam hai", "naam h"}
+    _q_lower = question.lower().strip()
+    if any(iw in _q_lower for iw in _intro_words):
+        # Extract name after the intro phrase
+        _name = _q_lower.split()[-1].capitalize()
+        _intro_resp = {
+            "en": f"Hello {_name}! How can I help you? Ask me anything about GBPIET.",
+            "hi": f"नमस्ते {_name} जी! GBPIET के बारे में कुछ भी पूछ सकते हैं।",
+            "ga": f"समन्या {_name} जी! GBPIET बारे माँ कुछ भी पुछि सकदन।",
+            "ku": f"नमस्कार {_name} जी! GBPIET बारे मा कुछ भी पूछ सकदन।",
+        }
+        print(f"[RESULT] User intro — name: {_name}")
+        return _intro_resp.get(lang, _intro_resp["en"])
+
+        # ── Out-of-scope check ────────────────────────────────────────────
     if is_out_of_scope(question):
         print("[RESULT] Out of scope")
         return OUT_OF_SCOPE_RESPONSE.get(lang, OUT_OF_SCOPE_RESPONSE["en"])
