@@ -21,8 +21,8 @@ SARVAM_LANG_MAP = {
 }
 
 # Sarvam Indian female speakers
-# Options: anushka, pavithra, maitreyi, arvind, amol, amartya
-SARVAM_SPEAKER = "anushka"   # Best natural Indian female voice
+# Options: meera, pavithra, maitreyi, arvind, amol, amartya
+SARVAM_SPEAKER = "anushka"   # Indian female voice
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -123,7 +123,7 @@ def sarvam_tts(text: str, lang: str = "en") -> bytes:
                 "loudness":              1.5,
                 "speech_sample_rate":    22050,
                 "enable_preprocessing":  True,
-                "model":                 "bulbul:v1",
+                "model":                 "bulbul:v2",
             },
             timeout=15,
         )
@@ -191,7 +191,7 @@ def generate_voice(text: str, lang: str = "en") -> bytes:
     Generate Indian female voice audio.
 
     Priority:
-      1. Sarvam AI  — natural Indian female voice (anushka)
+      1. Sarvam AI  — natural Indian female voice (meera)
       2. gTTS       — Indian accent fallback
 
     Edge-TTS is NOT used (blocked on Railway/cloud IPs).
