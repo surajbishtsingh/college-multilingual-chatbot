@@ -22,7 +22,7 @@ SARVAM_LANG_MAP = {
 
 # Sarvam Indian female speakers
 # Options: meera, pavithra, maitreyi, arvind, amol, amartya
-SARVAM_SPEAKER = "suhani"    # Pleasant and soothing Indian female voice
+SARVAM_SPEAKER = "neha"    # Pleasant and soothing Indian female voice
 
 
 # ══════════════════════════════════════════════════════════════════════
