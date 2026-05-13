@@ -123,7 +123,7 @@ def sarvam_tts(text: str, lang: str = "en") -> bytes:
                 "loudness":              1.5,
                 "speech_sample_rate":    22050,
                 "enable_preprocessing":  True,
-                "model":                 "bulbul:v2",
+                "model":                 "bulbul:v3",
             },
             timeout=15,
         )
