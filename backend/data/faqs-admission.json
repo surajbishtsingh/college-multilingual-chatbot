@@ -62,5 +62,125 @@
     "category": "eligibility",
     "tags": ["mca"],
     "lang": "en"
+  },
+  {
+    "id": 1,
+    "question": "What is the admission process for B.Tech Lateral Entry at GBPIET?",
+    "answer": "Admission to the second year of B.Tech (Lateral Entry) at GBPIET is based on merit, subject to the minimum eligibility criteria mentioned in the admission brochure.",
+    "category": "admission",
+    "tags": ["btech", "lateral entry", "admission"],
+    "lang": "en"
+  },
+  {
+    "id": 2,
+    "question": "What is the eligibility criteria for B.Tech Lateral Entry at GBPIET?",
+    "answer": "Eligibility for B.Tech Lateral Entry at GBPIET: Option 1: Candidates must have passed a minimum three-year Diploma examination (or two-year Diploma for lateral entry) with at least 45% marks (40% for reserved category) in any branch of Engineering and Technology. OR Option 2: Candidates must have a B.Sc. degree from a recognized University with at least 45% marks (40% for reserved category) and should have passed 10+2 with Mathematics as a subject.",
+    "category": "admission",
+    "tags": ["btech", "lateral entry", "eligibility", "diploma", "bsc"],
+    "lang": "en"
+  },
+  {
+    "id": 3,
+    "question": "Can Diploma students get direct second year admission in B.Tech at GBPIET?",
+    "answer": "Yes, Diploma holders can get direct admission into the second year of B.Tech at GBPIET through Lateral Entry, subject to merit and eligibility criteria.",
+    "category": "admission",
+    "tags": ["diploma", "btech", "lateral entry", "second year"],
+    "lang": "en"
+  },
+  {
+    "id": 4,
+    "question": "Can B.Sc students apply for B.Tech Lateral Entry at GBPIET?",
+    "answer": "Yes, B.Sc. graduates from a recognized University with at least 45% marks (40% for reserved category) and Mathematics in 10+2 can apply for B.Tech Lateral Entry at GBPIET.",
+    "category": "admission",
+    "tags": ["bsc", "btech", "lateral entry", "eligibility"],
+    "lang": "en"
+  },
+  {
+    "id": 5,
+    "question": "What is the admission process for M.Tech at GBPIET?",
+    "answer": "Admission to M.Tech programmes at GBPIET is conducted through GATE. Admission and counselling for M.Tech courses are processed directly by the college.",
+    "category": "mtech",
+    "tags": ["mtech", "admission", "gate"],
+    "lang": "en"
+  },
+  {
+    "id": 6,
+    "question": "How many students are admitted in M.Tech at GBPIET?",
+    "answer": "GBPIET admits nearly 70 students in various M.Tech postgraduate programmes through GATE.",
+    "category": "mtech",
+    "tags": ["mtech", "students", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 7,
+    "question": "What are the M.Tech courses available at GBPIET?",
+    "answer": "GBPIET offers M.Tech programmes in Computer Science and Engineering, Digital Signal Processing, Biotechnology, Production Engineering, Thermal Engineering, Geotechnology, and Infrastructure.",
+    "category": "mtech",
+    "tags": ["mtech", "courses", "programs"],
+    "lang": "en"
+  },
+  {
+    "id": 8,
+    "question": "How many seats are available in M.Tech CSE at GBPIET?",
+    "answer": "M.Tech Computer Science and Engineering at GBPIET has 18 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "cse", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 9,
+    "question": "How many seats are available in M.Tech Digital Signal Processing at GBPIET?",
+    "answer": "M.Tech Digital Signal Processing at GBPIET has 10 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "dsp", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 10,
+    "question": "How many seats are available in M.Tech Biotechnology at GBPIET?",
+    "answer": "M.Tech Biotechnology at GBPIET has 25 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "biotechnology", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 11,
+    "question": "How many seats are available in M.Tech Production Engineering at GBPIET?",
+    "answer": "M.Tech Production Engineering at GBPIET has 18 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "production engineering", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 12,
+    "question": "How many seats are available in M.Tech Thermal Engineering at GBPIET?",
+    "answer": "M.Tech Thermal Engineering at GBPIET has 18 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "thermal engineering", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 13,
+    "question": "How many seats are available in M.Tech Geotechnology at GBPIET?",
+    "answer": "M.Tech Geotechnology at GBPIET has 18 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "geotechnology", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 14,
+    "question": "How many seats are available in M.Tech Infrastructure at GBPIET?",
+    "answer": "M.Tech Infrastructure at GBPIET has 18 seats.",
+    "category": "mtech",
+    "tags": ["mtech", "infrastructure", "seats"],
+    "lang": "en"
+  },
+  {
+    "id": 15,
+    "question": "What is the eligibility criteria for M.Tech admission at GBPIET?",
+    "answer": "Candidates applying for M.Tech at GBPIET must have passed a Bachelor’s Degree or equivalent in the relevant field with at least 50% marks (45% marks for reserved category candidates).",
+    "category": "mtech",
+    "tags": ["mtech", "eligibility", "admission"],
+    "lang": "en"
   }
 ]
