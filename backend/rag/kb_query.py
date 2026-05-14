@@ -403,28 +403,87 @@ def detect_answer_lang(answer_text: str, item_lang: str = "") -> str:
 
 
 def translate_answer_if_needed(answer: str, lang: str, question: str) -> str:
-    answer_is_hindi = is_hindi_text(answer)
-    if lang == "en" and not answer_is_hindi:
+    answer_lang = detect_answer_lang(answer)
+    
+    # Already in correct language
+    if answer_lang == lang:
         return answer
-    if lang in ("hi", "ga", "ku") and answer_is_hindi:
-        return answer
+    
+    # English/Hindi → Garhwali
+    if lang == "ga":
+        prompt = (
+            f"Translate this college information into Garhwali language (गढ़वाली).\n"
+            f"Use Garhwali words: छन, छ, अर, कुण, बटि, मिलद, हूँद, कनकै, यु, वु।\n"
+            f"Keep names, numbers, URLs unchanged.\n"
+            f"Return ONLY the Garhwali translation.\n\n{answer}"
+        )
+        system = (
+            "You are a Garhwali translator. Translate to Garhwali ONLY. "
+            "Use words like छन, छ, अर, कुण, बटि, मिलद। "
+            "Keep proper nouns, numbers, URLs unchanged."
+        )
+        print(f"[TRANSLATE] → Garhwali...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=500, temperature=0.1,
+        )
+        return result if result else answer
 
-    if lang == "en":
-        prompt = f"Translate to English. Return ONLY translated text.\n\n{answer}"
-        system = "Translator. Hindi→English. Keep names, numbers, URLs unchanged."
-    else:
+    # English/Hindi → Kumauni
+    if lang == "ku":
+        prompt = (
+            f"Translate this college information into Kumauni language (कुमाउनी).\n"
+            f"Use Kumauni words: छु, छन, राछ, हुनी, कनाँ, लै, बटा, ज्याणी, कैं।\n"
+            f"Keep names, numbers, URLs unchanged.\n"
+            f"Return ONLY the Kumauni translation.\n\n{answer}"
+        )
+        system = (
+            "You are a Kumauni translator. Translate to Kumauni ONLY. "
+            "Use words like छु, छन, लै, बटा, ज्याणी। "
+            "Keep proper nouns, numbers, URLs unchanged."
+        )
+        print(f"[TRANSLATE] → Kumauni...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=500, temperature=0.1,
+        )
+        return result if result else answer
+
+    # English → Hindi
+    if lang in ("hi", "ga", "ku") and answer_lang == "en":
         prompt = f"Translate to Hindi (Devanagari). Return ONLY translated text.\n\n{answer}"
         system = "Translator. English→Hindi. Keep names, numbers, URLs unchanged."
+        print(f"[TRANSLATE] → Hindi...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=400, temperature=0.1,
+        )
+        return result if result else answer
 
-    print(f"[TRANSLATE] lang={lang}...")
-    result = groq_call(
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user",   "content": prompt},
-        ],
-        max_tokens=400, temperature=0.1,
-    )
-    return result if result else answer
+    # Hindi → English
+    if lang == "en" and answer_lang in ("hi", "ga", "ku"):
+        prompt = f"Translate to English. Return ONLY translated text.\n\n{answer}"
+        system = "Translator. Hindi→English. Keep names, numbers, URLs unchanged."
+        print(f"[TRANSLATE] → English...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=400, temperature=0.1,
+        )
+        return result if result else answer
+
+    return answer
 
 
 # ══════════════════════════════════════════════════════════════════════
