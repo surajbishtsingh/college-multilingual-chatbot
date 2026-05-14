@@ -146,5 +146,23 @@
     "category": "academics",
     "tags": ["phd"],
     "lang": "en"
-  }
+  },
+  {
+  "question": "Does GBPIET offer BCA?",
+  "answer": "GBPIET does not currently offer BCA (Bachelor of Computer Applications). The college offers B.Tech, M.Tech, MCA, MBA and Ph.D programs. For details visit https://gbpiet.ac.in",
+  "category": "courses",
+  "lang": "en"
+},
+{
+  "question": "BCA",
+  "answer": "GBPIET does not currently offer BCA. Available courses are B.Tech, M.Tech, MCA, MBA and Ph.D. Visit https://gbpiet.ac.in for more details.",
+  "category": "courses",
+  "lang": "en"
+},
+{
+  "question": "bca course available hai",
+  "answer": "GBPIET mein abhi BCA course nahi hai. Uplabdh courses hain: B.Tech, M.Tech, MCA, MBA aur Ph.D. Adhik jaankari ke liye https://gbpiet.ac.in dekhein.",
+  "category": "courses",
+  "lang": "hi"
+}
 ]
