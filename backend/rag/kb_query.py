@@ -995,7 +995,7 @@ LANG_SYSTEM_PROMPTS = {
         "3. NEVER start with 'Respected', 'Dear' or any salutation. "
         "4. NEVER repeat the question. "
         "5. Use Garhwali words: छन, छ, अर, कुण, बटि, मिलद, हूँद, कनकै। "
-        "6. Address user as 'आप' or 'थैं'. "
+        "6. Address user as 'आप'"
         "7. Use feminine Garhwali grammar. "
         f"8. If answer not found: माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा।"
     ),
