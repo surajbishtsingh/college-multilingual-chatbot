@@ -560,17 +560,34 @@ def ga_ku_to_hi_en(text: str) -> str:
 # KUMAUNI SYNONYM MAP
 # ══════════════════════════════════════════════════════════════════════
 KUMAUNI_SYNONYM_MAP = {
-    'लिजी': 'ke liye', 'काज': 'ke liye',
-    'रैण': 'rehna',    'बौण': 'baithna',
-    'कते': 'kahan',    'कसि': 'kaise',
-    'कतु': 'kitna',    'कै': 'kitne',
-    'ज्याणी': 'jankari', 'भर्ति': 'admission',
-    'चेलो': 'ladka',   'चेली': 'ladki',
-    'दाम': 'fees',     'टक': 'paisa',
-    'रैण-बौण': 'hostel', 'खाण-पीण': 'mess food',
-    'सुबिद': 'facility', 'नौकरी': 'job placement',
-    'कमाइ': 'salary',  'पगार': 'salary',
-    'बटा': 'from',     'हैबर': 'from after',
+    # Basic Interrogatives (Sawal-Jawab)
+    'को': 'who / kaun',
+    'के': 'what / kya',
+    'कथै': 'where / kahan',  # Your file uses 'kathai'
+    'कते': 'where / kahan',
+    'कसि': 'how / kaise',
+    'कतु': 'how much / kitna',
+    'किलै': 'why / kyun',    # From your file: 'kilai'
+    
+    # Pronouns & People (Log aur Rishte)
+    'म्यर': 'my / mera',     # From your file: 'myar'
+    'तुमार': 'your / tumhara',
+    'चेलो': 'boy / ladka',
+    'चेली': 'girl / ladki',
+    'हमार': 'our / hamara',
+    
+    # Verbs & Actions (Kaam)
+    'लिया': 'bring / lao',   # From your file: 'lyaa'
+    'ज्याणी': 'info / jankari',
+    'भयो': 'happened / hua',
+    'नी': 'no / nahi',       # From your file: 'ni'
+    'हिटा': 'walk / chalo',
+    
+    # Postpositions (Connectors)
+    'बटा': 'from / se',
+    'हैबेर': 'after / kar ke',
+    'लिजीये': 'for / liye',  # From your file: 'lijiye'
+    'कैं': 'to / ko',
 }
 
 def ku_to_hi_en(text: str) -> str:
@@ -1149,6 +1166,7 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     if q_lower in IDENTITY_Q or q_no_name in IDENTITY_Q:
         print("[RESULT] Identity")
         return clean_response(IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"]))
+        
 
     # ── User introducing themselves ───────────────────────────────────
     _intro_words = {"i am", "my name is", "mera naam", "naam hai", "naam h"}
