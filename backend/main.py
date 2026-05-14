@@ -200,8 +200,8 @@ async def startup_event():
     try:
         from qdrant_setup import get_client as _get_qdrant
         _qc = _get_qdrant()
-        _info = _qc.get_collection("website")
-        if _info.points_count < 100:
+        _info = _qc.get_collection("gbpiet_web")  # ← sirf ye badla
+        if _info.points_count < 10:               # ← 100 se 10 kiya
             print(f"[Startup] ⚠️ Qdrant website has only {_info.points_count} points — auto-scraping...")
             import threading
             def _auto_scrape():
