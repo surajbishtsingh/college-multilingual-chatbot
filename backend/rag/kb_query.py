@@ -560,36 +560,38 @@ def ga_ku_to_hi_en(text: str) -> str:
 # KUMAUNI SYNONYM MAP
 # ══════════════════════════════════════════════════════════════════════
 KUMAUNI_SYNONYM_MAP = {
-    # Basic Interrogatives (Sawal-Jawab)
-    'को': 'who / kaun',
-    'के': 'what / kya',
-    'कथै': 'where / kahan',  # Your file uses 'kathai'
-    'कते': 'where / kahan',
-    'कसि': 'how / kaise',
-    'कतु': 'how much / kitna',
-    'किलै': 'why / kyun',    # From your file: 'kilai'
-    
-    # Pronouns & People (Log aur Rishte)
-    'म्यर': 'my / mera',     # From your file: 'myar'
-    'तुमार': 'your / tumhara',
-    'चेलो': 'boy / ladka',
-    'चेली': 'girl / ladki',
-    'हमार': 'our / hamara',
-    
-    # Verbs & Actions (Kaam)
-    'लिया': 'bring / lao',   # From your file: 'lyaa'
-    'ज्याणी': 'info / jankari',
-    'भयो': 'happened / hua',
-    'नी': 'no / nahi',       # From your file: 'ni'
-    'हिटा': 'walk / chalo',
-    
-    # Postpositions (Connectors)
-    'बटा': 'from / se',
-    'हैबेर': 'after / kar ke',
-    'लिजीये': 'for / liye',  # From your file: 'lijiye'
-    'कैं': 'to / ko',
-}
+    # --- NEGATION (sabse important fix) ---
+    'नाइ':    'नहीं',
+    'छु नाइ': 'न्हां छ',   # "is not" → correct Kumauni negation
+    'नी छ':   'न्हां छ',
+    'न छ':    'न्हां छ',
 
+    # --- CONJUNCTIONS ---
+    'र':      'और',        # 'र' Garhwali है, Kumauni नहीं
+    
+    # --- FOR/TO (direction words) ---
+    'लै हुनी':  'लिजी',    # "for getting" 
+    'लै':       'लिजी',    # "for"
+    'कनाँ':     'लिजी',    # wrong usage fix
+    
+    # --- VISIT/GO ---
+    'जावा':   'जाया',      # Garhwali → Kumauni
+    'जा':     'जाया',
+    
+    # --- EXISTING (keep these) ---
+    'बटा':    'from / se',
+    'छु':     'है / छ',
+    'छन':     'हैं / छन',
+    'ज्याणी': 'जानकारी',
+    'लिजीये': 'लिजी',
+    'कैं':    'को',
+    'हैबेर':  'के बाद',
+    'कसि':    'कैसे',
+    'कतु':    'कितना',
+    'किलै':   'क्यों',
+    'को':     'कौन',
+    'के':     'क्या',
+}
 def ku_to_hi_en(text: str) -> str:
     t = text.lower()
     for word, tr in sorted(KUMAUNI_SYNONYM_MAP.items(), key=lambda x: -len(x[0])):
