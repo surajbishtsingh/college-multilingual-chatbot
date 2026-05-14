@@ -351,7 +351,7 @@ def crawl_website(
     to_visit = []
 
     # Add priority pages
-    for path in PRIORITY_URLS:
+    for path in PRIORITY_PAGES:
         url = start_url.rstrip("/") + path
         to_visit.append(url)
 
