@@ -1079,12 +1079,15 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     question = question.strip()
 
     # ── Greeting ──────────────────────────────────────────────────────
-    if question.lower().strip() in GREETINGS:
+    q_lower = question.lower().strip()
+    q_no_name = re.sub(r'\b(diksha|disha|dixa|दीक्षा)\b', '', q_lower).strip()
+    
+    if q_lower in GREETINGS or q_no_name in GREETINGS:
         print("[RESULT] Greeting")
         return clean_response(GREETING_RESPONSE.get(lang, GREETING_RESPONSE["en"]))
 
-    # ── Identity ──────────────────────────────────────────────────────
-    if question.lower().strip() in IDENTITY_Q:
+# ── Identity ──────────────────────────────────────────────────────
+    if q_lower in IDENTITY_Q or q_no_name in IDENTITY_Q:
         print("[RESULT] Identity")
         return clean_response(IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"]))
 
