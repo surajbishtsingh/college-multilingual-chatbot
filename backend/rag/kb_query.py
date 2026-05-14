@@ -218,16 +218,16 @@ IDENTITY_Q = {
 
 GREETING_RESPONSE = {
     "en": "Hello! I'm Diksha, the official AI assistant for GBPIET, Pauri Garhwal. Ask me about admissions, fees, hostel, placements, faculty, courses and more!",
-    "hi": "नमस्ते! मैं दीक्षा हूँ — GBPIET की आधिकारिक AI सहायिका। आप मुझसे admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
+    "hi": "नमस्ते! GBPIET की आधिकारिक AI सहायिका दीक्षा आपकी सेवा में हूँ। admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
     "ga": "समन्या जी! जीबीपीआईईटी की AI दगड़िया छुं। कुछ भी पुछि सकदन।",
     "ku": "नमस्कार जी! जीबीपीआईईटी की AI दगड़िया छु। कुछ भी पूछ सकदन।",
 }
 
 IDENTITY_RESPONSE = {
-    "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal, Uttarakhand. I help with college information in English, Hindi, Garhwali and Kumauni. Visit: {GBPIET_URL}",
-    "hi": f"मैं दीक्षा हूँ — GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot। वेबसाइट: {GBPIET_URL}",
-    "ga": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छुं — नाम दीक्षा छ। admission, fees, hostel बारे माँ पुछि सकदन। वेबसाइट: {GBPIET_URL}",
-    "ku": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छु — नाम दीक्षा छ। admission, fees, hostel बारे मा पूछ सकदन। वेबसाइट: {GBPIET_URL}",
+    "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal. Visit: {GBPIET_URL}",
+    "hi": f"GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot दीक्षा हूँ। वेबसाइट: {GBPIET_URL}",
+    "ga": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छुं — नाम दीक्षा छ। वेबसाइट: {GBPIET_URL}",
+    "ku": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छु — नाम दीक्षा छ। वेबसाइट: {GBPIET_URL}",
 }
 
 OUT_OF_SCOPE_RESPONSE = {
