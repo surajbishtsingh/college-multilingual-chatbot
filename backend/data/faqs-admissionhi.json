@@ -62,5 +62,125 @@
     "category": "eligibility",
     "tags": ["mca"],
     "lang": "hi"
+  },
+  {
+    "id": 1,
+    "question": "GBPIET में B.Tech लेटरल एंट्री का प्रवेश प्रक्रिया क्या है?",
+    "answer": "GBPIET में B.Tech (लेटरल एंट्री) के दूसरे वर्ष में प्रवेश मेरिट के आधार पर दिया जाता है, जो प्रवेश पुस्तिका में दिए गए न्यूनतम पात्रता मानदंडों के अधीन होता है।",
+    "category": "admission",
+    "tags": ["btech", "lateral entry", "admission"],
+    "lang": "hi"
+  },
+  {
+    "id": 2,
+    "question": "GBPIET में B.Tech लेटरल एंट्री के लिए पात्रता मानदंड क्या है?",
+    "answer": "GBPIET में B.Tech लेटरल एंट्री के लिए पात्रता: विकल्प 1: उम्मीदवार के पास इंजीनियरिंग एवं प्रौद्योगिकी की किसी भी शाखा में न्यूनतम तीन वर्षीय डिप्लोमा (या लेटरल एंट्री हेतु दो वर्षीय डिप्लोमा) में कम से कम 45% अंक (आरक्षित वर्ग हेतु 40%) होने चाहिए। अथवा विकल्प 2: उम्मीदवार के पास मान्यता प्राप्त विश्वविद्यालय से B.Sc. डिग्री में कम से कम 45% अंक (आरक्षित वर्ग हेतु 40%) होने चाहिए तथा 10+2 में गणित विषय होना चाहिए।",
+    "category": "admission",
+    "tags": ["btech", "lateral entry", "eligibility", "diploma", "bsc"],
+    "lang": "hi"
+  },
+  {
+    "id": 3,
+    "question": "क्या डिप्लोमा छात्र GBPIET में B.Tech के दूसरे वर्ष में सीधे प्रवेश ले सकते हैं?",
+    "answer": "हाँ, डिप्लोमा धारक छात्र GBPIET में लेटरल एंट्री के माध्यम से B.Tech के दूसरे वर्ष में सीधे प्रवेश प्राप्त कर सकते हैं, बशर्ते वे मेरिट और पात्रता मानदंडों को पूरा करते हों।",
+    "category": "admission",
+    "tags": ["diploma", "btech", "lateral entry", "second year"],
+    "lang": "hi"
+  },
+  {
+    "id": 4,
+    "question": "क्या B.Sc छात्र GBPIET में B.Tech लेटरल एंट्री के लिए आवेदन कर सकते हैं?",
+    "answer": "हाँ, मान्यता प्राप्त विश्वविद्यालय से B.Sc. में कम से कम 45% अंक (आरक्षित वर्ग हेतु 40%) प्राप्त करने वाले तथा 10+2 में गणित विषय रखने वाले छात्र GBPIET में B.Tech लेटरल एंट्री के लिए आवेदन कर सकते हैं।",
+    "category": "admission",
+    "tags": ["bsc", "btech", "lateral entry", "eligibility"],
+    "lang": "hi"
+  },
+  {
+    "id": 5,
+    "question": "GBPIET में M.Tech का प्रवेश प्रक्रिया क्या है?",
+    "answer": "GBPIET में M.Tech कार्यक्रमों में प्रवेश GATE के माध्यम से किया जाता है। M.Tech पाठ्यक्रमों का प्रवेश और काउंसलिंग सीधे कॉलेज द्वारा संचालित किया जाता है।",
+    "category": "mtech",
+    "tags": ["mtech", "admission", "gate"],
+    "lang": "hi"
+  },
+  {
+    "id": 6,
+    "question": "GBPIET में M.Tech में कितने छात्रों को प्रवेश दिया जाता है?",
+    "answer": "GBPIET में विभिन्न M.Tech स्नातकोत्तर कार्यक्रमों में GATE के माध्यम से लगभग 70 छात्रों को प्रवेश दिया जाता है।",
+    "category": "mtech",
+    "tags": ["mtech", "students", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 7,
+    "question": "GBPIET में कौन-कौन से M.Tech पाठ्यक्रम उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech कार्यक्रम कंप्यूटर साइंस एंड इंजीनियरिंग, डिजिटल सिग्नल प्रोसेसिंग, बायोटेक्नोलॉजी, प्रोडक्शन इंजीनियरिंग, थर्मल इंजीनियरिंग, जियोटेक्नोलॉजी और इंफ्रास्ट्रक्चर में उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "courses", "programs"],
+    "lang": "hi"
+  },
+  {
+    "id": 8,
+    "question": "GBPIET में M.Tech CSE में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech कंप्यूटर साइंस एंड इंजीनियरिंग में 18 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "cse", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 9,
+    "question": "GBPIET में M.Tech डिजिटल सिग्नल प्रोसेसिंग में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech डिजिटल सिग्नल प्रोसेसिंग में 10 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "dsp", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 10,
+    "question": "GBPIET में M.Tech बायोटेक्नोलॉजी में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech बायोटेक्नोलॉजी में 25 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "biotechnology", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 11,
+    "question": "GBPIET में M.Tech प्रोडक्शन इंजीनियरिंग में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech प्रोडक्शन इंजीनियरिंग में 18 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "production engineering", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 12,
+    "question": "GBPIET में M.Tech थर्मल इंजीनियरिंग में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech थर्मल इंजीनियरिंग में 18 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "thermal engineering", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 13,
+    "question": "GBPIET में M.Tech जियोटेक्नोलॉजी में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech जियोटेक्नोलॉजी में 18 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "geotechnology", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 14,
+    "question": "GBPIET में M.Tech इंफ्रास्ट्रक्चर में कितनी सीटें उपलब्ध हैं?",
+    "answer": "GBPIET में M.Tech इंफ्रास्ट्रक्चर में 18 सीटें उपलब्ध हैं।",
+    "category": "mtech",
+    "tags": ["mtech", "infrastructure", "seats"],
+    "lang": "hi"
+  },
+  {
+    "id": 15,
+    "question": "GBPIET में M.Tech प्रवेश के लिए पात्रता मानदंड क्या है?",
+    "answer": "GBPIET में M.Tech में प्रवेश के लिए उम्मीदवार के पास संबंधित क्षेत्र में स्नातक डिग्री या समकक्ष योग्यता में कम से कम 50% अंक (आरक्षित वर्ग हेतु 45%) होने चाहिए।",
+    "category": "mtech",
+    "tags": ["mtech", "eligibility", "admission"],
+    "lang": "hi"
   }
 ]
