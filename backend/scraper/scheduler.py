@@ -42,7 +42,7 @@ def index_website_chunks(chunks: list[dict]) -> int:
         import uuid
 
         client     = get_client()
-        collection = "website"
+        collection = "gbpiet_web"
 
         # ── Ensure website collection exists ──────────────────────────
         existing = {c.name for c in client.get_collections().collections}
@@ -164,30 +164,6 @@ def run_scrape_job():
         scrape_status["status"] = "error"
         scrape_status["errors"].append(error_msg)
         print(f"[Scheduler] ❌ Scrape failed: {error_msg}")
-
-
-def start_scheduler():
-    """Start the background scheduler."""
-    global _scheduler
-
-    if not ENABLE_AUTO_SCRAPE:
-        print("[Scheduler] Auto-scrape disabled")
-        return
-
-    if _scheduler and _scheduler.running:
-        return
-
-    _scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
-    _scheduler.add_job(
-        func=run_scrape_job,
-        trigger=IntervalTrigger(hours=SCRAPE_INTERVAL_HOURS),
-        id="website_scrape",
-        name="Website Scraper",
-        replace_existing=True,
-        misfire_grace_time=3600,
-    )
-    _scheduler.start()
-    print(f"[Scheduler] ✅ Started — runs every {SCRAPE_INTERVAL_HOURS} hours")
 
 
 def start_scheduler():
