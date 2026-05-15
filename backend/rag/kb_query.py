@@ -1,18 +1,14 @@
 # kb_query.py — Complete RAG pipeline
 # ✅ 4 Groq keys (8-attempt fallback) + Gemini fallback
 # ✅ LLM-based out-of-scope detection
-# ✅ STRICT LANGUAGE ISOLATION:
-#      ga  → sirf Garhwali DB answers, LLM/translate BILKUL NAHI
-#      ku  → sirf Kumauni DB answers,  LLM/translate BILKUL NAHI
-#      hi  → sirf Hindi DB answers,    LLM allowed (hi only)
-#      en  → sirf English DB answers,  LLM allowed (en only)
+# ✅ Strict language: ga→Garhwali ONLY, ku→Kumauni ONLY, hi→Hindi ONLY, en→English ONLY
 # ✅ Bot NEVER starts answer with own name ("दीक्षा छु / दीक्षा छुं")
 # ✅ "Respected" / "Dear" salutations removed
 # ✅ Question NOT repeated in answer
 # ✅ Emoji stripped before TTS / response
 # ✅ Feminine grammar enforced
 # ✅ Language drift detector + enforcer (ga/ku correction pass)
-# ✅ translate_answer_if_needed REMOVED — no cross-language translation
+# ✅ ga/ku → DATASET ONLY (no LLM), Roman↔Devanagari bridge for mixed queries
 
 import os
 import json
@@ -88,6 +84,93 @@ GBPIET_URL       = "https://gbpiet.ac.in"
 
 
 # ══════════════════════════════════════════════════════════════════════
+# ROMAN ↔ DEVANAGARI BRIDGE
+# Used so that Roman-script queries ("hostel kitne h") match
+# Devanagari dataset entries ("GBPIET मा कति हॉस्टल छन्?") and vice-versa
+# ══════════════════════════════════════════════════════════════════════
+ROMAN_TO_DEVANAGARI = {
+    "hostel":      "हॉस्टल",
+    "hostels":     "हॉस्टल",
+    "hostle":      "हॉस्टल",
+    "fees":        "फीस",
+    "fee":         "फीस",
+    "admission":   "प्रवेश",
+    "admissions":  "प्रवेश",
+    "director":    "निदेशक",
+    "hod":         "विभागाध्यक्ष",
+    "warden":      "वार्डन",
+    "placement":   "प्लेसमेंट",
+    "placements":  "प्लेसमेंट",
+    "library":     "पुस्तकालय",
+    "canteen":     "कैंटीन",
+    "result":      "परिणाम",
+    "results":     "परिणाम",
+    "faculty":     "संकाय",
+    "exam":        "परीक्षा",
+    "exams":       "परीक्षा",
+    "sports":      "खेल",
+    "transport":   "परिवहन",
+    "ragging":     "रैगिंग",
+    "bank":        "बैंक",
+    "mess":        "मेस",
+    "contact":     "संपर्क",
+    "scholarship": "छात्रवृत्ति",
+    "scholarships":"छात्रवृत्ति",
+    "course":      "कोर्स",
+    "courses":     "कोर्स",
+    "branch":      "शाखा",
+    "branches":    "शाखा",
+    "department":  "विभाग",
+    "departments": "विभाग",
+    "btech":       "बी.टेक",
+    "b.tech":      "बी.टेक",
+    "mtech":       "एम.टेक",
+    "m.tech":      "एम.टेक",
+    "mca":         "एमसीए",
+    "phd":         "पीएचडी",
+    "ph.d":        "पीएचडी",
+    "cse":         "सीएसई",
+    "ece":         "ईसीई",
+    "civil":       "सिविल",
+    "electrical":  "इलेक्ट्रिकल",
+    "mechanical":  "मैकेनिकल",
+    "biotech":     "बायोटेक्नोलॉजी",
+    "biotechnology":"बायोटेक्नोलॉजी",
+    "dean":        "डीन",
+    "registrar":   "रजिस्ट्रार",
+    "chairman":    "अध्यक्ष",
+    "boys":        "नौना",
+    "girls":       "नौन्यिँ",
+    "first":       "पैलि",
+    "year":        "साल",
+    "semester":    "सेमेस्टर",
+    "wifi":        "वाई-फाई",
+    "internet":    "इंटरनेट",
+    "bus":         "बस",
+    "health":      "स्वास्थ्य",
+    "atm":         "एटीएम",
+    "auditorium":  "ऑडिटोरियम",
+    "gate":        "गेट",
+    "jee":         "जेईई",
+    "total":       "कुल",
+    "how many":    "कति",
+    "kitne":       "कति",
+    "kitna":       "कति",
+    "kaun":        "कु",
+    "kon":         "कु",
+    "kahan":       "कख",
+    "kya":         "क्या",
+    "bca":         "बीसीए",
+    "mba":         "एमबीए",
+    "nptel":       "एनपीटीईएल",
+    "ieee":        "आईईईई",
+}
+
+# Reverse map: Devanagari → Roman
+DEVANAGARI_TO_ROMAN = {v: k for k, v in ROMAN_TO_DEVANAGARI.items()}
+
+
+# ══════════════════════════════════════════════════════════════════════
 # GROQ CALL — 8 attempts, then Gemini
 # ══════════════════════════════════════════════════════════════════════
 def _groq_call(client, model, messages, max_tokens, temperature):
@@ -156,7 +239,6 @@ _EMOJI_PATTERN = re.compile(
     flags=re.UNICODE,
 )
 
-# Patterns that indicate bot is introducing itself at the start
 _SELF_INTRO_PATTERN = re.compile(
     r'^(Respected\s+\w+[\s,]*'
     r'|Dear\s+\w+[\s,]*'
@@ -172,7 +254,6 @@ _SELF_INTRO_PATTERN = re.compile(
 def clean_response(text: str) -> str:
     """Strip emojis, self-intros, salutations, extra whitespace."""
     text = _EMOJI_PATTERN.sub("", text)
-    # Remove self-intro / salutation at start (loop for nested)
     for _ in range(3):
         text = _SELF_INTRO_PATTERN.sub("", text).strip()
     if text:
@@ -242,16 +323,6 @@ OUT_OF_SCOPE_RESPONSE = {
     "ku": "माफ करिया, यु सवाल मेरे syllabus बटा भ्यार छ! मी सिर्फ GBPIET बारे मा ज्याणी दे सकदु।",
 }
 
-# ══════════════════════════════════════════════════════════════════════
-# FALLBACK MESSAGES — per language
-# ══════════════════════════════════════════════════════════════════════
-NO_ANSWER_FALLBACK = {
-    "en": f"Sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030.",
-    "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।",
-    "ga": f"माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
-    "ku": f"माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।",
-}
-
 
 # ══════════════════════════════════════════════════════════════════════
 # LLM-BASED OUT-OF-SCOPE DETECTOR
@@ -261,27 +332,23 @@ _scope_cache: dict = {}
 def is_out_of_scope(question: str) -> bool:
     q = question.strip().lower()
 
-    # Always allow very short replies (conversational follow-ups)
     if len(q.split()) <= 4:
         return False
 
     if q in GREETINGS or q in IDENTITY_Q:
         return False
 
-    # User introducing themselves → never out of scope
     _intro_words = {"i am", "i'm", "my name", "mera naam", "main hoon", "naam hai"}
     if any(iw in q for iw in _intro_words):
         print(f"[SCOPE] User intro detected → IN SCOPE")
         return False
 
-    # If matches any role/person in SPECIFIC_ROLE_MAP → always in scope
     q_clean = re.sub(r'[^\w\s]', '', q).strip()
     for phrase in SPECIFIC_ROLE_MAP:
         if phrase in q_clean:
             print(f"[SCOPE] Role map match '{phrase}' → IN SCOPE")
             return False
 
-    # If contains known faculty/staff name keywords → in scope
     STAFF_KEYWORDS = {
         "priti", "dimri", "rawat", "nautiyal", "negi", "bisht", "kunwar",
         "narayan", "siddharth", "ghansela", "professor", "prof", "dr",
@@ -403,25 +470,96 @@ def is_hindi_text(text: str) -> bool:
 
 
 def detect_answer_lang(answer_text: str, item_lang: str = "") -> str:
-    """
-    Priority order:
-    1. item_lang field (agar JSON mein explicitly set hai)
-    2. GA/KU markers se detect karo
-    3. Script ratio se detect karo
-    """
     if item_lang in ("ga", "garhwali"): return "ga"
     if item_lang in ("ku", "kumauni"):  return "ku"
     if item_lang in ("hi", "hindi"):    return "hi"
     if item_lang == "en":               return "en"
-    # Marker-based detection
     if any(m in answer_text for m in GA_MARKERS): return "ga"
     if any(m in answer_text for m in KU_MARKERS): return "ku"
-    # Script ratio
     latin = sum(1 for c in answer_text if c.isascii() and c.isalpha())
     total = len(answer_text.replace(" ", ""))
     if total > 0 and (latin / total) > 0.5: return "en"
     dev = sum(1 for c in answer_text if '\u0900' <= c <= '\u097F')
     return "hi" if dev > 5 else "en"
+
+
+def translate_answer_if_needed(answer: str, lang: str, question: str) -> str:
+    answer_lang = detect_answer_lang(answer)
+
+    if answer_lang == lang:
+        return answer
+
+    if lang == "ga":
+        prompt = (
+            f"Translate this college information into Garhwali language (गढ़वाली).\n"
+            f"Use Garhwali words: छन, छ, अर, कुण, बटि, मिलद, हूँद, कनकै, यु, वु।\n"
+            f"Keep names, numbers, URLs unchanged.\n"
+            f"Return ONLY the Garhwali translation.\n\n{answer}"
+        )
+        system = (
+            "You are a Garhwali translator. Translate to Garhwali ONLY. "
+            "Use words like छन, छ, अर, कुण, बटि, मिलद। "
+            "Keep proper nouns, numbers, URLs unchanged."
+        )
+        print(f"[TRANSLATE] → Garhwali...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=500, temperature=0.1,
+        )
+        return result if result else answer
+
+    if lang == "ku":
+        prompt = (
+            f"Translate this college information into Kumauni language (कुमाउनी).\n"
+            f"Use Kumauni words: छु, छन, राछ, हुनी, कनाँ, लै, बटा, ज्याणी, कैं।\n"
+            f"Keep names, numbers, URLs unchanged.\n"
+            f"Return ONLY the Kumauni translation.\n\n{answer}"
+        )
+        system = (
+            "You are a Kumauni translator. Translate to Kumauni ONLY. "
+            "Use words like छु, छन, लै, बटा, ज्याणी। "
+            "Keep proper nouns, numbers, URLs unchanged."
+        )
+        print(f"[TRANSLATE] → Kumauni...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=500, temperature=0.1,
+        )
+        return result if result else answer
+
+    if lang in ("hi", "ga", "ku") and answer_lang == "en":
+        prompt = f"Translate to Hindi (Devanagari). Return ONLY translated text.\n\n{answer}"
+        system = "Translator. English→Hindi. Keep names, numbers, URLs unchanged."
+        print(f"[TRANSLATE] → Hindi...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=400, temperature=0.1,
+        )
+        return result if result else answer
+
+    if lang == "en" and answer_lang in ("hi", "ga", "ku"):
+        prompt = f"Translate to English. Return ONLY translated text.\n\n{answer}"
+        system = "Translator. Hindi→English. Keep names, numbers, URLs unchanged."
+        print(f"[TRANSLATE] → English...")
+        result = groq_call(
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": prompt},
+            ],
+            max_tokens=400, temperature=0.1,
+        )
+        return result if result else answer
+
+    return answer
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -608,11 +746,6 @@ ROLE_BLACKLIST = [
 ]
 
 def specific_role_answer(question: str, preferred_lang: str = "en"):
-    """
-    STRICT LANGUAGE ISOLATION:
-    - Sirf wahi answers return karo jo preferred_lang ke hain
-    - Koi cross-language answer nahi
-    """
     q_fixed = fix_typos(question)
     q_clean = re.sub(r'[^\w\s]', '', q_fixed.strip().lower()).strip()
 
@@ -633,12 +766,6 @@ def specific_role_answer(question: str, preferred_lang: str = "en"):
         a_lower = item["answer"].lower()
         if any(p in q_lower for p in ROLE_BLACKLIST):
             continue
-
-        # ── STRICT: sirf same-lang candidates ──────────────────────
-        item_detected_lang = detect_answer_lang(item["answer"], item.get("lang", ""))
-        if item_detected_lang != preferred_lang:
-            continue
-
         score = 0
         if all(w in q_lower for w in topic_words):                                       score += 3
         elif mapped.lower() in q_lower:                                                   score += 2
@@ -648,14 +775,16 @@ def specific_role_answer(question: str, preferred_lang: str = "en"):
             candidates.append({
                 "answer": item["answer"],
                 "score":  score,
-                "lang":   item_detected_lang,
+                "lang":   detect_answer_lang(item["answer"], item.get("lang", "")),
             })
 
     if not candidates:
-        print(f"[ROLE] No {preferred_lang} answer found for '{mapped}'")
         return None
 
-    candidates.sort(key=lambda c: c["score"], reverse=True)
+    candidates.sort(
+        key=lambda c: (1 if c["lang"] == preferred_lang else 0, c["score"]),
+        reverse=True,
+    )
     best = candidates[0]
     print(f"[ROLE] ✅ score={best['score']} lang={best['lang']}")
     return best["answer"]
@@ -694,11 +823,6 @@ DIRECT_KEYWORD_MAP = {
 }
 
 def direct_keyword_answer(question: str, preferred_lang: str = "en"):
-    """
-    STRICT LANGUAGE ISOLATION:
-    - Sirf same-lang answer return karo
-    - Agar us lang mein answer nahi → None
-    """
     q_fixed    = fix_typos(question)
     q_clean    = q_fixed.strip().lower()
     word_count = len(q_clean.split())
@@ -725,11 +849,6 @@ def direct_keyword_answer(question: str, preferred_lang: str = "en"):
     candidates   = []
 
     for item in load_qa_database():
-        # ── STRICT: sirf same-lang candidates ──────────────────────
-        item_detected_lang = detect_answer_lang(item["answer"], item.get("lang", ""))
-        if item_detected_lang != preferred_lang:
-            continue
-
         score = 0
         if mapped_lower in item["question"].lower(): score += 2
         if mapped_lower in item["answer"].lower():   score += 1
@@ -737,38 +856,35 @@ def direct_keyword_answer(question: str, preferred_lang: str = "en"):
             candidates.append({
                 "answer": item["answer"],
                 "score":  score,
-                "lang":   item_detected_lang,
+                "lang":   detect_answer_lang(item["answer"], item.get("lang", "")),
             })
 
     if not candidates:
-        print(f"[DIRECT_KW] No {preferred_lang} answer found for '{mapped}'")
         return None
 
-    candidates.sort(key=lambda c: c["score"], reverse=True)
+    candidates.sort(
+        key=lambda c: (1 if c["lang"] == preferred_lang else 0, c["score"]),
+        reverse=True,
+    )
     best = candidates[0]
     print(f"[DIRECT_KW] ✅ score={best['score']} lang={best['lang']}")
     return best["answer"]
 
 
 # ══════════════════════════════════════════════════════════════════════
-# EXACT MATCH — lang-aware
+# EXACT MATCH
 # ══════════════════════════════════════════════════════════════════════
-def exact_match(question: str, lang: str = "en"):
-    """
-    STRICT: Sirf wahi exact match return karo jo preferred_lang ka ho.
-    """
+def exact_match(question: str):
     q = question.strip().lower()
     for item in load_qa_database():
         if q == item["question"].strip().lower():
-            item_lang = detect_answer_lang(item["answer"], item.get("lang", ""))
-            if item_lang == lang:
-                print(f"[EXACT] ✅ {item['question'][:60]} (lang={lang})")
-                return item["answer"]
+            print(f"[EXACT] {item['question'][:60]}")
+            return item["answer"]
     return None
 
 
 # ══════════════════════════════════════════════════════════════════════
-# KEYWORD MATCH — strict lang filter
+# KEYWORD MATCH
 # ══════════════════════════════════════════════════════════════════════
 STOP = {
     'what','who','is','are','the','at','in','of','a','an','and','or',
@@ -803,12 +919,6 @@ def get_keywords(text: str) -> set:
 
 
 def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en"):
-    """
-    STRICT LANGUAGE ISOLATION:
-    - Sirf same-lang candidates lo
-    - Agar same-lang mein koi match nahi → None return karo
-    - Koi cross-language fallback nahi
-    """
     q_fixed         = fix_typos(question)
     q_kw            = get_keywords(q_fixed.lower())
     specific_hostel = q_kw & HOSTEL_NAMES
@@ -818,11 +928,6 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
 
     candidates = []
     for item in load_qa_database():
-        # ── STRICT: sirf same-lang candidates ──────────────────────
-        item_detected_lang = detect_answer_lang(item["answer"], item.get("lang", ""))
-        if item_detected_lang != preferred_lang:
-            continue
-
         s_kw    = get_keywords(item["question"].lower())
         matches = len(q_kw & s_kw)
         score   = matches / max(len(q_kw), len(s_kw), 1)
@@ -835,16 +940,107 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
             candidates.append({
                 "answer": item["answer"],
                 "score":  score,
-                "lang":   item_detected_lang,
+                "lang":   detect_answer_lang(item["answer"], item.get("lang", "")),
             })
 
     if not candidates:
-        print(f"[KW] No {preferred_lang} match found")
         return None
 
-    candidates.sort(key=lambda c: c["score"], reverse=True)
+    candidates.sort(
+        key=lambda c: (1 if c["lang"] == preferred_lang else 0, c["score"]),
+        reverse=True,
+    )
     best = candidates[0]
     print(f"[KW] ✅ score={best['score']:.2f} lang={best['lang']}")
+    return best["answer"]
+
+
+# ══════════════════════════════════════════════════════════════════════
+# DATASET-ONLY SEARCH — ga/ku mein sirf dataset se jawab, NO LLM
+# Roman ↔ Devanagari bridge se mixed queries ("hostel kitne h") bhi match
+# ══════════════════════════════════════════════════════════════════════
+def _enrich_keywords_roman(kw_set: set, original_text: str) -> set:
+    """
+    Add Devanagari equivalents for Roman words found in query,
+    and Roman equivalents for Devanagari words — so cross-script
+    matching works (e.g. "hostel" ↔ "हॉस्टल").
+    """
+    enriched = set(kw_set)
+    words = original_text.lower().split()
+
+    # Roman word → add its Devanagari equivalent
+    for word in words:
+        if word in ROMAN_TO_DEVANAGARI:
+            enriched.add(ROMAN_TO_DEVANAGARI[word])
+
+    # Devanagari word → add its Roman equivalent
+    for word in list(enriched):
+        if word in DEVANAGARI_TO_ROMAN:
+            enriched.add(DEVANAGARI_TO_ROMAN[word])
+
+    return enriched - STOP
+
+
+def dataset_only_search(question: str, lang: str) -> str | None:
+    """
+    Search ONLY within dataset entries whose lang matches (ga or ku).
+    Uses Roman↔Devanagari bridge so mixed-script queries still match.
+    Returns best answer string or None. No LLM is ever called here.
+    """
+    q_fixed = fix_typos(question)
+    q_lower = q_fixed.lower()
+
+    # Base keyword set + enriched with bridge
+    q_kw_base = get_keywords(q_lower)
+    q_kw      = _enrich_keywords_roman(q_kw_base, q_lower)
+
+    # Also build English-translated keyword set
+    q_en      = hi_to_en(q_lower)
+    q_en_kw   = set(re.findall(r'[a-zA-Z0-9]+', q_en)) - STOP
+
+    # Combine all
+    q_all_kw  = q_kw | q_en_kw
+
+    if not q_all_kw:
+        return None
+
+    candidates = []
+
+    for item in load_qa_database():
+        # Only consider entries of the target language
+        item_lang = item.get("lang", "").strip().lower()
+        if item_lang != lang:
+            continue
+
+        # Build enriched keyword set for this dataset entry
+        s_lower   = item["question"].lower()
+        s_kw_base = get_keywords(s_lower)
+        s_kw      = _enrich_keywords_roman(s_kw_base, s_lower)
+        s_en_kw   = set(re.findall(r'[a-zA-Z0-9]+', hi_to_en(s_lower))) - STOP
+        s_all_kw  = s_kw | s_en_kw
+
+        # Count overlapping keywords
+        matches = len(q_all_kw & s_all_kw)
+        if matches == 0:
+            continue
+
+        denom = max(len(q_all_kw), len(s_all_kw), 1)
+        score = matches / denom
+
+        candidates.append({
+            "answer":  item["answer"],
+            "score":   score,
+            "matches": matches,
+        })
+
+    if not candidates:
+        print(f"[DATASET_ONLY] No match for lang={lang} q='{question}'")
+        return None
+
+    # Sort by match count first, then score
+    candidates.sort(key=lambda c: (c["matches"], c["score"]), reverse=True)
+    best = candidates[0]
+    print(f"[DATASET_ONLY] ✅ lang={lang} matches={best['matches']} score={best['score']:.2f}")
     return best["answer"]
 
 
@@ -1083,13 +1279,9 @@ def enforce_language(response: str, expected_lang: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# LLM ANSWER — sirf en/hi ke liye
+# LLM ANSWER  (only used for hi/en now)
 # ══════════════════════════════════════════════════════════════════════
 def llm_answer(question: str, context: str, lang: str, history: str = "") -> str:
-    """
-    NOTE: Yeh function sirf en/hi ke liye call hoga.
-    ga/ku ke liye get_answer() mein hi block hai.
-    """
     prompt = build_prompt(question, context, lang, history)
     system = LANG_SYSTEM_PROMPTS.get(lang, LANG_SYSTEM_PROMPTS["en"])
 
@@ -1103,6 +1295,7 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
 
     if result:
         result = clean_response(result)
+        result = enforce_language(result, lang)
         return result
 
     if context:
@@ -1110,28 +1303,19 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
         if lines:
             return clean_response(lines[0]) + f"\n\nFor more info: {GBPIET_URL}"
 
-    return NO_ANSWER_FALLBACK.get(lang, NO_ANSWER_FALLBACK["en"])
+    return f"Sorry, I couldn't generate a response. Please visit {GBPIET_URL} or call 01368-228030."
 
 
 # ══════════════════════════════════════════════════════════════════════
-# MAIN ENTRY POINT
+# MAIN ENTRY
 # ══════════════════════════════════════════════════════════════════════
 def get_answer(question: str, lang: str = "en", history: str = "") -> str:
-    """
-    ╔══════════════════════════════════════════════════════╗
-    ║        STRICT LANGUAGE ROUTING TABLE                 ║
-    ╠══════════════════════════════════════════════════════╣
-    ║  lang=ga  │ Sirf Garhwali DB  │ LLM: ❌  Trans: ❌  ║
-    ║  lang=ku  │ Sirf Kumauni DB   │ LLM: ❌  Trans: ❌  ║
-    ║  lang=hi  │ Sirf Hindi DB     │ LLM: ✅  Trans: ❌  ║
-    ║  lang=en  │ Sirf English DB   │ LLM: ✅  Trans: ❌  ║
-    ╚══════════════════════════════════════════════════════╝
-    """
     question = question.strip()
-    q_lower  = question.lower().strip()
-    q_no_name = re.sub(r'\b(diksha|disha|dixa|दीक्षा)\b', '', q_lower).strip()
 
     # ── Greeting ──────────────────────────────────────────────────────
+    q_lower   = question.lower().strip()
+    q_no_name = re.sub(r'\b(diksha|disha|dixa|दीक्षा)\b', '', q_lower).strip()
+
     if q_lower in GREETINGS or q_no_name in GREETINGS:
         print("[RESULT] Greeting")
         return clean_response(GREETING_RESPONSE.get(lang, GREETING_RESPONSE["en"]))
@@ -1167,19 +1351,22 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     ans = specific_role_answer(question, preferred_lang=lang)
     if ans:
         print("[RESULT] Specific role match")
-        return enforce_language(clean_response(ans), lang)
+        raw = clean_response(translate_answer_if_needed(ans, lang, question))
+        return enforce_language(raw, lang)
 
     # ── Step 0b: Direct keyword ───────────────────────────────────────
     ans = direct_keyword_answer(question, preferred_lang=lang)
     if ans:
         print("[RESULT] Direct keyword")
-        return enforce_language(clean_response(ans), lang)
+        raw = clean_response(translate_answer_if_needed(ans, lang, question))
+        return enforce_language(raw, lang)
 
     # ── Step 1: Exact match ───────────────────────────────────────────
-    ans = exact_match(question, lang=lang)
+    ans = exact_match(question)
     if ans:
         print("[RESULT] Exact match")
-        return enforce_language(clean_response(ans), lang)
+        raw = clean_response(translate_answer_if_needed(ans, lang, question))
+        return enforce_language(raw, lang)
 
     # ── Step 2: Keyword match ─────────────────────────────────────────
     word_count = len(question.split())
@@ -1187,19 +1374,35 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     ans        = keyword_match(question, thresh, preferred_lang=lang)
     if ans:
         print("[RESULT] Keyword match")
-        return enforce_language(clean_response(ans), lang)
+        raw = clean_response(translate_answer_if_needed(ans, lang, question))
+        return enforce_language(raw, lang)
 
-    # ── Step 3: RAG + LLM — ga/ku ke liye BILKUL NAHI ────────────────
+    # ── Step 3: ga/ku → Dataset ONLY, no LLM ─────────────────────────
     if lang in ("ga", "ku"):
-        print(f"[RESULT] {lang.upper()} — LLM/RAG blocked, no native DB answer found")
-        return NO_ANSWER_FALLBACK[lang]
+        ans = dataset_only_search(question, lang)
+        if ans:
+            print(f"[RESULT] Dataset-only match ({lang})")
+            return clean_response(ans)
+        # Nothing found in dataset → language-specific fallback
+        print(f"[RESULT] No dataset match for lang={lang}")
+        fb_ga_ku = {
+            "ga": f"माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
+            "ku": f"माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।",
+        }
+        return fb_ga_ku[lang]
 
-    # ── Step 3: RAG + LLM (sirf en/hi ke liye) ───────────────────────
+    # ── Step 3: hi/en → RAG + LLM ────────────────────────────────────
     ctx = rag_search(question, lang)
     if ctx:
         print("[RESULT] RAG + LLM")
         return llm_answer(question, ctx, lang, history)
 
-    # ── No match anywhere ─────────────────────────────────────────────
+    # ── No match at all ───────────────────────────────────────────────
     print("[RESULT] No match")
-    return NO_ANSWER_FALLBACK.get(lang, NO_ANSWER_FALLBACK["en"])
+    fb = {
+        "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।",
+        "ga": f"माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
+        "ku": f"माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया या 01368-228030 पर फोन करिया।",
+        "en": f"Sorry, I couldn't find that information. Please visit {GBPIET_URL} or call 01368-228030.",
+    }
+    return fb.get(lang, fb["en"])
