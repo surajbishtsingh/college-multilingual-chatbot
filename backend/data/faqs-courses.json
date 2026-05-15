@@ -148,21 +148,22 @@
     "lang": "en"
   },
   {
-  "question": "Does GBPIET offer BCA?",
-  "answer": "GBPIET does not currently offer BCA (Bachelor of Computer Applications). The college offers B.Tech, M.Tech, MCA and Ph.D programs. For details visit https://gbpiet.ac.in",
-  "category": "courses",
-  "lang": "en"
-},
-{
-  "question": "BCA",
-  "answer": "GBPIET does not currently offer BCA. Available courses are B.Tech, M.Tech, MCA and Ph.D. Visit https://gbpiet.ac.in for more details.",
-  "category": "courses",
-  "lang": "en"
-},
-{
-  "question": "bca course available hai",
-  "answer": "GBPIET mein abhi BCA course nahi hai. Uplabdh courses hain: B.Tech, M.Tech, MCA aur Ph.D. Adhik jaankari ke liye https://gbpiet.ac.in dekhein.",
-  "category": "courses",
-  "lang": "hi"
-}
+    "question": "Is BCA available in GBPIET?",
+    "answer": "The BCA course has received approval from AICTE. The first batch will commence from the academic year 2026-27. There are a total of 40 seats available and admission will be based on merit.",
+    "category": "courses",
+    "lang": "en"
+  },
+  {
+    "question": "BCA",
+    "answer": "The BCA course has received approval from AICTE. The first batch will commence from the academic year 2026-27. There are a total of 40 seats available and admission will be based on merit.",
+    "category": "courses",
+    "lang": "en"
+  },
+  {
+    "question": "Is the BCA course available or not?",
+    "answer": "The BCA course has received approval from AICTE. The first batch will commence from the academic year 2026-27. There are a total of 40 seats available and admission will be based on merit.",
+    "category": "courses",
+    "lang": "en"
+  }
 ]
+
