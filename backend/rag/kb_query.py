@@ -938,9 +938,9 @@ _GA_EXAMPLE = (
 )
 _KU_EXAMPLE = (
     "Example Kumauni answer: "
-    "GBPIET मा admission लिजी JEE Main rank चाहिनी। "
-    "फीस बारे मा: पैलो साल फीस लगभग 80,000 रुपया छ। "
-    "Hostel मा रैण-बौण मिलद। Director कु Dr. XYZ छन।"
+    "GBPIET मा एडमिशन लिजिं JEE Main रैंक चैंनि। "
+    "फीस बारे मा: पैलो साल फीस लगभग 80,000 रुप्या छ। "
+    "Hostel में रैण-बौण मिलद। Director कु Dr. XYZ छन।"
 )
 
 LANG_SYSTEM_PROMPTS = {
