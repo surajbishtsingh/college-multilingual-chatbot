@@ -218,16 +218,16 @@ IDENTITY_Q = {
 
 GREETING_RESPONSE = {
     "en": "Hello! I'm Diksha, the official AI assistant for GBPIET, Pauri Garhwal. Ask me about admissions, fees, hostel, placements, faculty, courses and more!",
-    "hi": "नमस्ते! GBPIET की आधिकारिक AI सहायिका दीक्षा आपकी सेवा में हूँ। admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
+    "hi": "नमस्ते! मैं दीक्षा हूँ — GBPIET की आधिकारिक AI सहायिका। आप मुझसे admission, fees, hostel, placement के बारे में पूछ सकते हैं।",
     "ga": "समन्या जी! जीबीपीआईईटी की AI दगड़िया छुं। कुछ भी पुछि सकदन।",
     "ku": "नमस्कार जी! जीबीपीआईईटी की AI दगड़िया छु। कुछ भी पूछ सकदन।",
 }
 
 IDENTITY_RESPONSE = {
-    "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal. Visit: {GBPIET_URL}",
-    "hi": f"GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot दीक्षा हूँ। वेबसाइट: {GBPIET_URL}",
-    "ga": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छुं — नाम दीक्षा छ। वेबसाइट: {GBPIET_URL}",
-    "ku": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छु — नाम दीक्षा छ। वेबसाइट: {GBPIET_URL}",
+    "en": f"I'm Diksha, the official AI chatbot for GBPIET (Govind Ballabh Pant Institute of Engineering and Technology), Pauri Garhwal, Uttarakhand. I help with college information in English, Hindi, Garhwali and Kumauni. Visit: {GBPIET_URL}",
+    "hi": f"मैं दीक्षा हूँ — GBPIET (गोविंद बल्लभ पंत इंजीनियरिंग कॉलेज), पौड़ी गढ़वाल की आधिकारिक AI chatbot। वेबसाइट: {GBPIET_URL}",
+    "ga": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छुं — नाम दीक्षा छ। admission, fees, hostel बारे माँ पुछि सकदन। वेबसाइट: {GBPIET_URL}",
+    "ku": f"जीबीपीआईईटी, पौड़ी गढ़वाल की official AI chatbot छु — नाम दीक्षा छ। admission, fees, hostel बारे मा पूछ सकदन। वेबसाइट: {GBPIET_URL}",
 }
 
 OUT_OF_SCOPE_RESPONSE = {
@@ -403,87 +403,28 @@ def detect_answer_lang(answer_text: str, item_lang: str = "") -> str:
 
 
 def translate_answer_if_needed(answer: str, lang: str, question: str) -> str:
-    answer_lang = detect_answer_lang(answer)
-    
-    # Already in correct language
-    if answer_lang == lang:
+    answer_is_hindi = is_hindi_text(answer)
+    if lang == "en" and not answer_is_hindi:
         return answer
-    
-    # English/Hindi → Garhwali
-    if lang == "ga":
-        prompt = (
-            f"Translate this college information into Garhwali language (गढ़वाली).\n"
-            f"Use Garhwali words: छन, छ, अर, कुण, बटि, मिलद, हूँद, कनकै, यु, वु।\n"
-            f"Keep names, numbers, URLs unchanged.\n"
-            f"Return ONLY the Garhwali translation.\n\n{answer}"
-        )
-        system = (
-            "You are a Garhwali translator. Translate to Garhwali ONLY. "
-            "Use words like छन, छ, अर, कुण, बटि, मिलद। "
-            "Keep proper nouns, numbers, URLs unchanged."
-        )
-        print(f"[TRANSLATE] → Garhwali...")
-        result = groq_call(
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": prompt},
-            ],
-            max_tokens=500, temperature=0.1,
-        )
-        return result if result else answer
+    if lang in ("hi", "ga", "ku") and answer_is_hindi:
+        return answer
 
-    # English/Hindi → Kumauni
-    if lang == "ku":
-        prompt = (
-            f"Translate this college information into Kumauni language (कुमाउनी).\n"
-            f"Use Kumauni words: छु, छन, राछ, हुनी, कनाँ, लै, बटा, ज्याणी, कैं।\n"
-            f"Keep names, numbers, URLs unchanged.\n"
-            f"Return ONLY the Kumauni translation.\n\n{answer}"
-        )
-        system = (
-            "You are a Kumauni translator. Translate to Kumauni ONLY. "
-            "Use words like छु, छन, लै, बटा, ज्याणी। "
-            "Keep proper nouns, numbers, URLs unchanged."
-        )
-        print(f"[TRANSLATE] → Kumauni...")
-        result = groq_call(
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": prompt},
-            ],
-            max_tokens=500, temperature=0.1,
-        )
-        return result if result else answer
-
-    # English → Hindi
-    if lang in ("hi", "ga", "ku") and answer_lang == "en":
-        prompt = f"Translate to Hindi (Devanagari). Return ONLY translated text.\n\n{answer}"
-        system = "Translator. English→Hindi. Keep names, numbers, URLs unchanged."
-        print(f"[TRANSLATE] → Hindi...")
-        result = groq_call(
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": prompt},
-            ],
-            max_tokens=400, temperature=0.1,
-        )
-        return result if result else answer
-
-    # Hindi → English
-    if lang == "en" and answer_lang in ("hi", "ga", "ku"):
+    if lang == "en":
         prompt = f"Translate to English. Return ONLY translated text.\n\n{answer}"
         system = "Translator. Hindi→English. Keep names, numbers, URLs unchanged."
-        print(f"[TRANSLATE] → English...")
-        result = groq_call(
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user",   "content": prompt},
-            ],
-            max_tokens=400, temperature=0.1,
-        )
-        return result if result else answer
+    else:
+        prompt = f"Translate to Hindi (Devanagari). Return ONLY translated text.\n\n{answer}"
+        system = "Translator. English→Hindi. Keep names, numbers, URLs unchanged."
 
-    return answer
+    print(f"[TRANSLATE] lang={lang}...")
+    result = groq_call(
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user",   "content": prompt},
+        ],
+        max_tokens=400, temperature=0.1,
+    )
+    return result if result else answer
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -560,38 +501,32 @@ def ga_ku_to_hi_en(text: str) -> str:
 # KUMAUNI SYNONYM MAP
 # ══════════════════════════════════════════════════════════════════════
 KUMAUNI_SYNONYM_MAP = {
-    # --- NEGATION (sabse important fix) ---
-    'नाइ':    'नहीं',
-    'छु नाइ': 'न्हां छ',   # "is not" → correct Kumauni negation
-    'नी छ':   'न्हां छ',
-    'न छ':    'न्हां छ',
-
-    # --- CONJUNCTIONS ---
-    'र':      'और',        # 'र' Garhwali है, Kumauni नहीं
-    
-    # --- FOR/TO (direction words) ---
-    'लै हुनी':  'लिजी',    # "for getting" 
-    'लै':       'लिजी',    # "for"
-    'कनाँ':     'लिजी',    # wrong usage fix
-    
-    # --- VISIT/GO ---
-    'जावा':   'जाया',      # Garhwali → Kumauni
-    'जा':     'जाया',
-    
-    # --- EXISTING (keep these) ---
-    'बटा':    'from / se',
-    'छु':     'है / छ',
-    'छन':     'हैं / छन',
-    'ज्याणी': 'जानकारी',
-    'लिजीये': 'लिजी',
-    'कैं':    'को',
-    'हैबेर':  'के बाद',
-    'कसि':    'कैसे',
-    'कतु':    'कितना',
-    'किलै':   'क्यों',
-    'को':     'कौन',
-    'के':     'क्या',
+    # Kumauni question words — search ke liye English mein convert
+    'कते':     'kahan where',
+    'कसि':    'kaise how',
+    'कतु':    'kitna how much',
+    'किलै':   'kyun why',
+    # Kumauni pronouns
+    'म्यर':    'mera my',
+    'तुमार':   'tumhara your',
+    'चेलो':    'ladka boy',
+    'चेली':    'ladki girl',
+    # Kumauni topic words
+    'ज्याणी':  'jankari information',
+    'भर्ति':   'admission',
+    'दाम':     'fees price',
+    'रैण-बौण': 'hostel stay',
+    'खाण-पीण': 'mess food',
+    'नौकरी':   'job placement',
+    'कमाइ':    'salary income',
+    'बटा':     'from se',
+    'कैं':     'ko to',
+    'लिजी':    'ke liye for',
+    'हैबर':    'ke baad after',
+    'सुबिद':   'facility',
+    'टक':      'paisa money',
 }
+
 def ku_to_hi_en(text: str) -> str:
     t = text.lower()
     for word, tr in sorted(KUMAUNI_SYNONYM_MAP.items(), key=lambda x: -len(x[0])):
@@ -902,8 +837,16 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
                 collections = ["kb_ga"] + [c for c in collections if c not in ("kb_hi", "kb_ku")]
             print(f"[RAG] Lang=ga → {collections}")
         elif lang == "ku":
-            if "kb_ku" in COLLECTIONS and "kb_ku" not in collections:
-                collections = ["kb_ku"] + [c for c in collections if c not in ("kb_hi", "kb_ga")]
+            # kb_ku available hai toh use karo, warna kb_hi mat use karo
+            if "kb_ku" in COLLECTIONS:
+                if "kb_ku" not in collections:
+                    collections = ["kb_ku"] + [c for c in collections if c not in ("kb_hi", "kb_ga")]
+            else:
+                # kb_ku nahi hai — kb_hi bhi nahi use karni (wrong language)
+                # Sirf faq aur website use karo, LLM translate karega
+                collections = [c for c in collections if c not in ("kb_hi", "kb_ga")]
+                if "faq" not in collections:
+                    collections.insert(0, "faq")
             print(f"[RAG] Lang=ku → {collections}")
         elif lang == "hi":
             if "kb_hi" not in collections:
@@ -986,50 +929,73 @@ def rag_search(question: str, lang: str = "en"):
 # STRICT LANGUAGE SYSTEM PROMPTS
 # ✅ Bot naam se shuru NAHI karti — seedha answer deti hai
 # ══════════════════════════════════════════════════════════════════════
+# ── Per-language example answers so LLM knows exact style ──
+_GA_EXAMPLE = (
+    "Example Garhwali answer: "
+    "GBPIET मा admission खुणि JEE Main rank चाहिंद। "
+    "फीस बारे माँ: पैलो साल फीस लगभग 80,000 रुपया च। "
+    "Hostel मा रैणा-सैणा मिलद। Director कु Dr. XYZ छन।"
+)
+_KU_EXAMPLE = (
+    "Example Kumauni answer: "
+    "GBPIET मा admission लिजी JEE Main rank चाहिनी। "
+    "फीस बारे मा: पैलो साल फीस लगभग 80,000 रुपया छ। "
+    "Hostel मा रैण-बौण मिलद। Director कु Dr. XYZ छन।"
+)
+
 LANG_SYSTEM_PROMPTS = {
     "en": (
-        f"You are Diksha, the official AI assistant for GBPIET ({GBPIET_URL}). "
-        "STRICT RULES: "
-        "1. Respond in ENGLISH ONLY. "
-        "2. NEVER start with 'Respected', 'Dear', or any salutation. "
-        "3. NEVER start answer with your own name like 'I am Diksha' — start directly with the answer. "
-        "4. NEVER repeat the question. Start the answer directly. "
-        "5. Be concise, accurate and helpful."
+        f"You are Diksha, official female AI assistant for GBPIET ({GBPIET_URL}). "
+        "ABSOLUTE RULES — no exceptions: "
+        "1. YOU MUST respond in ENGLISH ONLY. Every single word must be English. "
+        "2. NEVER use Hindi, Garhwali, Kumauni or any other language. "
+        "3. NEVER start with salutations like Respected, Dear. "
+        "4. NEVER repeat the question. Start answer directly. "
+        "5. NEVER introduce yourself — go straight to the answer. "
+        "6. Be concise and helpful."
     ),
     "hi": (
-        f"तुम दीक्षा हो — GBPIET ({GBPIET_URL}) की official AI chatbot। "
-        "सख्त नियम: "
-        "1. केवल और केवल हिंदी में जवाब दो। "
-        "2. 'Respected', 'Dear', 'प्रिय' जैसे शब्दों से शुरू मत करो। "
-        "3. अपना नाम लेकर शुरू मत करो जैसे 'मैं दीक्षा हूँ' — सीधे जवाब दो। "
-        "4. सवाल दोबारा मत लिखो — सीधे जवाब दो। "
+        f"तुम दीक्षा हो — GBPIET ({GBPIET_URL}) की official female AI chatbot। "
+        "पक्के नियम — कोई exception नहीं: "
+        "1. हर जवाब केवल और केवल हिंदी में दो — एक भी English, Garhwali या Kumauni शब्द नहीं। "
+        "2. Respected, Dear, प्रिय से शुरू मत करो। "
+        "3. सवाल दोबारा मत लिखो — सीधे जवाब दो। "
+        "4. अपना नाम लेकर शुरू मत करो। "
         "5. Feminine grammar: सकती हूँ, करूँगी, जानती हूँ। "
-        "6. User को 'आप' कहो।"
+        "6. User को आप कहो।"
     ),
     "ga": (
-        f"You are दीक्षा, official AI of GBPIET ({GBPIET_URL}). "
-        "STRICT RULES: "
-        "1. Always respond in Garhwali ONLY. Never Hindi or English. "
-        "2. NEVER start answer with your own name like 'दीक्षा छुं' — start directly with the answer. "
-        "3. NEVER start with 'Respected', 'Dear' or any salutation. "
-        "4. NEVER repeat the question. "
-        "5. Use Garhwali words: छन, छ, अर, कुण, बटि, मिलद, हूँद, कनकै। "
-        "6. Address user as 'आप'"
-        "7. Use feminine Garhwali grammar. "
-        f"8. If answer not found: माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा।"
+        f"You are Diksha, official female AI for GBPIET ({GBPIET_URL}). "
+        "ABSOLUTE RULES — no exceptions: "
+        "1. YOU MUST respond in Garhwali dialect ONLY. "
+        "2. Garhwali is different from Hindi. Use these Garhwali words: "
+        "   छन (hain), छ (hai/is), अर (aur/and), कुण (ke liye/for), "
+        "   बटि (se/from), मिलद (milta hai), हूँद (hota hai), "
+        "   कनकै (kaise/how), कख (kahan/where), यु (yeh/this), "
+        "   वु (woh/that), मी (main/I), तुमुं (tumhara/your), "
+        "   पैलू (pehle/before), माँ (mein/in), बटे (se/from). "
+        "3. NEVER write in pure Hindi — use Garhwali words from above. "
+        "4. NEVER start with salutations. NEVER repeat the question. "
+        "5. NEVER introduce yourself. Start answer directly. "
+        "6. Use feminine forms. Address user as आप or थैं. "
+        f"7. If no answer: माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा। "
+        f"{_GA_EXAMPLE}"
     ),
-    "ku": (
+        "ku": (
         f"You are दीक्षा, official AI of GBPIET ({GBPIET_URL}). "
-        "STRICT RULES: "
-        "1. Always respond in Kumauni ONLY. Never Hindi or English. "
-        "2. NEVER start answer with your own name like 'दीक्षा छु' — start directly with the answer. "
-        "3. NEVER start with 'Respected', 'Dear' or any salutation. "
-        "4. NEVER repeat the question. "
-        "5. Use Kumauni words: छु, छन, राछ, हुनी, कनाँ, कैं, बेर, लै, बटा, ज्याणी। "
-        "6. Address user as 'आप' or 'ज्यू'. "
-        "7. Use feminine Kumauni grammar. "
-        f"8. If answer not found: माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया।"
+        "ABSOLUTE RULES — NO EXCEPTIONS: "
+        "1. Respond in Kumauni dialect ONLY. Never Hindi or English. "
+        "2. CRITICAL: NEVER use 'र' — this is Garhwali word for 'and'. "
+        "   In Kumauni, use 'लै' or 'अनि' for 'and'. "
+        "3. Correct Kumauni words to use: "
+        "   छु (hoon), छन (hain), लिजी (ke liye), बटा (se), "
+        "   कनाँ (kahan), कैं (ko), ज्याणी (jankari), लै (aur/and). "
+        "4. Degree/course names: PhD=पीएचडी, BSc=बीएससी, MCA=एमसीए, BTech=बीटेक. "
+        "5. NEVER start with your name. NEVER repeat question. No salutations. "
+        "6. Address user as आप or ज्यू. Use feminine grammar. "
+        f"7. No answer: माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया।"
     ),
+
 }
 
 
@@ -1045,24 +1011,46 @@ def build_prompt(question: str, context: str, lang: str, history: str = "") -> s
         "ku": f"माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया।",
     }
 
+    # Very explicit per-language instruction in the prompt itself
     lang_instruction = {
-        "en": "Answer in ENGLISH ONLY. NEVER start with your name.",
-        "hi": "केवल हिंदी में जवाब दो। अपने नाम से शुरू मत करो।",
-        "ga": "केवल गढ़वाली भाषा मा जवाब दे। अपणे नाम से शुरू नि करण। गढ़वाली शब्द: छन, छ, अर, कुण, बटि, कनकै।",
-        "ku": "केवल कुमाउनी भाषा मा जवाब दे। अपणे नाम से शुरू नि करण। कुमाउनी शब्द: छु, छन, लै, बटा, कनाँ, ज्याणी।",
+        "en": (
+            "LANGUAGE = ENGLISH ONLY. Every word must be English. "
+            "Do NOT use Hindi/Devanagari script at all."
+        ),
+        "hi": (
+            "LANGUAGE = केवल हिंदी। हर शब्द हिंदी में। "
+            "English या Garhwali/Kumauni बिल्कुल नहीं।"
+        ),
+        "ga": (
+            "LANGUAGE = केवल गढ़वाली (Garhwali)। "
+            "गढ़वाली Hindi से अलग है। जरूरी शब्द use करो: "
+            "छन, छ, अर, कुण, बटि, मिलद, हूँद, कनकै, कख, यु, वु, मी, माँ। "
+            "Pure Hindi में मत लिखो।"
+        ),
+        "ku": (
+            "LANGUAGE = केवल कुमाउनी (Kumauni)। "
+            "CRITICAL: 'र' (Garhwali word for 'and') कभी मत use करो। "
+            "Kumauni मा 'and' = 'लै' या 'और' होंद। "
+            "Degree names सही लिखो: PhD=पीएचडी, BSc=बीएससी, MCA=एमसीए। "
+            "जरूरी Kumauni शब्द: छु, छन, लिजी, बटा, कनाँ, कैं, ज्याणी। "
+            "Pure Hindi या Garhwali मत लिखो।"
+        ),
     }
 
-    return f"""{lang_instruction.get(lang, lang_instruction['en'])}
-NEVER repeat the question. Start answer directly.
-NEVER use 'Respected', 'Dear', or introduce yourself.
-If not in context: {no_answer.get(lang, no_answer['en'])}
-Website: {GBPIET_URL}
+    return f"""STRICT INSTRUCTION: {lang_instruction.get(lang, lang_instruction["en"])}
+
+RULES:
+- Start answer DIRECTLY — no self-introduction, no salutation.
+- NEVER repeat the question.
+- Use ONLY the context below.
+- If answer not in context: {no_answer.get(lang, no_answer["en"])}
+- Website: {GBPIET_URL}
 {history}
 Context:
 {context}
 
 Question: {question}
-Answer ({lang.upper()} ONLY — direct, no self-intro, no salutation):"""
+Answer ({lang.upper()} dialect ONLY):"""
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -1157,18 +1145,14 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     question = question.strip()
 
     # ── Greeting ──────────────────────────────────────────────────────
-    q_lower = question.lower().strip()
-    q_no_name = re.sub(r'\b(diksha|disha|dixa|दीक्षा)\b', '', q_lower).strip()
-    
-    if q_lower in GREETINGS or q_no_name in GREETINGS:
+    if question.lower().strip() in GREETINGS:
         print("[RESULT] Greeting")
         return clean_response(GREETING_RESPONSE.get(lang, GREETING_RESPONSE["en"]))
 
-# ── Identity ──────────────────────────────────────────────────────
-    if q_lower in IDENTITY_Q or q_no_name in IDENTITY_Q:
+    # ── Identity ──────────────────────────────────────────────────────
+    if question.lower().strip() in IDENTITY_Q:
         print("[RESULT] Identity")
         return clean_response(IDENTITY_RESPONSE.get(lang, IDENTITY_RESPONSE["en"]))
-        
 
     # ── User introducing themselves ───────────────────────────────────
     _intro_words = {"i am", "my name is", "mera naam", "naam hai", "naam h"}
