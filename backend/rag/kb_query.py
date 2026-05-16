@@ -596,7 +596,7 @@ HINDI_MAP = {
     'मी': 'i me', 'जु': 'who', 'यु': 'this', 'वु': 'that',
     # Kumauni
     'को': 'who', 'के': 'what', 'कते': 'where',
-    'कसि': 'how', 'कतु': 'how much', 'बटा': 'from',
+    'कसि': 'how', 'कतु': 'how much', 'बटी': 'from',
 }
 
 def hi_to_en(text: str) -> str:
