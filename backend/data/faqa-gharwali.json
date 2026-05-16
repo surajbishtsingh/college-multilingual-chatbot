@@ -1092,7 +1092,7 @@
     "lang": "ga"
   },
   {
-  "question": "sabi nauna hostel ku ku chhin",
+  "question": "sabi nauna hostel ?",
   "answer": "नीलकंठ, केदार ABC, कैलाश, रूद्र, बद्री, अलकनंदा...",
   "category": "hostel",
   "tags": ["boys"],
@@ -1100,7 +1100,7 @@
  },
  {
   "id": 803,
-  "question": "sabi nauni hostel ku ku chhin ?",
+  "question": "sabi nauni hostel ?",
   "answer": "नौन्यिँ का हॉस्टल छन्: रमन हॉस्टल, भागीरथी हॉस्टल अर विश्वेश्वरैया हॉस्टल।",
   "category": "hostel",
   "tags": ["girls"],
