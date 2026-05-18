@@ -59,22 +59,7 @@ def should_crawl(url: str) -> bool:
 
 # ── Check if site needs JavaScript ────────────────────────────────────
 def needs_javascript(url: str) -> bool:
-    """
-    Quick check — fetch page with requests.
-    If body text is very short, site uses JavaScript rendering.
-    """
-    try:
-        r    = requests.get(url, headers=HEADERS, timeout=10)
-        soup = BeautifulSoup(r.text, "html.parser")
-        body = soup.find("body")
-        if not body:
-            return True
-        text = body.get_text(strip=True)
-        # If less than 200 chars in body → JavaScript site
-        return len(text) < 200
-    except Exception:
-        return True
-
+    return False  # Railway pe Selenium nahi chalta — hamesha requests use karo
 
 # ── Selenium fetcher ───────────────────────────────────────────────────
 def fetch_with_selenium(url: str) -> dict | None:
