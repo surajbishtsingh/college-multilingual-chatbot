@@ -311,86 +311,78 @@ PRIORITY_PAGES = [
 ]
 
 def crawl_website(
-    start_url: str  = BASE_URL,
-    max_pages: int  = MAX_PAGES,
+    start_url: str = BASE_URL,
+    max_pages: int = MAX_PAGES,
 ) -> list[dict]:
     """
-    Crawl the college website.
-    Auto-detects if JavaScript rendering is needed.
+    gbpiet.ac.in JS-rendered hai — SerpAPI se data fetch karo.
     """
-    print(f"[Crawler] Starting crawl of {start_url}")
-    print(f"[Crawler] Max pages: {max_pages}")
-
-    # ── Detect if site uses JavaScript ────────────────────────────
-    print("[Crawler] Checking if site uses JavaScript rendering...")
-    js_needed = needs_javascript(start_url)
-    if js_needed:
-        print("[Crawler] ⚡ JavaScript rendering detected — using Selenium")
-    else:
-        print("[Crawler] ✅ Static HTML detected — using requests")
-
-    visited   = set()
-    pages     = []
-
-    # Build URL list — priority URLs first
-    to_visit = []
-
-    # Add priority pages
-    for path in PRIORITY_PAGES:
-        url = start_url.rstrip("/") + path
-        to_visit.append(url)
-
-    # Try sitemap
-    sitemap_urls = get_urls_from_sitemap(start_url)
-    for url in sitemap_urls:
-        if url not in to_visit:
-            to_visit.append(url)
-
-    # Add home page
-    if start_url not in to_visit:
-        to_visit.insert(0, start_url)
-
-    # Limit to max_pages
-    to_visit = to_visit[:max_pages * 2]  # fetch extra to account for failures
-
-    for url in to_visit:
-        if len(pages) >= max_pages:
-            break
-
-        if url in visited:
+    print("[Crawler] Using SerpAPI for gbpiet.ac.in (JS site)")
+    
+    QUERIES = [
+        "GBPIET fees BTech MTech MCA",
+        "GBPIET admission process JEE",
+        "GBPIET hostel facility boys girls",
+        "GBPIET placement record companies",
+        "GBPIET director faculty staff",
+        "GBPIET departments CSE ECE ME Civil",
+        "GBPIET contact address phone",
+        "GBPIET library transport sports",
+        "GBPIET scholarship result exam",
+        "GBPIET anti ragging rules regulations",
+    ]
+    
+    pages = []
+    serpapi_key = os.getenv("SERPAPI_KEY", "").strip()
+    
+    if not serpapi_key:
+        print("[Crawler] ❌ SERPAPI_KEY not set — skipping")
+        return []
+    
+    for query in QUERIES:
+        try:
+            params = {
+                "q":       f"site:gbpiet.ac.in {query}",
+                "api_key": serpapi_key,
+                "num":     10,
+            }
+            r = requests.get(
+                "https://serpapi.com/search",
+                params=params,
+                timeout=15,
+            )
+            if r.status_code != 200:
+                print(f"[Crawler] SerpAPI error {r.status_code} for: {query}")
+                continue
+                
+            results = r.json().get("organic_results", [])
+            print(f"[Crawler] '{query}' → {len(results)} results")
+            
+            for result in results:
+                url     = result.get("link", "")
+                snippet = result.get("snippet", "")
+                title   = result.get("title", "")
+                
+                if not snippet or len(snippet) < 30:
+                    continue
+                    
+                # HTML format mein wrap karo
+                fake_html = f"<html><body><h1>{title}</h1><p>{snippet}</p></body></html>"
+                pages.append({
+                    "url":          url,
+                    "html":         fake_html,
+                    "status_code":  200,
+                    "content_type": "text/html",
+                })
+            
+            time.sleep(1)  # Rate limit
+            
+        except Exception as e:
+            print(f"[Crawler] SerpAPI failed for '{query}': {e}")
             continue
-
-        visited.add(url)
-        print(f"[Crawler] [{len(pages)+1}/{max_pages}] Fetching: {url[:70]}")
-
-        page = fetch_page(url, use_selenium=js_needed)
-
-        if not page:
-            continue
-
-        # Verify content was extracted
-        soup = BeautifulSoup(page["html"], "html.parser")
-        body = soup.find("body")
-        body_text = body.get_text(strip=True) if body else ""
-
-        if len(body_text) < 50:
-            print(f"  [Skip] Still empty after fetch: {url[:60]}")
-            continue
-
-        pages.append(page)
-
-        # If not using sitemap, extract new links
-        if not sitemap_urls:
-            new_links = extract_links(page["html"], url)
-            for link in new_links:
-                if link not in visited and link not in to_visit:
-                    to_visit.append(link)
-
-        time.sleep(REQUEST_DELAY)
-
-    print(f"[Crawler] ✅ Crawled {len(pages)} pages")
+    
+    print(f"[Crawler] ✅ SerpAPI: {len(pages)} snippets collected")
     return pages
-
 
 if __name__ == "__main__":
     pages = crawl_website(max_pages=5)
