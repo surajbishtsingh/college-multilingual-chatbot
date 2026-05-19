@@ -1,15 +1,3 @@
-# kb_query.py — Complete RAG pipeline
-# ✅ 4 Groq keys (8-attempt fallback) + Gemini fallback
-# ✅ LLM-based out-of-scope detection
-# ✅ Strict language: ga→Garhwali ONLY, ku→Kumauni ONLY, hi→Hindi ONLY, en→English ONLY
-# ✅ Bot NEVER starts answer with own name ("दीक्षा छु / दीक्षा छुं")
-# ✅ "Respected" / "Dear" salutations removed
-# ✅ Question NOT repeated in answer
-# ✅ Emoji stripped before TTS / response
-# ✅ Feminine grammar enforced
-# ✅ Language drift detector + enforcer (ga/ku correction pass)
-# ✅ ga/ku → DATASET ONLY (no LLM), Roman↔Devanagari bridge for mixed queries
-
 import os
 import json
 import glob
@@ -910,6 +898,16 @@ HOSTEL_NAMES = {
     'shivalik','trishul','raman','bhagirathi','viswerwarya','vh',
 }
 
+LATERAL_KEYWORDS = {"lateral", "लेटरल", "second year", "द्वितीय वर्ष", "2nd year"}
+
+def _is_lateral_query(question: str) -> bool:
+    q = question.lower()
+    return any(k in q for k in LATERAL_KEYWORDS)
+
+def _is_lateral_item(item: dict) -> bool:
+    combined = (item["question"] + " " + item["answer"]).lower()
+    return any(k in combined for k in LATERAL_KEYWORDS)
+
 def get_keywords(text: str) -> set:
     words         = set(re.findall(r'[\u0900-\u097F]+|[a-zA-Z0-9]+', text.lower()))
     translated    = set(re.findall(r'[a-zA-Z0-9]+', hi_to_en(text)))
@@ -925,9 +923,11 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
 
     if not q_kw:
         return None
-
+        
     candidates = []
     for item in load_qa_database():
+        if _is_lateral_item(item) and not _is_lateral_query(question):  # ADD THIS
+            continue                                                      # ADD THIS
         s_kw    = get_keywords(item["question"].lower())
         matches = len(q_kw & s_kw)
         score   = matches / max(len(q_kw), len(s_kw), 1)
@@ -953,6 +953,8 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
     best = candidates[0]
     print(f"[KW] ✅ score={best['score']:.2f} lang={best['lang']}")
     return best["answer"]
+
+
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -1007,10 +1009,11 @@ def dataset_only_search(question: str, lang: str) -> str | None:
     candidates = []
 
     for item in load_qa_database():
-        # Only consider entries of the target language
         item_lang = item.get("lang", "").strip().lower()
         if item_lang != lang:
             continue
+        if _is_lateral_item(item) and not _is_lateral_query(question):  # ADD THIS
+            continue                                                      # ADD THIS
 
         # Build enriched keyword set for this dataset entry
         s_lower   = item["question"].lower()
