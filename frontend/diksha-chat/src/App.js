@@ -1,4 +1,5 @@
 import avatarImg from './assets/logo.png';
+import counsellingImg from './assets/image.png';
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
@@ -47,6 +48,7 @@ const QUICK_BUTTONS = [
   { label: 'Courses',    query: 'What courses are available?' },
   { label: 'Placements', query: 'What is the placement record?' },
   { label: 'Contact',    query: 'What is the contact number?' },
+  { label: '🆕 New Admission', query: 'counselling2026' },
 ];
 
 const getTimeGreeting = () => {
@@ -609,7 +611,20 @@ export default function App() {
     }]);
     setInput('');
     setLoading(true);
-
+// ── New Admission / Counselling 2026 ──────────────────────────────
+if (q === 'counselling2026') {
+  setMessages(prev => [...prev, {
+    role: 'diksha',
+    text: language === 'hi'
+      ? 'UKTECH ऑनलाइन काउंसलिंग 2026-27 की सूचना:'
+      : 'UKTECH Online Counselling 2026-27 Notice:',
+    lang: language,
+    type: 'counselling2026',
+    time: new Date().toLocaleTimeString()
+  }]);
+  setLoading(false);
+  return;
+}
     // ── Local intent handlers (no backend needed) ──────────────────────────
     if (!skipIntent && isCourseQuery(q)) {
       const txt = language === 'hi'
@@ -916,7 +931,51 @@ export default function App() {
                       <AdmissionDropdown lang={msg.lang} onSelect={handleAdmissionSelect}/>
                     )}
                     {msg.type === 'fees' && <FeesDropdown lang={msg.lang}/>}
+                   
+                    {msg.type === 'counselling2026' && (
+                      <div style={{ marginTop: 8 }}>
+                        <img
+                          src={counsellingImg}
+                          alt="UKTECH Counselling 2026-27"
+                          style={{
+                            width: '100%',
+                            borderRadius: 8,
+                            border: '2px solid #8B0000',
+                            cursor: 'pointer',
+                          }}
+                          onClick={() => window.open('https://uktech.ac.in', '_blank')}
+                        />
+                        <div style={{
+                          fontSize: 11,
+                          color: '#8B0000',
+                          fontWeight: 600,
+                          marginTop: 6,
+                          textAlign: 'center',
+                        }}>
+                          🌐 {language === 'hi'
+                            ? 'पूरी जानकारी के लिए uktech.ac.in पर जाएं →'
+                            : 'Click image to visit uktech.ac.in →'}
+                        </div>
+                        <div style={{
+                          marginTop: 8,
+                          fontSize: 12,
+                          background: '#fff8e1',
+                          border: '1px solid #f0c040',
+                          borderRadius: 6,
+                          padding: '8px 10px',
+                          color: '#5a3e00',
+                          lineHeight: 1.8,
+                        }}>
+                          📅 {language === 'hi' ? 'पहला चरण: 28 मई – 10 जून 2026'    : 'Phase 1: 28 May – 10 Jun 2026'}<br/>
+                          📅 {language === 'hi' ? 'दूसरा चरण: 12 – 24 जून 2026'       : 'Phase 2: 12 – 24 Jun 2026'}<br/>
+                          📅 {language === 'hi' ? 'तीसरा चरण: 26 जून – 09 जुलाई 2026' : 'Phase 3: 26 Jun – 09 Jul 2026'}
+                        </div>
+                      </div>
+                    )}
+
+                    
                   </div>
+                      
 
                   <div className="msg-meta">
                     <span className="msg-time">{msg.time}</span>
