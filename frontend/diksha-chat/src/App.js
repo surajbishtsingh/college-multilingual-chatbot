@@ -43,7 +43,7 @@ const LANGUAGES = [
 
 const QUICK_BUTTONS = [
   { label: 'Admissions', query: 'What is the admission process?' },
-  { label: 'Fees',       query: 'What are the fees?' },
+ // { label: 'Fees',       query: 'What are the fees?' },
   { label: 'Hostel',     query: 'How many Hostels are available?' },
   { label: 'Courses',    query: 'What courses are available?' },
   { label: 'Placements', query: 'What is the placement record?' },
