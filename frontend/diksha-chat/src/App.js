@@ -662,17 +662,17 @@ if (q === 'counselling2026') {
       return;
     }
 
-    if (!skipIntent && isFeesQuery(q)) {
-      const txt = language === 'hi'
-        ? 'यहाँ GBPIET की फीस संरचना है:'
-        : 'Here is the fee structure of GBPIET:';
-      setMessages(prev => [...prev, {
-        role: 'diksha', text: txt, lang: language,
-        type: 'fees', time: new Date().toLocaleTimeString()
-      }]);
-      setLoading(false);
-      return;
-    }
+   // if (!skipIntent && isFeesQuery(q)) {
+    //  const txt = language === 'hi'
+     //   ? 'यहाँ GBPIET की फीस संरचना है:'
+      //  : 'Here is the fee structure of GBPIET:';
+    //  setMessages(prev => [...prev, {
+      //  role: 'diksha', text: txt, lang: language,
+       // type: 'fees', time: new Date().toLocaleTimeString()
+     // }]);
+     // setLoading(false);
+     // return;
+  //  }
 
     // ── Backend call ───────────────────────────────────────────────────────
     try {
