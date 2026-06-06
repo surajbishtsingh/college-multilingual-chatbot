@@ -662,7 +662,7 @@ if (q === 'counselling2026') {
       return;
     }
 
-    if (!skipIntent && isFeesQuery(q)) {
+    //if (!skipIntent && isFeesQuery(q)) {
     //  const txt = language === 'hi'
      //   ? 'यहाँ GBPIET की फीस संरचना है:'
       //  : 'Here is the fee structure of GBPIET:';
@@ -670,9 +670,22 @@ if (q === 'counselling2026') {
       //  role: 'diksha', text: txt, lang: language,
        // type: 'fees', time: new Date().toLocaleTimeString()
      // }]);
-     setLoading(false);
-      return;
-   }
+     //setLoading(false);
+     // return;
+  // }
+
+    if (!skipIntent && isFeesQuery(q)) {
+  setMessages(prev => [...prev, {
+    role: 'diksha',
+    text: language === 'hi'
+      ? 'फीस संरचना अभी update हो रही है। जल्द ही उपलब्ध होगी। 🙏'
+      : 'Fee structure is currently being updated. Please check back soon. 🙏',
+    lang: language,
+    time: new Date().toLocaleTimeString()
+  }]);
+  setLoading(false);
+  return;
+}
 
     // ── Backend call ───────────────────────────────────────────────────────
     try {
