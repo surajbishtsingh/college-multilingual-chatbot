@@ -121,6 +121,7 @@ function CourseDropdown({ lang }) {
   const [openPG, setOpenPG] = useState(false);
 
   const ugCourses = [
+    { name: 'BCA',                  seats: 'Intake:40', years: '3 yr' },
     { name: 'B.Tech CSE',           seats: 'Intake:60', years: '4 yr' },
     { name: 'B.Tech CSE (AI & ML)', seats: 'Intake:60', years: '4 yr' },
     { name: 'B.Tech ECE',           seats: 'Intake:60', years: '4 yr' },
@@ -128,7 +129,6 @@ function CourseDropdown({ lang }) {
     { name: 'B.Tech ME',            seats: 'Intake:60', years: '4 yr' },
     { name: 'B.Tech Civil',         seats: 'Intake:60', years: '4 yr' },
     { name: 'B.Tech Biotech',       seats: 'Intake:60', years: '4 yr' },
-    { name: 'BCA',                  seats: 'Intake:40', years: '3 yr' },
   ];
   const pgCourses = [
     { name: 'MCA',                    seats: 'Intake:60', years: '2 yr' },
