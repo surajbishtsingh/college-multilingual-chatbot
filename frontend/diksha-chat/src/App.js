@@ -128,6 +128,7 @@ function CourseDropdown({ lang }) {
     { name: 'B.Tech ME',            seats: 'Intake:60', years: '4 yr' },
     { name: 'B.Tech Civil',         seats: 'Intake:60', years: '4 yr' },
     { name: 'B.Tech Biotech',       seats: 'Intake:60', years: '4 yr' },
+    { name: 'BCA',                  seats: 'Intake:60', years: '3 yr' },
   ];
   const pgCourses = [
     { name: 'MCA',                    seats: 'Intake:60', years: '2 yr' },
