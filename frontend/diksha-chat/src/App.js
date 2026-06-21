@@ -288,6 +288,7 @@ function HostelDropdown({ lang }) {
 function AdmissionDropdown({ lang, onSelect }) {
   const programs = [
     { key: 'btech', label: 'B.Tech',  sub: 'Via JEE Main',  query: 'What is the admission process for B.Tech?' },
+    { key: 'bca',   label: 'BCA',     sub: 'Via VMSBUTU',   query: 'What is the admission process for BCA?' },
     { key: 'mca',   label: 'MCA',     sub: 'Via VMSBUTU',   query: 'What is the admission process for MCA?' },
     { key: 'mtech', label: 'M.Tech',  sub: 'Via GATE',      query: 'What is the admission process for M.Tech?' },
     { key: 'phd',   label: 'PhD',     sub: 'Written Exam',  query: 'What is the admission process for PhD?' },
