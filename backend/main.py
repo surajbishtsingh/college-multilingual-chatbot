@@ -34,7 +34,8 @@ try:
     from language_detector import detect_language
     print("[BOOT] ✅ language_detector OK")
 
-    from rag.kb_query import get_answer, get_qdrant, get_embed_model
+    # ✅ CHANGED: sirf get_answer import kiya — model startup pe load nahi hoga
+    from rag.kb_query import get_answer
     print("[BOOT] ✅ rag.kb_query OK")
 
     from voice import generate_voice
@@ -96,7 +97,7 @@ class ChatRequest(BaseModel):
     session_id:       Optional[str] = None
     is_first_message: bool          = False
     language:         Optional[str] = None
-    section:          Optional[str] = None   # "garhwali"|"kumauni"|"hindi"|"english"
+    section:          Optional[str] = None
 
 
 class ChatResponse(BaseModel):
@@ -112,11 +113,10 @@ class ChatResponse(BaseModel):
 
 app = FastAPI(title="Diksha - GBPIET Chatbot", version="2.0.0")
 
-# ── CORS — allow all origins (mobile + all networks) ─────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],       # ✅ Sab allow — "not connected" fix
-    allow_credentials=False,   # ✅ False zaroori hai jab origins=["*"] ho
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
@@ -131,7 +131,6 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     from rag.bm25_search import build_bm25_index
-    from rag.kb_query import get_embed_model, load_qa_database
 
     print("=" * 60)
     print("[Startup] BEGIN")
@@ -155,22 +154,12 @@ async def startup_event():
         print(f"[Startup] ⚠️ BM25: {e}")
     sys.stdout.flush()
 
-    # 3. QA Database
-    print("[Startup] Step 3: Loading QA database...")
-    try:
-        await run_in_threadpool(load_qa_database)
-        print("[Startup] ✅ QA database ready")
-    except Exception as e:
-        print(f"[Startup] ⚠️ QA database: {e}")
+    # 3. ✅ CHANGED: QA Database — pehli request pe load hoga, startup pe nahi
+    print("[Startup] Step 3: QA database — lazy load enabled ✅ (memory saved)")
     sys.stdout.flush()
 
-    # 4. Qdrant
-    print("[Startup] Step 4: Qdrant...")
-    try:
-        await asyncio.wait_for(run_in_threadpool(get_qdrant), timeout=15)
-        print("[Startup] ✅ Qdrant connected")
-    except Exception as e:
-        print(f"[Startup] ⚠️ Qdrant: {e}")
+    # 4. ✅ CHANGED: Qdrant — pehli request pe connect hoga, startup pe nahi
+    print("[Startup] Step 4: Qdrant — lazy load enabled ✅ (memory saved)")
     sys.stdout.flush()
 
     # 5. Scheduler
@@ -182,14 +171,14 @@ async def startup_event():
         print(f"[Startup] ⚠️ Scheduler: {e}")
     sys.stdout.flush()
 
-    # 6. Auto-scrape if gbpiet_web collection is empty
+    # 6. Auto-scrape check
     print("[Startup] Step 6: Checking Qdrant data...")
     try:
         from qdrant_setup import get_client as _get_qdrant
         _qc   = _get_qdrant()
         _info = _qc.get_collection("gbpiet_web")
         if _info.points_count < 10:
-            print(f"[Startup] ⚠️ Qdrant website has only {_info.points_count} points — auto-scraping...")
+            print(f"[Startup] ⚠️ Only {_info.points_count} points — auto-scraping...")
             import threading
             def _auto_scrape():
                 try:
@@ -204,7 +193,6 @@ async def startup_event():
         print(f"[Startup] ⚠️ Auto-scrape check: {e}")
     sys.stdout.flush()
 
-    # ── Environment Summary ───────────────────────────────────────────
     print("-" * 60)
     print("[Startup] Environment:")
     print(f"  Groq Key 1 : {'✅' if os.getenv('GROQ_API_KEY')   else '❌ NOT SET'}")
@@ -250,7 +238,6 @@ async def shutdown_event():
 # ROUTES
 # ═══════════════════════════════════════════════
 
-# ── OPTIONS preflight — mobile browsers ke liye ZAROORI ─────────────
 @app.options("/{full_path:path}")
 async def options_handler(full_path: str, request: Request):
     origin = request.headers.get("origin", "*")
@@ -265,7 +252,6 @@ async def options_handler(full_path: str, request: Request):
     )
 
 
-# ── robots.txt — search crawlers ke liye ─────────────────────────────
 @app.get("/robots.txt", response_class=PlainTextResponse)
 def robots_txt():
     return "User-agent: *\nDisallow: /admin/\nAllow: /"
@@ -306,7 +292,6 @@ async def health_check():
 async def chat(request: ChatRequest, req: Request):
     session_id = request.session_id or str(uuid.uuid4())
 
-    # ── Language resolution — 3 level priority ────────────────────────
     if request.section and request.section.lower().strip() in SECTION_TO_LANG:
         lang = SECTION_TO_LANG[request.section.lower().strip()]
         print(f"[Chat] Lang from section='{request.section}' → '{lang}'")
@@ -358,17 +343,13 @@ async def scrape_now(background_tasks: BackgroundTasks):
     return {"message": "Scrape job started in background"}
 
 
-# ── Evaluation endpoint — Confusion Matrix ───────────────────────────
 @app.get("/evaluate")
 async def evaluate_chatbot(background_tasks: BackgroundTasks):
-    """Run confusion matrix evaluation — results appear in Railway logs."""
-
     def _run():
         try:
             from rag.kb_query import get_answer, is_out_of_scope
             from language_detector import detect_language
 
-            # ── Test Data ─────────────────────────────────────────────
             LANG_TESTS = [
                 ("What are the fees for BTech?",        "en"),
                 ("Who is the director of GBPIET?",      "en"),
@@ -418,7 +399,6 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
                 ("admission process",    "en", ["admission", "jee", "application", "rank"]),
             ]
 
-            # ── Test 1: Language Detection ────────────────────────────
             print("\n[EVAL] ══════════════════════════════════")
             print("[EVAL]   TEST 1: LANGUAGE DETECTION")
             print("[EVAL] ══════════════════════════════════")
@@ -438,7 +418,6 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
             lang_acc = lang_correct / len(LANG_TESTS) * 100
             print(f"[EVAL] Language Accuracy: {lang_acc:.1f}% ({lang_correct}/{len(LANG_TESTS)})")
 
-            # Confusion matrix (text)
             labels = ["en", "hi", "ga", "ku"]
             print("\n[EVAL] Confusion Matrix (Language):")
             print(f"[EVAL] {'':8}", end="")
@@ -451,28 +430,23 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
                     print(f"{count:>6}", end="")
                 print()
 
-            # ── Test 2: Scope Detection ───────────────────────────────
             print("\n[EVAL] ══════════════════════════════════")
             print("[EVAL]   TEST 2: SCOPE DETECTION")
             print("[EVAL] ══════════════════════════════════")
 
-            scope_actual    = []
-            scope_predicted = []
-            scope_correct   = 0
+            scope_correct = 0
             tp = fp = tn = fn = 0
 
             for q, should_in_scope in SCOPE_TESTS:
-                is_oos          = is_out_of_scope(q)
-                detected_in     = not is_oos
-                ok              = detected_in == should_in_scope
+                is_oos      = is_out_of_scope(q)
+                detected_in = not is_oos
+                ok          = detected_in == should_in_scope
                 if ok: scope_correct += 1
 
                 exp_label = "in_scope"  if should_in_scope else "out_scope"
                 det_label = "in_scope"  if detected_in     else "out_scope"
-                scope_actual.append(exp_label)
-                scope_predicted.append(det_label)
 
-                if should_in_scope and detected_in:     tp += 1
+                if should_in_scope and detected_in:           tp += 1
                 elif not should_in_scope and not detected_in: tn += 1
                 elif not should_in_scope and detected_in:     fp += 1
                 else:                                         fn += 1
@@ -484,7 +458,7 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
             recall    = tp / (tp + fn) if (tp + fn) > 0 else 0
             f1        = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
 
-            print(f"[EVAL] Scope Accuracy : {scope_acc:.1f}% ({scope_correct}/{len(SCOPE_TESTS)})")
+            print(f"[EVAL] Scope Accuracy : {scope_acc:.1f}%")
             print(f"[EVAL] Precision      : {precision*100:.1f}%")
             print(f"[EVAL] Recall         : {recall*100:.1f}%")
             print(f"[EVAL] F1 Score       : {f1*100:.1f}%")
@@ -493,13 +467,12 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
             print(f"[EVAL] in_scope  :  {tp:>6}    {fn:>6}")
             print(f"[EVAL] out_scope :  {fp:>6}    {tn:>6}")
 
-            # ── Test 3: Answer Quality ────────────────────────────────
             print("\n[EVAL] ══════════════════════════════════")
             print("[EVAL]   TEST 3: ANSWER QUALITY")
             print("[EVAL] ══════════════════════════════════")
 
-            ans_correct  = 0
-            ans_wrong    = 0
+            ans_correct   = 0
+            ans_wrong     = 0
             ans_no_answer = 0
 
             for q, lang, keywords in ANS_TESTS:
@@ -522,25 +495,15 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
                     ans_no_answer += 1
                     print(f"[EVAL] ❌ [{lang}] {q[:40]} → ERROR: {e}")
 
-            total_ans = len(ANS_TESTS)
-            ans_acc   = ans_correct / total_ans * 100
-            print(f"\n[EVAL] Answer Quality : {ans_acc:.1f}% ({ans_correct}/{total_ans})")
-            print(f"[EVAL] Correct        : {ans_correct}")
-            print(f"[EVAL] Wrong          : {ans_wrong}")
-            print(f"[EVAL] No Answer      : {ans_no_answer}")
-            print(f"\n[EVAL] Confusion Matrix (Answer):")
-            print(f"[EVAL]            correct  wrong  no_answer")
-            print(f"[EVAL] correct :  {ans_correct:>6}  {ans_wrong:>5}  {ans_no_answer:>8}")
-
-            # ── Final Summary ─────────────────────────────────────────
+            ans_acc = ans_correct / len(ANS_TESTS) * 100
             overall = (lang_acc + scope_acc + ans_acc) / 3
+
             print("\n[EVAL] ══════════════════════════════════")
             print("[EVAL]   FINAL SUMMARY")
             print("[EVAL] ══════════════════════════════════")
             print(f"[EVAL] Language Detection : {lang_acc:.1f}%")
-            print(f"[EVAL] Scope Detection    : {scope_acc:.1f}%  (P:{precision*100:.0f}% R:{recall*100:.0f}% F1:{f1*100:.0f}%)")
+            print(f"[EVAL] Scope Detection    : {scope_acc:.1f}%")
             print(f"[EVAL] Answer Quality     : {ans_acc:.1f}%")
-            print(f"[EVAL] ─────────────────────────────────")
             print(f"[EVAL] Overall Score      : {overall:.1f}%")
             print("[EVAL] ✅ Evaluation complete!")
 
@@ -550,12 +513,11 @@ async def evaluate_chatbot(background_tasks: BackgroundTasks):
 
     background_tasks.add_task(_run)
     return {
-        "message": "✅ Evaluation started — check Railway logs for results",
-        "tip":     "Results will appear in logs within 2-3 minutes",
+        "message": "✅ Evaluation started — check Railway logs",
         "tests": {
-            "language_detection": "16 questions (en/hi/ga/ku)",
-            "scope_detection":    "16 questions (in_scope/out_scope)",
-            "answer_quality":     "8 questions (correct/wrong/no_answer)",
+            "language_detection": "16 questions",
+            "scope_detection":    "16 questions",
+            "answer_quality":     "8 questions",
         }
     }
 
