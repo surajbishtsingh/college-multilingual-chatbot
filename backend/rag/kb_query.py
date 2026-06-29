@@ -4,8 +4,6 @@ import glob
 import re
 import asyncio
 import unicodedata
-from langchain_huggingface import HuggingFaceEmbeddings
-from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -35,35 +33,56 @@ except ImportError:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# GROQ CLIENTS — 4 keys, 8-attempt fallback
+# ✅ LAZY GROQ CLIENTS — startup pe load nahi honge
 # ══════════════════════════════════════════════════════════════════════
-def _make_groq(env_var: str):
-    key = os.getenv(env_var, "").strip()
-    if key:
-        print(f"[GROQ] {env_var} ✅")
-        return Groq(api_key=key)
-    print(f"[GROQ] {env_var} ❌ not set")
-    return None
+_groq1 = None
+_groq2 = None
+_groq3 = None
+_groq4 = None
+_groq_initialized = False
 
-_groq1 = _make_groq("GROQ_API_KEY")
-_groq2 = _make_groq("GROQ_API_KEY_2")
-_groq3 = _make_groq("GROQ_API_KEY_3")
-_groq4 = _make_groq("GROQ_API_KEY_4")
+def _init_groq_clients():
+    """Groq clients sirf pehli baar call hone pe load honge."""
+    global _groq1, _groq2, _groq3, _groq4, _groq_initialized
+    if _groq_initialized:
+        return
+    from groq import Groq
+
+    def _make_groq(env_var: str):
+        key = os.getenv(env_var, "").strip()
+        if key:
+            print(f"[GROQ] {env_var} ✅")
+            return Groq(api_key=key)
+        print(f"[GROQ] {env_var} ❌ not set")
+        return None
+
+    _groq1 = _make_groq("GROQ_API_KEY")
+    _groq2 = _make_groq("GROQ_API_KEY_2")
+    _groq3 = _make_groq("GROQ_API_KEY_3")
+    _groq4 = _make_groq("GROQ_API_KEY_4")
+    _groq_initialized = True
+    print("[GROQ] ✅ All clients initialized")
+
 
 GROQ_PRIMARY  = "llama-3.3-70b-versatile"
 GROQ_FALLBACK = "llama3-70b-8192"
 
-GROQ_ATTEMPTS = [
-    (_groq1, GROQ_PRIMARY,  "Key1/Primary"),
-    (_groq2, GROQ_PRIMARY,  "Key2/Primary"),
-    (_groq3, GROQ_PRIMARY,  "Key3/Primary"),
-    (_groq4, GROQ_PRIMARY,  "Key4/Primary"),
-    (_groq1, GROQ_FALLBACK, "Key1/Fallback"),
-    (_groq2, GROQ_FALLBACK, "Key2/Fallback"),
-    (_groq3, GROQ_FALLBACK, "Key3/Fallback"),
-    (_groq4, GROQ_FALLBACK, "Key4/Fallback"),
-]
+def _get_groq_attempts():
+    """Attempts list dynamically banao taaki lazy init kaam kare."""
+    _init_groq_clients()
+    return [
+        (_groq1, GROQ_PRIMARY,  "Key1/Primary"),
+        (_groq2, GROQ_PRIMARY,  "Key2/Primary"),
+        (_groq3, GROQ_PRIMARY,  "Key3/Primary"),
+        (_groq4, GROQ_PRIMARY,  "Key4/Primary"),
+        (_groq1, GROQ_FALLBACK, "Key1/Fallback"),
+        (_groq2, GROQ_FALLBACK, "Key2/Fallback"),
+        (_groq3, GROQ_FALLBACK, "Key3/Fallback"),
+        (_groq4, GROQ_FALLBACK, "Key4/Fallback"),
+    ]
 
+
+# ✅ LAZY EMBED MODEL — pehli request pe load hoga
 _embed_model = None
 _qa_database = []
 
@@ -73,8 +92,6 @@ GBPIET_URL       = "https://gbpiet.ac.in"
 
 # ══════════════════════════════════════════════════════════════════════
 # ROMAN ↔ DEVANAGARI BRIDGE
-# Used so that Roman-script queries ("hostel kitne h") match
-# Devanagari dataset entries ("GBPIET मा कति हॉस्टल छन्?") and vice-versa
 # ══════════════════════════════════════════════════════════════════════
 ROMAN_TO_DEVANAGARI = {
     "hostel":      "हॉस्टल",
@@ -154,12 +171,11 @@ ROMAN_TO_DEVANAGARI = {
     "ieee":        "आईईईई",
 }
 
-# Reverse map: Devanagari → Roman
 DEVANAGARI_TO_ROMAN = {v: k for k, v in ROMAN_TO_DEVANAGARI.items()}
 
 
 # ══════════════════════════════════════════════════════════════════════
-# GROQ CALL — 8 attempts, then Gemini
+# GROQ CALL — lazy init + 8 attempts + Gemini fallback
 # ══════════════════════════════════════════════════════════════════════
 def _groq_call(client, model, messages, max_tokens, temperature):
     if client is None:
@@ -178,7 +194,7 @@ def _groq_call(client, model, messages, max_tokens, temperature):
 
 
 def groq_call(messages, max_tokens=500, temperature=0.3) -> str:
-    for client, model, label in GROQ_ATTEMPTS:
+    for client, model, label in _get_groq_attempts():
         result = _groq_call(client, model, messages, max_tokens, temperature)
         if result:
             print(f"[LLM] ✅ {label}")
@@ -240,7 +256,6 @@ _SELF_INTRO_PATTERN = re.compile(
 )
 
 def clean_response(text: str) -> str:
-    """Strip emojis, self-intros, salutations, extra whitespace."""
     text = _EMOJI_PATTERN.sub("", text)
     for _ in range(3):
         text = _SELF_INTRO_PATTERN.sub("", text).strip()
@@ -383,18 +398,19 @@ def is_out_of_scope(question: str) -> bool:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# EMBED MODEL + QDRANT
+# ✅ LAZY EMBED MODEL + QDRANT
 # ══════════════════════════════════════════════════════════════════════
-def get_embed_model() -> HuggingFaceEmbeddings:
+def get_embed_model():
     global _embed_model
     if _embed_model is None:
-        print("[Embed] Loading model...")
+        print("[Embed] Loading model... (first request)")
+        from langchain_huggingface import HuggingFaceEmbeddings
         _embed_model = HuggingFaceEmbeddings(
             model_name=EMBED_MODEL_NAME,
             model_kwargs={"device": "cpu"},
             encode_kwargs={"normalize_embeddings": True},
         )
-        print("[Embed] Model loaded")
+        print("[Embed] ✅ Model loaded")
     return _embed_model
 
 
@@ -403,7 +419,7 @@ def get_qdrant():
 
 
 # ══════════════════════════════════════════════════════════════════════
-# QA DATABASE
+# ✅ LAZY QA DATABASE
 # ══════════════════════════════════════════════════════════════════════
 def load_qa_database() -> list:
     global _qa_database
@@ -442,7 +458,7 @@ def load_qa_database() -> list:
         except Exception as e:
             print(f"[DB] Error loading {filepath}: {e}")
 
-    print(f"[DB] Loaded {len(_qa_database)} QA pairs")
+    print(f"[DB] ✅ Loaded {len(_qa_database)} QA pairs")
     return _qa_database
 
 
@@ -577,12 +593,10 @@ HINDI_MAP = {
     'संपर्क': 'contact',           'फोन': 'phone',
     'रजिस्ट्रार': 'registrar',     'कुलसचिव': 'registrar',
     'कितने': 'how many',           'कौन से': 'which',
-    # Garhwali
     'कु': 'who', 'कू': 'who', 'कन': 'how', 'कनकै': 'how',
     'कख': 'where', 'बटि': 'from', 'कुण': 'for',
     'अर': 'and', 'माँ': 'in', 'मा': 'in',
     'मी': 'i me', 'जु': 'who', 'यु': 'this', 'वु': 'that',
-    # Kumauni
     'को': 'who', 'के': 'what', 'कते': 'where',
     'कसि': 'how', 'कतु': 'how much', 'बटी': 'from',
 }
@@ -796,14 +810,12 @@ DIRECT_KEYWORD_MAP = {
     "faculty":   "faculty",     "hod":        "head of department",
     "about":     "about gbpiet","website":    "gbpiet website",
     "h0d":       "head of department", "hods": "head of department",
-    # Hindi
     "रजिस्ट्रार": "registrar",  "निदेशक":   "director",
     "डीन":         "dean",       "प्लेसमेंट": "placement",
     "हॉस्टल":      "hostel",     "फीस":       "fees",
     "प्रवेश":      "admission",  "संपर्क":    "contact",
     "पुस्तकालय":  "library",    "परिवहन":    "transport",
     "रैगिंग":      "ragging",    "संकाय":     "faculty",
-    # Garhwali/Kumauni
     "एडमिशन":      "admission",  "भर्ती":    "admission",
     "नौकरी":        "placement",  "सुविधा":   "facility",
     "भर्ति":        "admission",  "सुबिद":    "facility",
@@ -923,11 +935,11 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
 
     if not q_kw:
         return None
-        
+
     candidates = []
     for item in load_qa_database():
-        if _is_lateral_item(item) and not _is_lateral_query(question):  # ADD THIS
-            continue                                                      # ADD THIS
+        if _is_lateral_item(item) and not _is_lateral_query(question):
+            continue
         s_kw    = get_keywords(item["question"].lower())
         matches = len(q_kw & s_kw)
         score   = matches / max(len(q_kw), len(s_kw), 1)
@@ -955,52 +967,29 @@ def keyword_match(question: str, threshold: int = 2, preferred_lang: str = "en")
     return best["answer"]
 
 
-
-
 # ══════════════════════════════════════════════════════════════════════
-# DATASET-ONLY SEARCH — ga/ku mein sirf dataset se jawab, NO LLM
-# Roman ↔ Devanagari bridge se mixed queries ("hostel kitne h") bhi match
+# DATASET-ONLY SEARCH
 # ══════════════════════════════════════════════════════════════════════
 def _enrich_keywords_roman(kw_set: set, original_text: str) -> set:
-    """
-    Add Devanagari equivalents for Roman words found in query,
-    and Roman equivalents for Devanagari words — so cross-script
-    matching works (e.g. "hostel" ↔ "हॉस्टल").
-    """
     enriched = set(kw_set)
     words = original_text.lower().split()
-
-    # Roman word → add its Devanagari equivalent
     for word in words:
         if word in ROMAN_TO_DEVANAGARI:
             enriched.add(ROMAN_TO_DEVANAGARI[word])
-
-    # Devanagari word → add its Roman equivalent
     for word in list(enriched):
         if word in DEVANAGARI_TO_ROMAN:
             enriched.add(DEVANAGARI_TO_ROMAN[word])
-
     return enriched - STOP
 
 
 def dataset_only_search(question: str, lang: str) -> str | None:
-    """
-    Search ONLY within dataset entries whose lang matches (ga or ku).
-    Uses Roman↔Devanagari bridge so mixed-script queries still match.
-    Returns best answer string or None. No LLM is ever called here.
-    """
     q_fixed = fix_typos(question)
     q_lower = q_fixed.lower()
 
-    # Base keyword set + enriched with bridge
     q_kw_base = get_keywords(q_lower)
     q_kw      = _enrich_keywords_roman(q_kw_base, q_lower)
-
-    # Also build English-translated keyword set
     q_en      = hi_to_en(q_lower)
     q_en_kw   = set(re.findall(r'[a-zA-Z0-9]+', q_en)) - STOP
-
-    # Combine all
     q_all_kw  = q_kw | q_en_kw
 
     if not q_all_kw:
@@ -1012,17 +1001,15 @@ def dataset_only_search(question: str, lang: str) -> str | None:
         item_lang = item.get("lang", "").strip().lower()
         if item_lang != lang:
             continue
-        if _is_lateral_item(item) and not _is_lateral_query(question):  # ADD THIS
-            continue                                                      # ADD THIS
+        if _is_lateral_item(item) and not _is_lateral_query(question):
+            continue
 
-        # Build enriched keyword set for this dataset entry
         s_lower   = item["question"].lower()
         s_kw_base = get_keywords(s_lower)
         s_kw      = _enrich_keywords_roman(s_kw_base, s_lower)
         s_en_kw   = set(re.findall(r'[a-zA-Z0-9]+', hi_to_en(s_lower))) - STOP
         s_all_kw  = s_kw | s_en_kw
 
-        # Count overlapping keywords
         matches = len(q_all_kw & s_all_kw)
         if matches == 0:
             continue
@@ -1040,7 +1027,6 @@ def dataset_only_search(question: str, lang: str) -> str | None:
         print(f"[DATASET_ONLY] No match for lang={lang} q='{question}'")
         return None
 
-    # Sort by match count first, then score
     candidates.sort(key=lambda c: (c["matches"], c["score"]), reverse=True)
     best = candidates[0]
     print(f"[DATASET_ONLY] ✅ lang={lang} matches={best['matches']} score={best['score']:.2f}")
@@ -1060,19 +1046,15 @@ async def rag_search_async(question: str, lang: str = "en") -> dict:
         if lang == "ga":
             if "kb_ga" in COLLECTIONS and "kb_ga" not in collections:
                 collections = ["kb_ga"] + [c for c in collections if c not in ("kb_hi", "kb_ku")]
-            print(f"[RAG] Lang=ga → {collections}")
         elif lang == "ku":
             if "kb_ku" in COLLECTIONS and "kb_ku" not in collections:
                 collections = ["kb_ku"] + [c for c in collections if c not in ("kb_hi", "kb_ga")]
-            print(f"[RAG] Lang=ku → {collections}")
         elif lang == "hi":
             if "kb_hi" not in collections:
                 collections.insert(0, "kb_hi")
-            print(f"[RAG] Lang=hi → {collections}")
         elif lang == "en":
             if "kb_en" not in collections and "kb_en" in COLLECTIONS:
                 collections.insert(0, "kb_en")
-            print(f"[RAG] Lang=en → {collections}")
 
         if "website" not in collections:
             collections.append("website")
@@ -1196,21 +1178,18 @@ LANG_SYSTEM_PROMPTS = {
 # LLM PROMPT BUILDER
 # ══════════════════════════════════════════════════════════════════════
 def build_prompt(question: str, context: str, lang: str, history: str = "") -> str:
-
     no_answer = {
         "en": f"Sorry, I couldn't find that. Please visit {GBPIET_URL} or call 01368-228030.",
         "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें।",
         "ga": f"माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा।",
         "ku": f"माफ़ करिया जी, मीकें यु जानकारी नैं च। {GBPIET_URL} पर जाया।",
     }
-
     lang_instruction = {
         "en": "Answer in ENGLISH ONLY. NEVER start with your name.",
         "hi": "केवल हिंदी में जवाब दो। अपने नाम से शुरू मत करो।",
         "ga": "केवल गढ़वाली भाषा मा जवाब दे। अपणे नाम से शुरू नि करण। गढ़वाली शब्द: छन, छ, अर, कुण, बटि, कनकै।",
         "ku": "केवल कुमाउनी भाषा मा जवाब दे। अपणे नाम से शुरू नि करण। कुमाउनी शब्द: छु, छन, लै, बटा, कनाँ, ज्याणी।",
     }
-
     return f"""{lang_instruction.get(lang, lang_instruction['en'])}
 NEVER repeat the question. Start answer directly.
 NEVER use 'Respected', 'Dear', or introduce yourself.
@@ -1238,7 +1217,6 @@ def detect_response_lang(text: str) -> str:
 
 
 def enforce_language(response: str, expected_lang: str) -> str:
-    """If LLM drifted to wrong language, do one correction pass."""
     if expected_lang not in ("ga", "ku"):
         return response
 
@@ -1282,7 +1260,7 @@ def enforce_language(response: str, expected_lang: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════
-# LLM ANSWER  (only used for hi/en now)
+# LLM ANSWER
 # ══════════════════════════════════════════════════════════════════════
 def llm_answer(question: str, context: str, lang: str, history: str = "") -> str:
     prompt = build_prompt(question, context, lang, history)
@@ -1315,10 +1293,10 @@ def llm_answer(question: str, context: str, lang: str, history: str = "") -> str
 def get_answer(question: str, lang: str = "en", history: str = "") -> str:
     question = question.strip()
 
-    # ── Greeting ──────────────────────────────────────────────────────
     q_lower   = question.lower().strip()
     q_no_name = re.sub(r'\b(diksha|disha|dixa|दीक्षा)\b', '', q_lower).strip()
 
+    # ── Greeting ──────────────────────────────────────────────────────
     if q_lower in GREETINGS or q_no_name in GREETINGS:
         print("[RESULT] Greeting")
         return clean_response(GREETING_RESPONSE.get(lang, GREETING_RESPONSE["en"]))
@@ -1341,7 +1319,7 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
         print(f"[RESULT] User intro — name: {_name}")
         return _intro_resp.get(lang, _intro_resp["en"])
 
-    # ── Out-of-scope check ────────────────────────────────────────────
+    # ── Out-of-scope ──────────────────────────────────────────────────
     if is_out_of_scope(question):
         print("[RESULT] Out of scope")
         return OUT_OF_SCOPE_RESPONSE.get(lang, OUT_OF_SCOPE_RESPONSE["en"])
@@ -1386,7 +1364,6 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
         if ans:
             print(f"[RESULT] Dataset-only match ({lang})")
             return clean_response(ans)
-        # Nothing found in dataset → language-specific fallback
         print(f"[RESULT] No dataset match for lang={lang}")
         fb_ga_ku = {
             "ga": f"माफ़ करया जी, मीथे यु जानकारी नी च। {GBPIET_URL} पर जावा या 01368-228030 पर फोन कर्या।",
@@ -1400,7 +1377,7 @@ def get_answer(question: str, lang: str = "en", history: str = "") -> str:
         print("[RESULT] RAG + LLM")
         return llm_answer(question, ctx, lang, history)
 
-    # ── No match at all ───────────────────────────────────────────────
+    # ── No match ──────────────────────────────────────────────────────
     print("[RESULT] No match")
     fb = {
         "hi": f"माफ़ करें, यह जानकारी नहीं मिली। कृपया {GBPIET_URL} देखें या 01368-228030 पर कॉल करें।",
